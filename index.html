@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mini Market Simulation — Charts</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{ --bg:#0f1724; --card:#0b1220; --muted:#9aa6ab; --accent:#00c853; --danger:#ff5c5c;
+      --glass: rgba(255,255,255,0.03); --up: #16a34a; --down: #ef4444; --neutral: #94a3b8;
+      color-scheme: dark; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    html,body{ height:100%; margin:0; background: linear-gradient(180deg,#071024 0%, #091827 100%); color:#e6eef6; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+    .wrap{ max-width:1200px; margin:20px auto; padding:18px; display:grid; grid-template-columns: 1fr 360px; gap:18px;}
+    header{ grid-column:1/-1; display:flex; gap:12px; align-items:center; justify-content:space-between;}
+    h1{ margin:0; font-size:20px; }
+    .controls{ display:flex; gap:8px; align-items:center; }
+    select, button, input[type="number"]{ background:var(--glass); border:1px solid rgba(255,255,255,0.04); color:var(--muted); padding:8px 10px; border-radius:8px; font-size:14px; }
+    button.primary{ background:linear-gradient(90deg,#1f8bff,#00c3ff); color:white; border:none; padding:9px 12px; border-radius:8px; cursor:pointer; font-weight:600; }
+    .panel{ background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); padding:12px; border-radius:12px; box-shadow: 0 6px 18px rgba(2,6,23,0.6); }
+    .status{ display:flex; gap:14px; align-items:center; font-size:14px; } .status div{ color:var(--muted) } .status strong{ color:#fff; margin-left:6px; font-weight:700; }
+    .news{ margin-top:8px; padding:10px; border-radius:10px; background: linear-gradient(90deg, rgba(2,6,23,0.5), rgba(2,6,23,0.3)); border:1px solid rgba(255,255,255,0.02); }
+    table{ width:100%; border-collapse:collapse; font-size:14px; } th, td{ text-align:left; padding:8px 10px; border-bottom:1px dashed rgba(255,255,255,0.02); color:var(--muted); } th{ color:#a9c0d9; font-weight:600; font-size:13px; }
+    .price-up{ color:var(--up); font-weight:700; } .price-down{ color:var(--down); font-weight:700; } .small{ font-size:12px; color:var(--muted); }
+    .market-col{ display:flex; gap:8px; align-items:center; justify-content:flex-end; } .btn-buy, .btn-sell, .btn-chart{ border:none; padding:6px 8px; border-radius:8px; cursor:pointer; font-weight:600; font-size:13px; }
+    .btn-buy{ background:rgba(16,185,129,0.12); color:var(--up); border:1px solid rgba(16,185,129,0.12); } .btn-sell{ background:rgba(239,68,68,0.08); color:var(--down); border:1px solid rgba(239,68,68,0.08); }
+    .btn-chart{ background:rgba(31,139,255,0.10); color:#9fd7ff; border:1px solid rgba(31,139,255,0.12); }
+    .portfolio-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 0; border-bottom:1px dashed rgba(255,255,255,0.02); }
+    .muted { color:var(--muted); } .center{ text-align:center; } .foot{ grid-column:1/-1; display:flex; justify-content:space-between; gap:12px; margin-top:12px; }
+    .progress{ height:8px; background:rgba(255,255,255,0.03); border-radius:6px; overflow:hidden; } .progress > i{ display:block; height:100%; background:linear-gradient(90deg,#1f8bff,#00c3ff); width:0%; }
+    .big-number{ font-size:18px; font-weight:800; color:#ffffff; } .mini{ font-size:12px; color:var(--muted); }
+    .sector-badge { font-size:12px; padding:4px 8px; border-radius:8px; background: rgba(255,255,255,0.02); color:var(--muted); } .profit-pos { color: var(--up); font-weight:700; } .profit-neg { color: var(--down); font-weight:700; }
+    .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:9999; } 
+    .modal{ width:min(900px, 96%); background: linear-gradient(180deg,#07182a,#061026); border-radius:12px; padding:18px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); color:#eaf6ff; border:1px solid rgba(255,255,255,0.03); }
+    .modal h2{ margin:0 0 8px 0; font-size:18px; } .modal .headline{ font-weight:700; font-size:16px; color:#d8f1ff; } .modal .impact{ margin-top:8px; color:var(--muted); }
+    .explain-box{ margin-top:12px; background: rgba(255,255,255,0.02); border-radius:8px; padding:10px; display:none; color:var(--muted); font-size:13px; line-height:1.4; }
+    .modal .controls{ display:flex; gap:8px; justify-content:flex-end; margin-top:14px; } .modal button{ padding:8px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:700; }
+    .btn-secondary{ background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.03); } .btn-primary{ background:linear-gradient(90deg,#1f8bff,#00c3ff); color:white; }
+    /* chart modal specific */
+    .chart-canvas{ width:100%; height:320px; background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.02)); border-radius:8px; border:1px solid rgba(255,255,255,0.03); }
+    .chart-controls{ display:flex; gap:8px; align-items:center; margin-top:8px; }
+    @media (max-width:980px){ .wrap{ grid-template-columns: 1fr; padding:12px; } .controls{ flex-wrap:wrap; justify-content:flex-start; } .modal{ width:94%; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div style="display:flex;gap:14px;align-items:center;">
+        <h1>Mini Market Simulation</h1>
+      </div>
+
+      <div class="controls">
+        <label class="mini" style="display:none">Difficulty
+          <select id="difficulty" style="display:none"><option value="standard" selected>Standard</option></select>
+        </label>
+
+        <label class="mini">Game length (weeks)
+          <select id="gameLengthWeeks">
+            <option value="12">12 weeks</option>
+            <option value="26">26 weeks</option>
+            <option value="52" selected>52 weeks (1 year)</option>
+          </select>
+        </label>
+
+        <button id="restart" class="primary">Start / Restart</button>
+      </div>
+    </header>
+
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="status">
+          <div>Day <strong id="dayNum">0</strong></div>
+          <div>Cash <strong id="cash">$0</strong></div>
+          <div>Net Worth <strong id="networth">$0</strong></div>
+          <div>Unrealised <strong id="unrealisedTop">$0</strong> <span id="unrealisedTopPct" class="small muted"></span></div>
+        </div>
+        <div style="text-align:right">
+          <div class="mini">Simulation</div>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button id="pauseResume" class="primary">Pause</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="news" id="newsPanel">
+        <div class="small">No news yet — simulation runs weekly automatically.</div>
+      </div>
+
+      <div style="margin-top:12px; overflow:auto; max-height:520px;">
+        <table id="stocksTable" aria-live="polite">
+          <thead>
+            <tr>
+              <th>Stock</th>
+              <th>Price</th>
+              <th class="center">Change</th>
+              <th class="center">Sector</th>
+              <th class="market-col">Action</th>
+            </tr>
+          </thead>
+          <tbody id="stocksBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside>
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div class="mini">Portfolio</div>
+            <div class="big-number" id="portfolioValue">$0</div>
+          </div>
+          <div>
+            <div class="mini">Cash</div>
+            <div class="big-number" id="cashPanel">$0</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div id="portfolioList" class="flex-col small muted">
+            <div class="center small">You don't own any stocks yet.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:10px; font-size:13px; display:none;">
+          <div class="small muted">Total unrealised profit: <strong id="totalProfit">$0</strong> <span id="totalProfitPct" class="small muted"></span></div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px;">
+        <div class="mini">Simulation progress</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+          <div style="flex:1"><div class="progress"><i id="progressBar"></i></div></div>
+          <div class="mini" id="progressText">0/0</div>
+        </div>
+
+        <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0;">
+
+        <div class="mini">Last events</div>
+        <div id="eventsLog" class="small muted" style="margin-top:8px; max-height:160px; overflow:auto;">
+          <div class="center">-</div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px; text-align:center;">
+        <div class="small" style="margin-bottom:8px;">Notes</div>
+        <ul class="small muted" style="padding-left:16px;margin:0;">
+          <li>Weekly news appears and the week's 7 days are applied evenly across the 30s popup.</li>
+          <li>Click Explain to show a short simple explanation. Click Acknowledge to hide the popup early (changes will continue).</li>
+          <li>Use Pause to halt the run.</li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="foot">
+      <div class="small muted">Built for learning & fun — no real money involved.</div>
+      <div class="small muted">Simulation automatically advances week by week.</div>
+    </div>
+  </div>
+
+  <!-- News modal -->
+  <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">News for this Week</h2>
+      <div class="headline" id="modalHeadline">—</div>
+      <div class="impact small" id="modalImpact">Impact: —</div>
+      <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
+        <div class="sector-badge" id="modalSectors">Sectors: —</div>
+      </div>
+      <div class="explain-box" id="explainBox"></div>
+      <div class="controls">
+        <button id="explainBtn" class="btn-secondary">Explain impact</button>
+        <button id="ackBtn" class="btn-primary">Acknowledge (hide popup)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart modal -->
+  <div id="chartOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document" aria-labelledby="chartTitle" style="max-width:920px;">
+      <h2 id="chartTitle">Chart</h2>
+      <div class="headline" id="chartHeadline">—</div>
+      <div class="impact small" id="chartSub">—</div>
+
+      <canvas id="chartCanvas" class="chart-canvas"></canvas>
+
+      <div class="chart-controls">
+        <button id="chartClose" class="btn-secondary">Close</button>
+        <div style="flex:1"></div>
+        <label class="small muted">Mode:</label>
+        <select id="chartMode">
+          <option value="price">Price</option>
+          <option value="value">Value (owned shares)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // -----------------------
+  // Mini Market with per-stock Chart buttons & simple charting
+  // -----------------------
+
+  const STOCKS = [
+    { id: 'technova', name: 'TechNova', sector:'Tech', price: 120, volatility: 1.6 },
+    { id: 'cloudnet', name: 'CloudNet', sector:'Tech', price: 86, volatility: 1.4 },
+    { id: 'micrologic', name: 'MicroLogic', sector:'Tech', price: 152, volatility:1.8 },
+    { id: 'quantumai', name: 'QuantumAI', sector:'Tech', price: 210, volatility:2.2 },
+    { id: 'greenvolt', name: 'GreenVolt', sector:'Energy', price: 54, volatility:1.5 },
+    { id: 'solarwave', name: 'SolarWave', sector:'Energy', price: 64, volatility:1.6 },
+    { id: 'hydrocore', name: 'HydroCore', sector:'Energy', price: 47, volatility:1.4 },
+    { id: 'shophub', name: 'ShopHub', sector:'Retail', price: 38, volatility:1.2 },
+    { id: 'quickmart', name: 'QuickMart', sector:'Retail', price: 92, volatility:1.3 },
+    { id: 'urbanstyle', name: 'UrbanStyle', sector:'Retail', price: 27, volatility:1.5 },
+    { id: 'safebank', name: 'SafeBank', sector:'Finance', price: 74, volatility:1.0 },
+    { id: 'investco', name: 'InvestCo', sector:'Finance', price: 98, volatility:1.2 },
+    { id: 'capitaltrust', name: 'CapitalTrust', sector:'Finance', price: 130, volatility:1.1 },
+    { id: 'aerolink', name: 'AeroLink', sector:'Transport', price: 62, volatility:1.8 },
+    { id: 'speedrail', name: 'SpeedRail', sector:'Transport', price: 44, volatility:1.6 },
+    { id: 'autodrive', name: 'AutoDrive', sector:'Transport', price: 81, volatility:1.7 },
+    { id: 'biogen', name: 'BioGen', sector:'Biotech', price: 156, volatility:2.0 },
+    { id: 'foodchain', name: 'FoodChain', sector:'Consumer', price: 29, volatility:1.1 },
+    { id: 'spaceworks', name: 'SpaceWorks', sector:'Space', price: 230, volatility:2.6 },
+    { id: 'oceantrade', name: 'OceanTrade', sector:'Logistics', price: 49, volatility:1.3 }
+  ];
+
+  const SECTOR_DESCRIPTIONS = {
+    Tech: 'Technology (software, AI, hardware)',
+    Energy: 'Energy — oil & renewables',
+    Retail: 'Retail & e-commerce',
+    Finance: 'Finance & banking',
+    Transport: 'Transport (air, rail, auto)',
+    Biotech: 'Biotechnology & pharma',
+    Consumer: 'Consumer goods & food',
+    Space: 'Aerospace & space tech',
+    Logistics: 'Logistics & shipping',
+    Manufacturing: 'Manufacturing',
+    default: 'Various'
+  };
+
+  // simplified news templates (kept from your last version)
+  const NEWS_TEMPLATES = [
+    { headline: 'Tech stocks surge after AI breakthrough', sectors:['Tech'], impact: 0.15 },
+    { headline: 'Government invests heavily in renewable energy', sectors:['Energy'], impact: 0.12 },
+    { headline: 'Retailers report weak sales this quarter', sectors:['Retail'], impact: -0.10 },
+    { headline: 'Strong GDP growth sparks market optimism', sectors:['market'], impact: 0.08 },
+    { headline: 'Interest rate fears rattle financials', sectors:['Finance'], impact: -0.09 },
+    { headline: 'Transport demand rises with travel reopening', sectors:['Transport'], impact: 0.07 },
+    { headline: 'New drug shows promising trial results', sectors:['Biotech'], impact: 0.25 },
+    { headline: 'Major supplier disruption hits logistics', sectors:['Logistics'], impact: -0.14 },
+    { headline: 'Space startup secures big contract', sectors:['Space'], impact: 0.30 },
+    { headline: 'Food safety scare affects consumer stocks', sectors:['Consumer'], impact: -0.18 },
+    { headline: 'Mixed inflation data — markets uncertain', sectors:['market'], impact: -0.04 },
+    { headline: 'Celebrity brand endorsement sends retail higher', sectors:['Retail'], impact: 0.06 },
+    { headline: 'Oil oversupply concerns weigh on energy', sectors:['Energy'], impact: -0.12 },
+    { headline: 'Bank posts record profits', sectors:['Finance'], impact: 0.10 },
+    { headline: 'Cybersecurity breach at major cloud provider', sectors:['Tech'], impact: -0.20 },
+    { headline: 'Global trade improving — logistics benefits', sectors:['Logistics'], impact: 0.09 },
+    { headline: 'Autonomous vehicle pilot successful', sectors:['Transport'], impact: 0.18 },
+    { headline: 'Shortage of semiconductors continues', sectors:['Tech','Manufacturing'], impact: 0.09 },
+    { headline: 'Large-scale stimulus announced', sectors:['market'], impact: 0.22 },
+    { headline: 'Consumer confidence drops', sectors:['Consumer','Retail'], impact: -0.08 }
+  ];
+
+  // history & game state
+  let game = { stocks: [], day: 0, dayLimit: 365, cash: 10000, portfolio: {}, running:false, events: [], history: [] };
+
+  const STANDARD = {
+    volatilityMultiplier: 1.4,
+    crashChance: 0.065,
+    sectorCrashChance: 0.10,
+    boomChance: 0.055,
+    explosionChance: 0.04,
+    collapseChance: 0.03,
+    startingMoney: 10000
+  };
+
+  // helpers
+  function money(v){ return '$' + Number(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
+  function round2(v){ return Math.round(v*100)/100; }
+  function rand(min,max){ return Math.random()*(max-min)+min; }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  // DOM refs
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalHeadline = document.getElementById('modalHeadline');
+  const modalImpact = document.getElementById('modalImpact');
+  const modalSectors = document.getElementById('modalSectors');
+  const explainBox = document.getElementById('explainBox');
+  const explainBtn = document.getElementById('explainBtn');
+  const ackBtn = document.getElementById('ackBtn');
+  const pauseResumeBtn = document.getElementById('pauseResume');
+
+  // chart elements
+  const chartOverlay = document.getElementById('chartOverlay');
+  const chartHeadline = document.getElementById('chartHeadline');
+  const chartSub = document.getElementById('chartSub');
+  const chartCanvas = document.getElementById('chartCanvas');
+  const chartClose = document.getElementById('chartClose');
+  const chartMode = document.getElementById('chartMode');
+
+  let totalWeeks = 52, currentWeek = 0, runningYear = false, paused = false, weeklyIntervalId = null;
+  const popupDurationMs = 30000; const daysPerWeek = 7;
+
+  // chart state
+  let selectedStockId = null;
+
+  // initialize game data structure
+  function initGame(autoStart=true){
+    totalWeeks = parseInt(document.getElementById('gameLengthWeeks').value,10) || 52;
+    game.stocks = STOCKS.map(s => ({ id: s.id, name: s.name, sector: s.sector, price: s.price, volatility: s.volatility, changePct:0, history:[round2(s.price)]}));
+    game.portfolio = {};
+    game.day = 0;
+    game.events = [];
+    game.history = [];
+    game.cash = STANDARD.startingMoney;
+    game.running = true;
+    currentWeek = 0; runningYear = false; paused = false;
+    clearWeeklyInterval();
+    document.getElementById('eventsLog').innerHTML = '';
+    document.getElementById('newsPanel').innerHTML = `<div class="small">No news yet — simulation will show weekly news popups.</div>`;
+    logEvent(`Simulation started. Running ${totalWeeks} weeks. Starting cash ${money(game.cash)}.`);
+    updateUI();
+    if (autoStart) startYearRun();
+  }
+
+  function renderStocks(){
+    const tbody = document.getElementById('stocksBody'); tbody.innerHTML = '';
+    for (const s of game.stocks){
+      const tr = document.createElement('tr');
+      const nameTd = document.createElement('td'); nameTd.innerHTML = `<strong style="color:white">${s.name}</strong><div class="small muted">${s.id}</div>`;
+      const prev = (s.history.length >= 2) ? s.history[s.history.length-2] : s.history[s.history.length-1];
+      const priceTd = document.createElement('td'); priceTd.innerHTML = `<div style="font-weight:700">${money(s.price)}</div><div class="small muted">Prev: ${money(prev)}</div>`;
+      const changeTd = document.createElement('td'); changeTd.className='center';
+      const pct = s.changePct || 0;
+      if (pct > 0.0001) changeTd.innerHTML = `<span class="price-up">+${(pct*100).toFixed(2)}%</span>`;
+      else if (pct < -0.0001) changeTd.innerHTML = `<span class="price-down">${(pct*100).toFixed(2)}</span>`;
+      else changeTd.innerHTML = `<span class="small muted">0.00%</span>`;
+      const sectorTd = document.createElement('td'); sectorTd.className='center';
+      const desc = SECTOR_DESCRIPTIONS[s.sector] || SECTOR_DESCRIPTIONS.default;
+      sectorTd.innerHTML = `<div class="sector-badge">${s.sector}</div><div class="small muted">${desc}</div>`;
+      const actionTd = document.createElement('td'); actionTd.className='market-col';
+      const buyBtn = document.createElement('button'); buyBtn.className='btn-buy'; buyBtn.textContent='Buy'; buyBtn.onclick = ()=> buyStockPrompt(s.id);
+      const sellBtn = document.createElement('button'); sellBtn.className='btn-sell'; sellBtn.textContent='Sell'; sellBtn.onclick = ()=> sellStockPrompt(s.id);
+      const chartBtn = document.createElement('button'); chartBtn.className='btn-chart'; chartBtn.textContent='Chart'; chartBtn.onclick = ()=> openChart(s.id);
+      actionTd.appendChild(buyBtn); actionTd.appendChild(sellBtn); actionTd.appendChild(chartBtn);
+      tr.appendChild(nameTd); tr.appendChild(priceTd); tr.appendChild(changeTd); tr.appendChild(sectorTd); tr.appendChild(actionTd);
+      tbody.appendChild(tr);
+    }
+  }
+
+  function renderPortfolio(){
+    const list = document.getElementById('portfolioList'); list.innerHTML = '';
+    const holdings = Object.keys(game.portfolio);
+    let totalUnrealised=0, totalCostBasis=0;
+    if (holdings.length === 0){
+      list.innerHTML = `<div class="center small">You don't own any stocks yet.</div>`;
+      document.getElementById('totalProfit').textContent = money(0);
+      document.getElementById('totalProfitPct').textContent = '';
+    } else {
+      for (const id of holdings){
+        const entry = game.portfolio[id]; const s = game.stocks.find(x=>x.id===id);
+        const shares = entry.shares, avg = entry.avgPrice; const cost = round2(shares * avg); const currentVal = round2(shares * s.price);
+        const profit = round2(currentVal - cost); const profitPct = cost>0 ? round2((profit/cost)*100):0;
+        totalUnrealised += profit; totalCostBasis += cost;
+        const row = document.createElement('div'); row.className='portfolio-row';
+        row.innerHTML = `<div>
+          <div style="font-weight:700">${s.name} <span class="small muted">(${s.sector})</span></div>
+          <div class="small muted">${shares} shares · Avg buy: ${money(avg)} · Current: ${money(s.price)}</div>
+          <div class="small muted">Cost: ${money(cost)} · Value: ${money(currentVal)}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+          <div class="${profit >= 0 ? 'profit-pos' : 'profit-neg'}">${profit >=0 ? '+' : ''}${money(profit)} (${profitPct >=0 ? '+' : ''}${profitPct}%)</div>
+          <button class="btn-sell" style="padding:6px 10px;" onclick="sellStockPrompt('${s.id}')">Sell</button>
+        </div>`;
+        list.appendChild(row);
+      }
+      document.getElementById('totalProfit').textContent = `${totalUnrealised >= 0 ? '+' : ''}${money(totalUnrealised)}`;
+      const pctTotal = totalCostBasis>0 ? round2((totalUnrealised/totalCostBasis)*100):0;
+      document.getElementById('totalProfitPct').textContent = `(${pctTotal >= 0 ? '+' : ''}${pctTotal}%)`;
+    }
+
+    // update top unrealised display
+    const topU = document.getElementById('unrealisedTop');
+    const topUPct = document.getElementById('unrealisedTopPct');
+    topU.textContent = `${totalUnrealised >= 0 ? '+' : ''}${money(totalUnrealised)}`;
+    const pctTotalForTop = totalCostBasis>0 ? round2((totalUnrealised/totalCostBasis)*100):0;
+    topUPct.textContent = pctTotalForTop !== 0 ? `(${pctTotalForTop >= 0 ? '+' : ''}${pctTotalForTop}%)` : '';
+
+    const portfolioValue = Object.keys(game.portfolio).reduce((acc,id)=>{ const entry=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return acc + (s.price * entry.shares); },0);
+    document.getElementById('portfolioValue').textContent = money(portfolioValue);
+    document.getElementById('cashPanel').textContent = money(game.cash);
+    document.getElementById('networth').textContent = money(portfolioValue + game.cash);
+    document.getElementById('cash').textContent = money(game.cash);
+    document.getElementById('dayNum').textContent = game.day;
+  }
+
+  // buy/sell
+  function buyStockPrompt(stockId){
+    const s = game.stocks.find(x=>x.id===stockId);
+    const maxShares = Math.floor(game.cash / s.price); if (maxShares <= 0){ alert('Not enough cash to buy any shares of ' + s.name); return; }
+    const raw = prompt(`Buy ${s.name}\nPrice: ${money(s.price)}\nYou can buy up to ${maxShares} shares.\nEnter number of shares to buy:`, "1");
+    if (raw === null) return;
+    const shares = Math.floor(Number(raw)); if (!Number.isFinite(shares) || shares <= 0) { alert('Invalid number'); return; }
+    if (shares > maxShares) { alert('You cannot afford that many shares.'); return; }
+    const prevEntry = game.portfolio[stockId] || {shares:0, avgPrice:0}; const prevShares = prevEntry.shares; const prevAvg = prevEntry.avgPrice;
+    const newTotalShares = prevShares + shares; const newAvg = newTotalShares > 0 ? round2(((prevShares * prevAvg) + (shares * s.price)) / newTotalShares) : s.price;
+    game.cash -= shares * s.price; game.portfolio[stockId] = { shares: newTotalShares, avgPrice: newAvg };
+    logEvent(`Bought ${shares} × ${s.name} for ${money(shares * s.price)} (avg buy now ${money(newAvg)})`);
+    renderPortfolio(); renderStocks();
+  }
+
+  function sellStockPrompt(stockId){
+    const s = game.stocks.find(x=>x.id===stockId); const entry = game.portfolio[stockId] || {shares:0, avgPrice:0}; const owned = entry.shares;
+    if (owned <= 0){ alert('You do not own any shares of ' + s.name); return; }
+    const raw = prompt(`Sell ${s.name}\nPrice: ${money(s.price)}\nYou own ${owned} shares.\nEnter number of shares to sell:`, String(owned));
+    if (raw === null) return; const shares = Math.floor(Number(raw)); if (!Number.isFinite(shares) || shares <= 0) { alert('Invalid number'); return; }
+    if (shares > owned) { alert('You do not own that many shares.'); return; }
+    game.cash += shares * s.price; const remaining = owned - shares; if (remaining === 0) delete game.portfolio[stockId]; else game.portfolio[stockId] = { shares: remaining, avgPrice: entry.avgPrice };
+    logEvent(`Sold ${shares} × ${s.name} for ${money(shares * s.price)}`); renderPortfolio(); renderStocks();
+  }
+
+  function logEvent(text){
+    const el = document.getElementById('eventsLog'); const time = `Day ${game.day}`; const line = document.createElement('div'); line.style.padding='6px 0';
+    line.innerHTML = `<strong style="color:#cfe8ff">${time}:</strong> <span class="small muted">${text}</span>`; el.prepend(line);
+    while (el.children.length > 200) el.removeChild(el.lastChild); game.events.unshift({day:game.day, text});
+  }
+
+  function generateNews(){
+    const chanceFake = Math.random();
+    if (chanceFake < 0.12){
+      const fakeHeadlines = [ 'Local festival announced — little market reaction', 'Minor celebrity tweet — no real market effect', 'Small local event — unlikely to move markets' ];
+      const h = pick(fakeHeadlines); return { headline: h, sectors: [], impact: 0 };
+    }
+    const t = pick(NEWS_TEMPLATES); const variation = rand(0.85,1.25); return { headline: t.headline, sectors: t.sectors, impact: t.impact * variation };
+  }
+
+  // explain (kept simple for modal)
+  function explainNewsSimple(news){
+    if (!news || !news.headline) return 'No news to explain.';
+    if (!Array.isArray(news.sectors) || news.sectors.length === 0) return 'This news is small. It probably will not change many stock prices.';
+    const sectors = news.sectors.join(', '); const sign = news.impact > 0 ? 'up' : (news.impact < 0 ? 'down' : 'no change');
+    const impactSimple = Math.abs(Math.round(news.impact * 100)) + '%';
+    let text = `This headline is about: ${sectors}.`; text += `\n\nWhat it means in simple words:\n• It likely moves the price ${sign} by about ${impactSimple} for that sector.\n• Good news makes prices go up. Bad news makes prices go down.\n\nTip: News can move prices fast, but sometimes the effect is short. Use it to practice decisions.`;
+    return text;
+  }
+
+  // modal behavior and week runner (keeps existing behavior)
+  function showNewsModalAndRunWeek(weeklyNews){
+    clearWeeklyInterval();
+    modalHeadline.innerHTML = weeklyNews.headline;
+    modalImpact.innerHTML = `Impact: ${weeklyNews.impact === 0 ? 'none' : (weeklyNews.impact>0?'+':'') + (weeklyNews.impact*100).toFixed(1) + '%'}`;
+    modalSectors.innerHTML = 'Sectors: ' + (Array.isArray(weeklyNews.sectors) && weeklyNews.sectors.length ? weeklyNews.sectors.join(', ') : 'None / Neutral');
+    explainBox.innerHTML = explainNewsSimple(weeklyNews); explainBox.style.display='none'; explainBtn.textContent='Explain impact';
+    modalOverlay.style.display = 'flex'; modalOverlay.setAttribute('aria-hidden','false');
+
+    const perDayMs = Math.max(200, Math.floor(popupDurationMs / daysPerWeek));
+    let daysApplied = 0;
+    document.getElementById('newsPanel').innerHTML = `<div style="font-weight:700">Upcoming this week:</div><div class="small muted">${weeklyNews.headline} — Impact ${(weeklyNews.impact>0?'+':'') + (weeklyNews.impact*100).toFixed(1)}%</div>`;
+
+    weeklyIntervalId = setInterval(()=>{
+      if (paused) return;
+      if (daysApplied >= daysPerWeek){ clearWeeklyInterval(); return; }
+      applySingleDayWithNews(weeklyNews);
+      daysApplied++;
+      updateProgressUsingWeeks(currentWeek, totalWeeks);
+      if (daysApplied >= daysPerWeek){
+        clearWeeklyInterval();
+        hideModalIfOpen();
+        logEvent(`Week ${currentWeek} finished (7 days simulated).`);
+        setTimeout(()=>{ runNextWeek(); }, 700);
+      }
+    }, perDayMs);
+  }
+
+  function clearWeeklyInterval(){ if (weeklyIntervalId){ clearInterval(weeklyIntervalId); weeklyIntervalId = null; } }
+  function hideModalIfOpen(){ modalOverlay.style.display='none'; modalOverlay.setAttribute('aria-hidden','true'); }
+
+  ackBtn.addEventListener('click', ()=>{ hideModalIfOpen(); });
+  explainBtn.addEventListener('click', ()=>{ if (explainBox.style.display === 'none' || explainBox.style.display === '') { explainBox.style.display = 'block'; explainBtn.textContent = 'Hide explanation'; } else { explainBox.style.display = 'none'; explainBtn.textContent = 'Explain impact'; } });
+
+  // apply a single day using weekly news. IMPORTANT: push updated price into history (closing price)
+  function applySingleDayWithNews(weeklyNews){
+    const news = weeklyNews || {headline:'', sectors:[], impact:0};
+    const diff = STANDARD;
+    game.day++;
+    for (const s of game.stocks){
+      const baseVol = s.volatility * diff.volatilityMultiplier;
+      const basePct = (Math.random()*2 - 1) * baseVol * 0.03;
+      let totalPct = basePct;
+      if (Array.isArray(news.sectors) && news.sectors.includes('market')){
+        totalPct += (news.impact / daysPerWeek);
+      } else if (Array.isArray(news.sectors) && news.sectors.some(ns => ns === s.sector || s.sector.includes(ns))){
+        totalPct += (news.impact / daysPerWeek) * 0.95;
+      }
+      s.changePct = totalPct;
+      const newPrice = Math.max(0.01, round2(s.price * (1 + totalPct)));
+      s.price = newPrice;
+      s.history.push(round2(newPrice)); // IMPORTANT: record closing price
+    }
+
+    // occasional surprises
+    if (Math.random() < diff.explosionChance * 0.08){
+      const target = pick(game.stocks); const g = rand(1.0,2.0); target.changePct += g; target.price = round2(target.price * (1+g)); target.history.push(round2(target.price)); logEvent(`${target.name} sudden surge: +${Math.round(g*100)}%`);
+    }
+    if (Math.random() < diff.collapseChance * 0.06){
+      const target = pick(game.stocks); const l = rand(0.5,0.9); target.changePct -= l; target.price = Math.max(0.01, round2(target.price * (1-l))); target.history.push(round2(target.price)); logEvent(`${target.name} sudden fall: -${Math.round(l*100)}%`);
+    }
+
+    // record day snapshot (networth / portfolio)
+    const portfolioValue = Object.keys(game.portfolio).reduce((acc,id)=>{ const entry=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return acc + (s.price * entry.shares); },0);
+    const networth = round2(game.cash + portfolioValue);
+    game.history.push({ day: game.day, networth, portfolioValue, cash: game.cash });
+
+    renderStocks(); renderPortfolio();
+  }
+
+  function runNextWeek(){
+    if (!runningYear) return;
+    if (paused){ setTimeout(runNextWeek, 1000); return; }
+    if (currentWeek >= totalWeeks){ runningYear = false; logEvent('One-year simulation complete.'); return; }
+    currentWeek++;
+    const weeklyNews = generateNews();
+    logEvent(`Week ${currentWeek} news announced: ${weeklyNews.headline}`);
+    showNewsModalAndRunWeek(weeklyNews);
+  }
+
+  function startYearRun(){ if (runningYear) return; runningYear = true; paused = false; currentWeek = 0; document.getElementById('pauseResume').textContent = 'Pause'; runNextWeek(); }
+
+  pauseResumeBtn.addEventListener('click', ()=>{ paused = !paused; pauseResumeBtn.textContent = paused ? 'Resume' : 'Pause'; if (!paused && runningYear && !weeklyIntervalId){ runNextWeek(); }});
+
+  document.getElementById('restart').addEventListener('click', ()=>{ stopAllAndReset(); initGame(true); });
+  function stopAllAndReset(){ clearWeeklyInterval(); runningYear = false; paused = false; }
+
+  function updateProgressUsingWeeks(week, totalW){
+    const daysSoFar = Math.min(game.day, totalW*7);
+    const daysTotal = totalW*7;
+    const pct = Math.round((daysSoFar / daysTotal) * 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = `${daysSoFar}/${daysTotal} days`;
+  }
+
+  function updateUI(){ renderStocks(); renderPortfolio(); updateProgressUsingWeeks(currentWeek, totalWeeks); }
+  window.addEventListener('load', ()=>{ initGame(true); });
+
+  // -----------------------
+  // Charting functions (plain canvas)
+  // -----------------------
+  function openChart(stockId){
+    selectedStockId = stockId;
+    const s = game.stocks.find(x=>x.id===stockId);
+    if (!s) return;
+    chartHeadline.textContent = `${s.name} — ${s.sector}`;
+    chartSub.textContent = `Current: ${money(s.price)} · History points: ${s.history.length}`;
+    chartMode.value = 'price';
+    chartOverlay.style.display = 'flex';
+    chartOverlay.setAttribute('aria-hidden','false');
+    // give canvas a pixel-size that matches displayed size for crispness
+    setTimeout(()=> renderChart(), 60);
+  }
+
+  chartClose.addEventListener('click', ()=>{ closeChart(); });
+  chartMode.addEventListener('change', ()=>{ renderChart(); });
+
+  function closeChart(){
+    chartOverlay.style.display = 'none';
+    chartOverlay.setAttribute('aria-hidden','true');
+    selectedStockId = null;
+  }
+
+  function renderChart(){
+    if (!selectedStockId) return;
+    const s = game.stocks.find(x=>x.id===selectedStockId);
+    if (!s) return;
+    // resize canvas to match CSS pixels
+    const rect = chartCanvas.getBoundingClientRect();
+    chartCanvas.width = Math.floor(rect.width * devicePixelRatio);
+    chartCanvas.height = Math.floor(rect.height * devicePixelRatio);
+    const ctx = chartCanvas.getContext('2d');
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); // scale for crispness
+
+    // clear
+    ctx.clearRect(0,0,rect.width,rect.height);
+
+    // padding
+    const pad = { l:50, r:12, t:18, b:34 };
+    const W = rect.width, H = rect.height;
+    const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+
+    // prepare series depending on mode
+    const mode = chartMode.value; // 'price' or 'value'
+    let labels = s.history.map((_,i)=> i+1); // day indices relative to history
+    let series = [];
+    if (mode === 'price'){
+      series = s.history.slice(); // prices
+    } else if (mode === 'value'){
+      const entry = game.portfolio[s.id];
+      if (!entry || entry.shares <= 0){
+        // show message: no holdings
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.font = '14px system-ui, Arial';
+        ctx.fillText('You do not currently own shares of this stock — switch to Price mode to view price history.', pad.l, pad.t + 20);
+        // also draw price line in faint color for reference
+        series = s.history.slice();
+      } else {
+        series = s.history.map(p => round2(p * entry.shares)); // value series
+      }
+    }
+
+    // compute min/max
+    let min = Math.min(...series), max = Math.max(...series);
+    if (min === max){
+      min = min * 0.98; max = max * 1.02;
+    }
+    // if value mode and user owns shares, draw cost basis line
+    let costBasisY = null;
+    if (mode === 'value'){
+      const entry = game.portfolio[s.id];
+      if (entry && entry.shares > 0){
+        const cost = round2(entry.shares * entry.avgPrice);
+        costBasisY = cost;
+        min = Math.min(min, cost); max = Math.max(max, cost);
+      }
+    }
+
+    // add small margin
+    const yMargin = (max - min) * 0.08;
+    min -= yMargin; max += yMargin;
+
+    // draw axes
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t);
+    ctx.lineTo(pad.l, pad.t + plotH);
+    ctx.lineTo(pad.l + plotW, pad.t + plotH);
+    ctx.stroke();
+
+    // y ticks (4)
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font = '12px system-ui, Arial';
+    for (let i=0;i<=4;i++){
+      const y = pad.t + (plotH * i / 4);
+      const val = (max - ( (max - min) * i /4 ));
+      ctx.fillText(money(round2(val)), 6, y + 4);
+      // horizontal grid
+      ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+      ctx.beginPath();
+      ctx.moveTo(pad.l, y);
+      ctx.lineTo(pad.l + plotW, y);
+      ctx.stroke();
+    }
+
+    // x ticks (3)
+    const n = series.length;
+    const step = Math.max(1, Math.floor(n / 3));
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    for (let i=0;i<n;i+=step){
+      const x = pad.l + (plotW * i / Math.max(1, n-1));
+      const label = String(i+1);
+      ctx.fillText(label, x-6, pad.t + plotH + 18);
+    }
+    // last label
+    ctx.fillText(String(n), pad.l + plotW - 10, pad.t + plotH + 18);
+
+    // map function
+    function xOf(i){ return pad.l + (plotW * i / Math.max(1, n-1)); }
+    function yOf(v){ return pad.t + ( (max - v) / (max - min) * plotH ); }
+
+    // draw series line
+    ctx.beginPath();
+    for (let i=0;i<n;i++){
+      const x = xOf(i), y = yOf(series[i]);
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle = (mode === 'price' ? '#9fd7ff' : '#7af0a3');
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // fill under curve lightly
+    ctx.lineTo(pad.l + plotW, pad.t + plotH);
+    ctx.lineTo(pad.l, pad.t + plotH);
+    ctx.closePath();
+    ctx.fillStyle = (mode === 'price' ? 'rgba(159,215,255,0.06)' : 'rgba(122,240,163,0.04)');
+    ctx.fill();
+
+    // draw current marker
+    const lastX = xOf(n-1), lastY = yOf(series[n-1]);
+    ctx.beginPath();
+    ctx.fillStyle = '#fff';
+    ctx.arc(lastX, lastY, 3.5, 0, Math.PI*2);
+    ctx.fill();
+
+    // draw cost basis if present
+    if (costBasisY !== null){
+      ctx.strokeStyle = 'rgba(255,185,40,0.9)';
+      ctx.setLineDash([6,6]);
+      ctx.beginPath();
+      ctx.moveTo(pad.l, yOf(costBasisY));
+      ctx.lineTo(pad.l + plotW, yOf(costBasisY));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(255,185,40,0.9)';
+      ctx.fillText('Cost basis: ' + money(costBasisY), pad.l + 6, yOf(costBasisY) - 6);
+    }
+
+    // header (current)
+    ctx.fillStyle = '#d8f1ff';
+    ctx.font = '14px system-ui, Arial';
+    ctx.fillText(`${s.name} · ${s.sector}`, pad.l, 14);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.font = '12px system-ui, Arial';
+    if (mode === 'price'){
+      ctx.fillText(`Current price: ${money(s.price)}`, pad.l + 200, 14);
+    } else {
+      const entry = game.portfolio[s.id];
+      if (entry && entry.shares>0){
+        ctx.fillText(`Shares: ${entry.shares} · Current value: ${money(series[n-1])}`, pad.l + 200, 14);
+      } else {
+        ctx.fillText(`Not owned: showing price history`, pad.l + 200, 14);
+      }
+    }
+  }
+
+  // close chart on outside click
+  chartOverlay.addEventListener('click', (e)=>{ if (e.target === chartOverlay) closeChart(); });
+
+  </script>
+</body>
+</html>
