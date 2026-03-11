@@ -2,75 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Mini Market Simulation — Charts</title>
+  <title>Mini Market Simulation</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Mini Market Simulation - client-side learning game.">
   <style>
-    :root{ --bg:#0f1724; --card:#0b1220; --muted:#9aa6ab; --accent:#00c853; --danger:#ff5c5c;
-      --glass: rgba(255,255,255,0.03); --up: #16a34a; --down: #ef4444; --neutral: #94a3b8;
-      color-scheme: dark; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
-    html,body{ height:100%; margin:0; background: linear-gradient(180deg,#071024 0%, #091827 100%); color:#e6eef6; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
-    .wrap{ max-width:1200px; margin:20px auto; padding:18px; display:grid; grid-template-columns: 1fr 360px; gap:18px;}
-    header{ grid-column:1/-1; display:flex; gap:12px; align-items:center; justify-content:space-between;}
-    h1{ margin:0; font-size:20px; }
-    .controls{ display:flex; gap:8px; align-items:center; }
-    select, button, input[type="number"]{ background:var(--glass); border:1px solid rgba(255,255,255,0.04); color:var(--muted); padding:8px 10px; border-radius:8px; font-size:14px; }
-    button.primary{ background:linear-gradient(90deg,#1f8bff,#00c3ff); color:white; border:none; padding:9px 12px; border-radius:8px; cursor:pointer; font-weight:600; }
-    .panel{ background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); padding:12px; border-radius:12px; box-shadow: 0 6px 18px rgba(2,6,23,0.6); }
-    .status{ display:flex; gap:14px; align-items:center; font-size:14px; } .status div{ color:var(--muted) } .status strong{ color:#fff; margin-left:6px; font-weight:700; }
-    .news{ margin-top:8px; padding:10px; border-radius:10px; background: linear-gradient(90deg, rgba(2,6,23,0.5), rgba(2,6,23,0.3)); border:1px solid rgba(255,255,255,0.02); }
-    table{ width:100%; border-collapse:collapse; font-size:14px; } th, td{ text-align:left; padding:8px 10px; border-bottom:1px dashed rgba(255,255,255,0.02); color:var(--muted); } th{ color:#a9c0d9; font-weight:600; font-size:13px; }
-    .price-up{ color:var(--up); font-weight:700; } .price-down{ color:var(--down); font-weight:700; } .small{ font-size:12px; color:var(--muted); }
-    .market-col{ display:flex; gap:8px; align-items:center; justify-content:flex-end; } .btn-buy, .btn-sell, .btn-chart{ border:none; padding:6px 8px; border-radius:8px; cursor:pointer; font-weight:600; font-size:13px; }
-    .btn-buy{ background:rgba(16,185,129,0.12); color:var(--up); border:1px solid rgba(16,185,129,0.12); } .btn-sell{ background:rgba(239,68,68,0.08); color:var(--down); border:1px solid rgba(239,68,68,0.08); }
-    .btn-chart{ background:rgba(31,139,255,0.10); color:#9fd7ff; border:1px solid rgba(31,139,255,0.12); }
-    .portfolio-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 0; border-bottom:1px dashed rgba(255,255,255,0.02); }
-    .muted { color:var(--muted); } .center{ text-align:center; } .foot{ grid-column:1/-1; display:flex; justify-content:space-between; gap:12px; margin-top:12px; }
-    .progress{ height:8px; background:rgba(255,255,255,0.03); border-radius:6px; overflow:hidden; } .progress > i{ display:block; height:100%; background:linear-gradient(90deg,#1f8bff,#00c3ff); width:0%; }
-    .big-number{ font-size:18px; font-weight:800; color:#ffffff; } .mini{ font-size:12px; color:var(--muted); }
-    .sector-badge { font-size:12px; padding:4px 8px; border-radius:8px; background: rgba(255,255,255,0.02); color:var(--muted); } .profit-pos { color: var(--up); font-weight:700; } .profit-neg { color: var(--down); font-weight:700; }
-    .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:9999; } 
-    .modal{ width:min(900px, 96%); background: linear-gradient(180deg,#07182a,#061026); border-radius:12px; padding:18px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); color:#eaf6ff; border:1px solid rgba(255,255,255,0.03); }
-    .modal h2{ margin:0 0 8px 0; font-size:18px; } .modal .headline{ font-weight:700; font-size:16px; color:#d8f1ff; } .modal .impact{ margin-top:8px; color:var(--muted); }
-    .explain-box{ margin-top:12px; background: rgba(255,255,255,0.02); border-radius:8px; padding:10px; display:none; color:var(--muted); font-size:13px; line-height:1.4; }
-    .modal .controls{ display:flex; gap:8px; justify-content:flex-end; margin-top:14px; } .modal button{ padding:8px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:700; }
-    .btn-secondary{ background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.03); } .btn-primary{ background:linear-gradient(90deg,#1f8bff,#00c3ff); color:white; }
-    /* chart modal specific */
-    .chart-canvas{ width:100%; height:320px; background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.02)); border-radius:8px; border:1px solid rgba(255,255,255,0.03); }
-    .chart-controls{ display:flex; gap:8px; align-items:center; margin-top:8px; }
-    @media (max-width:980px){ .wrap{ grid-template-columns: 1fr; padding:12px; } .controls{ flex-wrap:wrap; justify-content:flex-start; } .modal{ width:94%; } }
+    /* Friendly child-oriented UI + readable sizes */
+    :root{
+      --bg: #f3fbff;
+      --card: #ffffff;
+      --muted: #4b6b7a;
+      --accent: #2b9cf5;
+      --accent-2: #34c38f;
+      --danger: #ff5c5c;
+      --glass: rgba(43,156,245,0.06);
+      --up: #16a34a;
+      --down:#ef4444;
+      --shadow: rgba(11,22,36,0.06);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color-scheme: light;
+    }
+    html,body{ height:100%; margin:0; background: linear-gradient(180deg,#eaf7ff 0%, #f7fbff 100%); color:#072c38; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; font-size:16px; }
+    .wrap{ max-width:1150px; margin:22px auto; padding:18px; display:grid; grid-template-columns: 1fr 360px; gap:18px; align-items:start; }
+    header{ grid-column:1/-1; display:flex; gap:12px; align-items:center; justify-content:space-between; }
+    h1{ margin:0; font-size:22px; color:var(--accent); letter-spacing:0.2px; }
+    .controls{ display:flex; gap:10px; align-items:center; }
+
+    select, button, input[type="number"], input[type="text"]{ background:var(--card); border:1px solid rgba(7,34,40,0.06); color:var(--muted); padding:10px 12px; border-radius:12px; font-size:15px; box-shadow: 0 6px 14px var(--shadow); }
+    button.primary{ background:linear-gradient(90deg,var(--accent), #00c3ff); color:white; border:none; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:800; box-shadow: 0 8px 24px rgba(43,156,245,0.14); }
+    button.ghost{ background:transparent; border:1px solid rgba(7,34,40,0.04); color:var(--muted); padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:700; }
+    .panel{ background:var(--card); border:1px solid rgba(7,34,40,0.04); padding:14px; border-radius:14px; box-shadow: 0 8px 26px rgba(11,22,36,0.04); color:#072c38; }
+    .status{ display:flex; gap:12px; align-items:center; font-size:15px; } .status div{ color:var(--muted) } .status strong{ color:#07303a; margin-left:6px; font-weight:900; }
+
+    .news{ margin-top:10px; padding:12px; border-radius:12px; background: linear-gradient(90deg, rgba(43,156,245,0.03), rgba(52,195,143,0.02)); border:1px solid rgba(43,156,245,0.06); color:#0d3040; }
+    table{ width:100%; border-collapse:collapse; font-size:15px; } th, td{ text-align:left; padding:12px 12px; border-bottom:1px solid rgba(7,34,40,0.04); color:var(--muted); } th{ color:#245a86; font-weight:800; font-size:13px; }
+    .price-up{ color:var(--accent-2); font-weight:800; } .price-down{ color:var(--danger); font-weight:800; } .small{ font-size:13px; color:var(--muted); }
+    .market-col{ display:flex; gap:8px; align-items:center; justify-content:flex-end; } .btn-buy, .btn-sell, .btn-chart{ border:none; padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:800; font-size:14px; box-shadow: 0 6px 12px rgba(2,6,23,0.04); }
+    .btn-buy{ background:rgba(52,195,143,0.12); color:var(--accent-2); border:1px solid rgba(52,195,143,0.12); } .btn-sell{ background:rgba(255,92,92,0.08); color:var(--danger); border:1px solid rgba(255,92,92,0.08); }
+    .btn-chart{ background:rgba(43,156,245,0.10); color:#145f8a; border:1px solid rgba(43,156,245,0.08); }
+
+    .portfolio-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 0; border-bottom:1px dashed rgba(7,34,40,0.03); }
+    .muted { color:var(--muted); } .center{ text-align:center; } .foot{ grid-column:1/-1; display:flex; justify-content:space-between; gap:12px; margin-top:16px; align-items:center; color:var(--muted); font-size:13px; }
+
+    .progress{ height:10px; background:rgba(7,34,40,0.04); border-radius:8px; overflow:hidden; } .progress > i{ display:block; height:100%; background:linear-gradient(90deg,var(--accent), var(--accent-2)); width:0%; }
+    .big-number{ font-size:20px; font-weight:900; color:#0b2a3a; } .mini{ font-size:13px; color:var(--muted); }
+    .sector-badge { font-size:13px; padding:6px 10px; border-radius:10px; background: rgba(43,156,245,0.06); color:#0b2a3a; } .profit-pos { color: var(--accent-2); font-weight:800; } .profit-neg { color: var(--danger); font-weight:800; }
+
+    .modal-overlay{ position:fixed; inset:0; background:rgba(5,25,35,0.55); display:none; align-items:center; justify-content:center; z-index:9999; }
+    .modal{ width:min(920px, 96%); background: linear-gradient(180deg,#ffffff,#fbfeff); border-radius:14px; padding:18px; box-shadow: 0 14px 48px rgba(8,18,26,0.12); color:#07202a; border:1px solid rgba(8,18,26,0.04); }
+    .modal h2{ margin:0 0 8px 0; font-size:20px; } .modal .headline{ font-weight:800; font-size:18px; color:#0b2a3a; } .modal .impact{ margin-top:8px; color:var(--muted); }
+    .explain-box{ margin-top:12px; background: rgba(43,156,245,0.03); border-radius:10px; padding:12px; display:none; color:var(--muted); font-size:14px; line-height:1.5; }
+    .modal .controls{ display:flex; gap:10px; justify-content:flex-end; margin-top:14px; } .modal button{ padding:10px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:800; }
+
+    .btn-secondary{ background:transparent; color:var(--muted); border:1px solid rgba(7,34,40,0.04); } .btn-primary{ background:linear-gradient(90deg,var(--accent), #00c3ff); color:white; }
+
+    .chart-canvas{ width:100%; height:360px; background:linear-gradient(180deg, rgba(43,156,245,0.03), rgba(0,0,0,0.00)); border-radius:10px; border:1px solid rgba(21,50,63,0.04); }
+    .chart-controls{ display:flex; gap:8px; align-items:center; margin-top:10px; }
+
+    /* start overlay */
+    #startOverlay .modal{ max-width:700px; text-align:center; }
+    #startOverlay h2{ font-size:24px; color:var(--accent); margin-bottom:6px; }
+    #startOverlay p{ font-size:16px; color:#11414f; margin:8px 0 18px 0; }
+    #startOverlay button#startBtn{ background:linear-gradient(90deg,var(--accent-2), var(--accent)); color:white; padding:16px 24px; font-size:18px; border-radius:16px; box-shadow: 0 14px 30px rgba(43,156,245,0.16); }
+
+    /* small screens */
+    @media (max-width:980px){
+      .wrap{ grid-template-columns: 1fr; padding:14px; }
+      .controls{ flex-wrap:wrap; justify-content:flex-start; }
+      .modal{ width:94%; }
+      .chart-canvas{ height:260px; }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap" id="appWrap">
     <header>
       <div style="display:flex;gap:14px;align-items:center;">
         <h1>Mini Market Simulation</h1>
+        <div class="small muted" style="margin-left:8px;font-weight:700">Learn & Play</div>
       </div>
 
       <div class="controls">
-        <label class="mini" style="display:none">Difficulty
-          <select id="difficulty" style="display:none"><option value="standard" selected>Standard</option></select>
-        </label>
-
-        <label class="mini">Game length (weeks)
-          <select id="gameLengthWeeks">
+        <label class="mini">Game length
+          <select id="gameLengthWeeks" title="How many weeks in a cycle">
             <option value="12">12 weeks</option>
             <option value="26">26 weeks</option>
-            <option value="52" selected>52 weeks (1 year)</option>
+            <option value="52" selected>52 (1 year)</option>
           </select>
         </label>
 
-        <button id="restart" class="primary">Start / Restart</button>
+        <button id="restart" class="primary" title="Start / Restart">Start / Restart</button>
+        <button id="saveBtn" class="ghost" title="Save your progress locally">Save</button>
+        <button id="loadBtn" class="ghost" title="Load saved progress">Load</button>
+        <button id="clearSaveBtn" class="ghost" title="Clear saved progress">Clear Save</button>
+        <button id="leaderboardBtn" class="ghost" title="View local leaderboard">Leaderboard</button>
+        <!-- New: Market chart quick access -->
+        <button id="marketChartBtn" class="ghost" title="View market / net worth chart">Market Chart</button>
       </div>
     </header>
 
-    <section class="panel">
+    <section class="panel" aria-live="polite">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <div class="status">
           <div>Day <strong id="dayNum">0</strong></div>
           <div>Cash <strong id="cash">$0</strong></div>
           <div>Net Worth <strong id="networth">$0</strong></div>
           <div>Profit <strong id="unrealisedTop">$0</strong> <span id="unrealisedTopPct" class="small muted"></span></div>
+          <!-- New: Market state -->
+          <div>Market <strong id="marketState" class="small muted" style="background:rgba(7,34,40,0.04);padding:6px 8px;border-radius:8px;">—</strong></div>
         </div>
         <div style="text-align:right">
           <div class="mini">Simulation</div>
@@ -80,7 +118,7 @@
         </div>
       </div>
 
-      <div class="news" id="newsPanel">
+      <div class="news" id="newsPanel" aria-live="polite">
         <div class="small">No news yet — simulation runs weekly automatically.</div>
       </div>
 
@@ -118,10 +156,6 @@
             <div class="center small">You don't own any stocks yet.</div>
           </div>
         </div>
-
-        <div style="margin-top:10px; font-size:13px; display:none;">
-          <div class="small muted">Total unrealised profit: <strong id="totalProfit">$0</strong> <span id="totalProfitPct" class="small muted"></span></div>
-        </div>
       </div>
 
       <div class="panel" style="margin-top:12px;">
@@ -131,7 +165,7 @@
           <div class="mini" id="progressText">0/0</div>
         </div>
 
-        <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0;">
+        <hr style="border:none;border-top:1px dashed rgba(7,34,40,0.04);margin:12px 0;">
 
         <div class="mini">Last events</div>
         <div id="eventsLog" class="small muted" style="margin-top:8px; max-height:160px; overflow:auto;">
@@ -141,10 +175,10 @@
 
       <div class="panel" style="margin-top:12px; text-align:center;">
         <div class="small" style="margin-bottom:8px;">Notes</div>
-        <ul class="small muted" style="padding-left:16px;margin:0;">
-          <li>Weekly news appears and the week's 7 days are applied evenly across the 30s popup.</li>
+        <ul class="small muted" style="padding-left:16px;margin:0;text-align:left;">
+          <li>Weekly news appears and the week's 7 days are applied evenly across the popup time.</li>
           <li>Click Explain to show a short simple explanation. Click Acknowledge to hide the popup early (changes will continue).</li>
-          <li>Use Pause to halt the run.</li>
+          <li>Use Pause to halt the run. Save progress to continue later.</li>
         </ul>
       </div>
     </aside>
@@ -152,13 +186,29 @@
     <div class="foot">
       <div class="small muted">Built for learning & fun — no real money involved.</div>
       <div class="small muted">Simulation automatically advances week by week.</div>
+      <div style="margin-left:auto;font-weight:700;color:var(--muted)">Rewritten Beta Version 2 (Testing)</div>
     </div>
   </div>
 
-  <!-- News modal -->
-  <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+  <!-- START overlay -->
+  <div id="startOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="false" style="display:flex;">
+    <div class="modal" role="document" aria-labelledby="startTitle">
+      <h2 id="startTitle">Welcome to Mini Market Simulation</h2>
+      <p>This is a simple, friendly game that simulates a small stock market. You can buy and sell stocks, watch news affect prices, and learn how markets move.</p>
+      <div style="display:flex;gap:12px;justify-content:center;align-items:center;margin-top:10px;">
+        <button id="startBtn">Let's Play!</button>
+      </div>
+      <div class="small muted" style="margin-top:12px;">Rewritten Beta Version 2 (Testing)</div>
+      <div style="margin-top:14px;">
+        <button id="startContinueSaved" class="ghost" style="display:none">Continue saved game</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS modal (weekly) -->
+  <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;">
     <div class="modal" role="document" aria-labelledby="modalTitle">
-      <h2 id="modalTitle">News for this Week</h2>
+      <h2 id="modalTitle">Weekly News</h2>
       <div class="headline" id="modalHeadline">—</div>
       <div class="impact small" id="modalImpact">Impact: —</div>
       <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
@@ -172,8 +222,8 @@
     </div>
   </div>
 
-  <!-- Chart modal -->
-  <div id="chartOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+  <!-- CHART modal -->
+  <div id="chartOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;">
     <div class="modal" role="document" aria-labelledby="chartTitle" style="max-width:920px;">
       <h2 id="chartTitle">Chart</h2>
       <div class="headline" id="chartHeadline">—</div>
@@ -188,540 +238,859 @@
         <select id="chartMode">
           <option value="price">Price</option>
           <option value="value">Value (owned shares)</option>
+          <option value="networth">Net Worth</option>
         </select>
       </div>
     </div>
   </div>
 
-  <script>
-  // -----------------------
-  // Mini Market with per-stock Chart buttons & simple charting
-  // -----------------------
+  <!-- TRADE modal (replaces prompt/alert) -->
+  <div id="tradeOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;">
+    <div class="modal" role="document" aria-labelledby="tradeTitle">
+      <h2 id="tradeTitle">Trade</h2>
+      <div class="headline" id="tradeHeadline">—</div>
+      <div class="small muted" id="tradeInfo">—</div>
 
-  const STOCKS = [
-    { id: 'technova', name: 'TechNova', sector:'Tech', price: 120, volatility: 1.6 },
-    { id: 'cloudnet', name: 'CloudNet', sector:'Tech', price: 86, volatility: 1.4 },
-    { id: 'micrologic', name: 'MicroLogic', sector:'Tech', price: 152, volatility:1.8 },
-    { id: 'quantumai', name: 'QuantumAI', sector:'Tech', price: 210, volatility:2.2 },
-    { id: 'greenvolt', name: 'GreenVolt', sector:'Energy', price: 54, volatility:1.5 },
-    { id: 'solarwave', name: 'SolarWave', sector:'Energy', price: 64, volatility:1.6 },
-    { id: 'hydrocore', name: 'HydroCore', sector:'Energy', price: 47, volatility:1.4 },
-    { id: 'shophub', name: 'ShopHub', sector:'Retail', price: 38, volatility:1.2 },
-    { id: 'quickmart', name: 'QuickMart', sector:'Retail', price: 92, volatility:1.3 },
-    { id: 'urbanstyle', name: 'UrbanStyle', sector:'Retail', price: 27, volatility:1.5 },
-    { id: 'safebank', name: 'SafeBank', sector:'Finance', price: 74, volatility:1.0 },
-    { id: 'investco', name: 'InvestCo', sector:'Finance', price: 98, volatility:1.2 },
-    { id: 'capitaltrust', name: 'CapitalTrust', sector:'Finance', price: 130, volatility:1.1 },
-    { id: 'aerolink', name: 'AeroLink', sector:'Transport', price: 62, volatility:1.8 },
-    { id: 'speedrail', name: 'SpeedRail', sector:'Transport', price: 44, volatility:1.6 },
-    { id: 'autodrive', name: 'AutoDrive', sector:'Transport', price: 81, volatility:1.7 },
-    { id: 'biogen', name: 'BioGen', sector:'Biotech', price: 156, volatility:2.0 },
-    { id: 'foodchain', name: 'FoodChain', sector:'Consumer', price: 29, volatility:1.1 },
-    { id: 'spaceworks', name: 'SpaceWorks', sector:'Space', price: 230, volatility:2.6 },
-    { id: 'oceantrade', name: 'OceanTrade', sector:'Logistics', price: 49, volatility:1.3 }
-  ];
+      <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
+        <label class="small muted">Shares:</label>
+        <input id="tradeShares" type="number" min="1" value="1" style="width:120px" />
+        <div style="flex:1"></div>
+        <div id="tradeCost" class="small muted">Cost: $0</div>
+      </div>
 
-  const SECTOR_DESCRIPTIONS = {
-    Tech: 'Technology (software, AI, hardware)',
-    Energy: 'Energy — oil & renewables',
-    Retail: 'Retail & e-commerce',
-    Finance: 'Finance & banking',
-    Transport: 'Transport (air, rail, auto)',
-    Biotech: 'Biotechnology & pharma',
-    Consumer: 'Consumer goods & food',
-    Space: 'Aerospace & space tech',
-    Logistics: 'Logistics & shipping',
-    Manufacturing: 'Manufacturing',
-    default: 'Various'
-  };
+      <div class="controls" style="margin-top:14px;">
+        <button id="tradeCancel" class="btn-secondary">Cancel</button>
+        <button id="tradeConfirm" class="btn-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
 
-  // simplified news templates (kept from your last version)
-  const NEWS_TEMPLATES = [
-    { headline: 'Tech stocks surge after AI breakthrough', sectors:['Tech'], impact: 0.15 },
-    { headline: 'Government invests heavily in renewable energy', sectors:['Energy'], impact: 0.12 },
-    { headline: 'Retailers report weak sales this quarter', sectors:['Retail'], impact: -0.10 },
-    { headline: 'Strong GDP growth sparks market optimism', sectors:['market'], impact: 0.08 },
-    { headline: 'Interest rate fears rattle financials', sectors:['Finance'], impact: -0.09 },
-    { headline: 'Transport demand rises with travel reopening', sectors:['Transport'], impact: 0.07 },
-    { headline: 'New drug shows promising trial results', sectors:['Biotech'], impact: 0.25 },
-    { headline: 'Major supplier disruption hits logistics', sectors:['Logistics'], impact: -0.14 },
-    { headline: 'Space startup secures big contract', sectors:['Space'], impact: 0.30 },
-    { headline: 'Food safety scare affects consumer stocks', sectors:['Consumer'], impact: -0.18 },
-    { headline: 'Mixed inflation data — markets uncertain', sectors:['market'], impact: -0.04 },
-    { headline: 'Celebrity brand endorsement sends retail higher', sectors:['Retail'], impact: 0.06 },
-    { headline: 'Oil oversupply concerns weigh on energy', sectors:['Energy'], impact: -0.12 },
-    { headline: 'Bank posts record profits', sectors:['Finance'], impact: 0.10 },
-    { headline: 'Cybersecurity breach at major cloud provider', sectors:['Tech'], impact: -0.20 },
-    { headline: 'Global trade improving — logistics benefits', sectors:['Logistics'], impact: 0.09 },
-    { headline: 'Autonomous vehicle pilot successful', sectors:['Transport'], impact: 0.18 },
-    { headline: 'Shortage of semiconductors continues', sectors:['Tech','Manufacturing'], impact: 0.09 },
-    { headline: 'Large-scale stimulus announced', sectors:['market'], impact: 0.22 },
-    { headline: 'Consumer confidence drops', sectors:['Consumer','Retail'], impact: -0.08 }
-  ];
+  <!-- CYCLE COMPLETE modal -->
+  <div id="cycleOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;">
+    <div class="modal" role="document" aria-labelledby="cycleTitle">
+      <h2 id="cycleTitle">Cycle Complete</h2>
+      <div class="small muted" id="cycleSummary">—</div>
+      <p style="margin-top:10px">Do you want to continue for another cycle? Your current stocks will be kept saved if you continue.</p>
+      <div class="controls">
+        <button id="cycleContinue" class="btn-primary">Continue (keep portfolio)</button>
+        <button id="cycleEnd" class="btn-secondary">Finish & Save Score</button>
+      </div>
+    </div>
+  </div>
 
-  // history & game state
-  let game = { stocks: [], day: 0, dayLimit: 365, cash: 10000, portfolio: {}, running:false, events: [], history: [] };
+  <!-- LEADERBOARD modal -->
+  <div id="leaderboardOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;">
+    <div class="modal" role="document" aria-labelledby="leaderboardTitle">
+      <h2 id="leaderboardTitle">Local Leaderboard</h2>
+      <div class="small muted">Top local scores (saved in this browser)</div>
+      <div style="margin-top:12px;">
+        <ol id="leaderboardList" style="padding-left:18px;margin:0;"></ol>
+      </div>
+      <div class="controls" style="margin-top:12px;">
+        <button id="leaderboardClose" class="btn-secondary">Close</button>
+        <button id="leaderboardClear" class="btn-secondary">Clear Local Scores</button>
+      </div>
+    </div>
+  </div>
 
-  const STANDARD = {
-    volatilityMultiplier: 1.4,
-    crashChance: 0.065,
-    sectorCrashChance: 0.10,
-    boomChance: 0.055,
-    explosionChance: 0.04,
-    collapseChance: 0.03,
-    startingMoney: 10000
-  };
+<script>
+/* -----------------------
+   Mini Market Simulation v1 — Enhanced
+   Added features:
+   - Market trend system (Bull/Bear/Sideways) that biases daily returns and news selection.
+   - Sector-based news already present, refined weighting by market state.
+   - Volatility differences per-stock preserved and enhanced with sector volatility map.
+   - Stock price and Net Worth history graph accessible via Market Chart.
+   - Rare global events: lowered probability and added explicit global crash event.
+   ----------------------- */
 
-  // helpers
-  function money(v){ return '$' + Number(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
-  function round2(v){ return Math.round(v*100)/100; }
-  function rand(min,max){ return Math.random()*(max-min)+min; }
-  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+const STORAGE_KEY = 'marketSim_save_v1_enhanced';
+const LEADERBOARD_KEY = 'marketSim_leaderboard_v1';
 
-  // DOM refs
-  const modalOverlay = document.getElementById('modalOverlay');
-  const modalHeadline = document.getElementById('modalHeadline');
-  const modalImpact = document.getElementById('modalImpact');
-  const modalSectors = document.getElementById('modalSectors');
-  const explainBox = document.getElementById('explainBox');
-  const explainBtn = document.getElementById('explainBtn');
-  const ackBtn = document.getElementById('ackBtn');
-  const pauseResumeBtn = document.getElementById('pauseResume');
+const STOCKS_MASTER = [
+  // Tech
+  { id:'technova', name:'TechNova', sector:'Tech', price:120, volatility:1.6 },
+  { id:'cloudnet', name:'CloudNet', sector:'Tech', price:86, volatility:1.4 },
+  { id:'micrologic', name:'MicroLogic', sector:'Tech', price:152, volatility:1.8 },
+  { id:'quantumai', name:'QuantumAI', sector:'Tech', price:210, volatility:2.2 },
+  { id:'chipcore', name:'ChipCore', sector:'Manufacturing', price:94, volatility:1.7 },
 
-  // chart elements
-  const chartOverlay = document.getElementById('chartOverlay');
-  const chartHeadline = document.getElementById('chartHeadline');
-  const chartSub = document.getElementById('chartSub');
-  const chartCanvas = document.getElementById('chartCanvas');
-  const chartClose = document.getElementById('chartClose');
-  const chartMode = document.getElementById('chartMode');
+  // Energy
+  { id:'greenvolt', name:'GreenVolt', sector:'Energy', price:54, volatility:1.5 },
+  { id:'solarwave', name:'SolarWave', sector:'Energy', price:64, volatility:1.6 },
+  { id:'petromax', name:'PetroMax', sector:'Energy', price:88, volatility:1.8 },
 
-  let totalWeeks = 52, currentWeek = 0, runningYear = false, paused = false, weeklyIntervalId = null;
-  const popupDurationMs = 30000; const daysPerWeek = 7;
+  // Retail / Consumer
+  { id:'shophub', name:'ShopHub', sector:'Retail', price:38, volatility:1.2 },
+  { id:'quickmart', name:'QuickMart', sector:'Retail', price:92, volatility:1.3 },
+  { id:'urbanstyle', name:'UrbanStyle', sector:'Retail', price:27, volatility:1.5 },
+  { id:'foodchain', name:'FoodChain', sector:'Consumer', price:29, volatility:1.1 },
 
-  // chart state
-  let selectedStockId = null;
+  // Finance
+  { id:'safebank', name:'SafeBank', sector:'Finance', price:74, volatility:1.0 },
+  { id:'investco', name:'InvestCo', sector:'Finance', price:98, volatility:1.2 },
+  { id:'capitaltrust', name:'CapitalTrust', sector:'Finance', price:130, volatility:1.1 },
 
-  // initialize game data structure
-  function initGame(autoStart=true){
-    totalWeeks = parseInt(document.getElementById('gameLengthWeeks').value,10) || 52;
-    game.stocks = STOCKS.map(s => ({ id: s.id, name: s.name, sector: s.sector, price: s.price, volatility: s.volatility, changePct:0, history:[round2(s.price)]}));
-    game.portfolio = {};
-    game.day = 0;
-    game.events = [];
-    game.history = [];
-    game.cash = STANDARD.startingMoney;
-    game.running = true;
-    currentWeek = 0; runningYear = false; paused = false;
-    clearWeeklyInterval();
-    document.getElementById('eventsLog').innerHTML = '';
-    document.getElementById('newsPanel').innerHTML = `<div class="small">No news yet — simulation will show weekly news popups.</div>`;
-    logEvent(`Simulation started. Running ${totalWeeks} weeks. Starting cash ${money(game.cash)}.`);
-    updateUI();
-    if (autoStart) startYearRun();
+  // Transport
+  { id:'aerolink', name:'AeroLink', sector:'Transport', price:62, volatility:1.8 },
+  { id:'speedrail', name:'SpeedRail', sector:'Transport', price:44, volatility:1.6 },
+  { id:'autodrive', name:'AutoDrive', sector:'Transport', price:81, volatility:1.7 },
+
+  // Biotech / Health
+  { id:'biogen', name:'BioGen', sector:'Biotech', price:156, volatility:2.0 },
+  { id:'pharmatec', name:'PharmaTec', sector:'Biotech', price:88, volatility:1.7 },
+
+  // Space / Logistics
+  { id:'spaceworks', name:'SpaceWorks', sector:'Space', price:230, volatility:2.6 },
+  { id:'oceantrade', name:'OceanTrade', sector:'Logistics', price:49, volatility:1.3 },
+
+  // Defense (for major event interest)
+  { id:'defendix', name:'Defendix', sector:'Defense', price:72, volatility:1.6 },
+
+  // Utilities / Services
+  { id:'cleantech', name:'CleanTech', sector:'Energy', price:50, volatility:1.2 },
+  { id:'edusys', name:'EduSys', sector:'Education', price:34, volatility:1.1 },
+];
+
+const SECTOR_DESCRIPTIONS = {
+  Tech: 'Technology (software, AI, hardware)',
+  Energy: 'Energy — oil & renewables',
+  Retail: 'Retail & e-commerce',
+  Finance: 'Finance & banking',
+  Transport: 'Transport (air, rail, auto)',
+  Biotech: 'Biotech & pharma',
+  Consumer: 'Consumer goods & food',
+  Space: 'Aerospace & space tech',
+  Logistics: 'Logistics & shipping',
+  Manufacturing: 'Manufacturing',
+  Defense: 'Defense & security',
+  Education: 'Education tech & services',
+  default: 'Various'
+};
+
+/* Sector volatility multipliers (so sectors can be inherently more/less volatile) */
+const SECTOR_VOLATILITY = {
+  Tech: 1.1,
+  Biotech: 1.25,
+  Space: 1.4,
+  Energy: 1.1,
+  Finance: 0.9,
+  Retail: 0.95,
+  Transport: 1.05,
+  Logistics: 1.0,
+  Consumer: 0.9,
+  Manufacturing: 1.05,
+  Defense: 1.15,
+  Education: 0.85,
+};
+
+/* News templates: sector -> pct effect (fractional), mood */
+const NEWS_TEMPLATES = [
+  { headline:'AI breakthrough boosts tech stocks', effects:{Tech:0.10}, mood:'pos' },
+  { headline:'Major renewable contract awarded', effects:{Energy:0.09}, mood:'pos' },
+  { headline:'Retail sales disappoint this quarter', effects:{Retail:-0.08, Consumer:-0.04}, mood:'neg' },
+  { headline:'Strong GDP growth lifts markets', effects:{market:0.06}, mood:'pos' },
+  { headline:'Interest rate worries hit banks', effects:{Finance:-0.09}, mood:'neg' },
+  { headline:'Travel demand rebounds', effects:{Transport:0.07, Retail:0.03}, mood:'pos' },
+  { headline:'Promising drug trial announced', effects:{Biotech:0.18}, mood:'pos' },
+  { headline:'Supply chain disruption affects shipping', effects:{Logistics:-0.12, Manufacturing:-0.06}, mood:'neg' },
+  { headline:'Space firm secures government deal', effects:{Space:0.24}, mood:'pos' },
+  { headline:'Food safety scare', effects:{Consumer:-0.16}, mood:'neg' },
+  { headline:'Mixed inflation data — market unsure', effects:{market:-0.03}, mood:'neg' },
+  { headline:'Celebrity endorsement sends retail higher', effects:{Retail:0.05}, mood:'pos' },
+  { headline:'Oil oversupply concerns weigh on energy', effects:{Energy:-0.10}, mood:'neg' },
+  { headline:'Bank posts record profits', effects:{Finance:0.08}, mood:'pos' },
+  { headline:'Cybersecurity breach at cloud provider', effects:{Tech:-0.15}, mood:'neg' },
+  { headline:'Autonomous vehicle pilot successful', effects:{Transport:0.12, Manufacturing:0.05}, mood:'pos' },
+  { headline:'Semiconductor shortage persists', effects:{Tech:-0.06, Manufacturing:-0.08}, mood:'neg' },
+  { headline:'Large-scale stimulus announced', effects:{market:0.20}, mood:'pos' },
+  { headline:'Consumer confidence drops', effects:{Consumer:-0.07, Retail:-0.05}, mood:'neg' },
+  { headline:'Education sector expands government funding', effects:{Education:0.09}, mood:'pos' }
+];
+
+/* Major global events (rare) with multi-sector impacts — includes a global crash */
+const MAJOR_EVENTS = [
+  { title: 'GLOBAL MARKET CRASH', effects:{market:-0.25}, severity:'extreme', desc:'A sudden panic sells off across markets — severe losses.' },
+  { title: 'Major War Breaks Out', effects:{Defense:0.25, Energy:0.12, Transport:-0.18, Consumer:-0.15}, severity:'high', desc:'A major geopolitical conflict affects energy, transport, and safety.' },
+  { title: 'Global Pandemic Scare', effects:{Biotech:0.3, Healthcare:0.2, Travel:-0.25, Retail:-0.18}, severity:'high', desc:'Health emergency disrupts travel and retail, biotech surges.' },
+  { title: 'Oil Shock from Supply Disruption', effects:{Energy:0.28, Transport:-0.12, Manufacturing:-0.08}, severity:'high', desc:'Oil prices spike, energy companies jump.' },
+  { title: 'Global Recession Fears', effects:{market:-0.22, Finance:-0.12, Retail:-0.15, Transport:-0.10}, severity:'high', desc:'Markets tumble on economic contraction fears.' },
+  { title: 'Major Trade Agreement Signed', effects:{Manufacturing:0.16, Logistics:0.12, Tech:0.08}, severity:'medium', desc:'Trade easing boosts manufacturing and logistics.' }
+];
+
+/* Game state */
+let game = { stocks: [], day: 0, dayLimit: 365, cash: 10000, portfolio: {}, running:false, events: [], history: [], cyclesCompleted:0, marketState:'Sideways' };
+const STANDARD = { volatilityMultiplier:1.4, startingMoney:10000, popupDurationMs: 26000 };
+
+/* Helpers */
+function money(v){ return '$' + Number(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function round2(v){ return Math.round(v*100)/100; }
+function rand(min,max){ return Math.random()*(max-min)+min; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* DOM references */
+const startOverlay = document.getElementById('startOverlay'), startBtn = document.getElementById('startBtn'), startContinueSaved = document.getElementById('startContinueSaved');
+const modalOverlay = document.getElementById('modalOverlay'), modalHeadline = document.getElementById('modalHeadline'), modalImpact = document.getElementById('modalImpact'), modalSectors = document.getElementById('modalSectors');
+const explainBox = document.getElementById('explainBox'), explainBtn = document.getElementById('explainBtn'), ackBtn = document.getElementById('ackBtn'), pauseResumeBtn = document.getElementById('pauseResume');
+const chartOverlay = document.getElementById('chartOverlay'), chartHeadline = document.getElementById('chartHeadline'), chartSub = document.getElementById('chartSub'), chartCanvas = document.getElementById('chartCanvas'), chartClose = document.getElementById('chartClose'), chartMode = document.getElementById('chartMode');
+const tradeOverlay = document.getElementById('tradeOverlay'), tradeHeadline = document.getElementById('tradeHeadline'), tradeInfo = document.getElementById('tradeInfo'), tradeShares = document.getElementById('tradeShares'), tradeCost = document.getElementById('tradeCost'), tradeConfirm = document.getElementById('tradeConfirm'), tradeCancel = document.getElementById('tradeCancel');
+const cycleOverlay = document.getElementById('cycleOverlay'), cycleSummary = document.getElementById('cycleSummary'), cycleContinue = document.getElementById('cycleContinue'), cycleEnd = document.getElementById('cycleEnd');
+const leaderboardOverlay = document.getElementById('leaderboardOverlay'), leaderboardList = document.getElementById('leaderboardList'), leaderboardClose = document.getElementById('leaderboardClose'), leaderboardClear = document.getElementById('leaderboardClear');
+const marketStateEl = document.getElementById('marketState'), marketChartBtn = document.getElementById('marketChartBtn');
+
+let weeklyIntervalId = null, totalWeeks = 52, currentWeek = 0, runningYear = false, paused = false;
+let selectedStockId = null, tradeMode = null; // tradeMode = 'buy'|'sell'
+const daysPerWeek = 7;
+
+/* Initialize stocks and UI */
+function initGame(autoStart=true){
+  totalWeeks = parseInt(document.getElementById('gameLengthWeeks').value,10) || 52;
+  // deep copy master stocks
+  game.stocks = STOCKS_MASTER.map(s => ({ id:s.id, name:s.name, sector:s.sector, price:s.price, volatility:s.volatility, changePct:0, history:[round2(s.price)] }));
+  game.portfolio = {};
+  game.day = 0; game.events = []; game.history = []; game.cash = STANDARD.startingMoney; game.running = true; currentWeek = 0; runningYear = false; paused = false;
+  game.marketState = 'Sideways';
+  clearWeeklyInterval();
+  document.getElementById('eventsLog').innerHTML = '';
+  document.getElementById('newsPanel').innerHTML = `<div class="small">No news yet — simulation will show weekly news popups.</div>`;
+  logEvent(`Simulation started. Cycle length ${totalWeeks} weeks. Starting cash ${money(game.cash)}.`);
+  updateUI();
+  if (autoStart) startYearRun();
+}
+
+/* Render stock list */
+function renderStocks(){
+  const tbody = document.getElementById('stocksBody'); tbody.innerHTML = '';
+  for (const s of game.stocks){
+    const tr = document.createElement('tr');
+    const nameTd = document.createElement('td'); nameTd.innerHTML = `<strong style="color:#0b2a3a">${s.name}</strong><div class="small muted">${s.id}</div>`;
+    const prev = (s.history.length >= 2) ? s.history[s.history.length-2] : s.history[s.history.length-1];
+    const priceTd = document.createElement('td'); priceTd.innerHTML = `<div style="font-weight:800">${money(s.price)}</div><div class="small muted">Prev: ${money(prev)}</div>`;
+    const changeTd = document.createElement('td'); changeTd.className='center';
+    const pct = s.changePct || 0;
+    if (pct > 0.0001) changeTd.innerHTML = `<span class="price-up">+${(pct*100).toFixed(2)}%</span>`;
+    else if (pct < -0.0001) changeTd.innerHTML = `<span class="price-down">${(pct*100).toFixed(2)}</span>`;
+    else changeTd.innerHTML = `<span class="small muted">0.00%</span>`;
+    const sectorTd = document.createElement('td'); sectorTd.className='center';
+    const desc = SECTOR_DESCRIPTIONS[s.sector] || SECTOR_DESCRIPTIONS.default;
+    sectorTd.innerHTML = `<div class="sector-badge">${s.sector}</div><div class="small muted">${desc}</div>`;
+    const actionTd = document.createElement('td'); actionTd.className='market-col';
+    const buyBtn = document.createElement('button'); buyBtn.className='btn-buy'; buyBtn.textContent='Buy'; buyBtn.onclick = ()=> openTradeModal('buy', s.id);
+    const sellBtn = document.createElement('button'); sellBtn.className='btn-sell'; sellBtn.textContent='Sell'; sellBtn.onclick = ()=> openTradeModal('sell', s.id);
+    const chartBtn = document.createElement('button'); chartBtn.className='btn-chart'; chartBtn.textContent='Chart'; chartBtn.onclick = ()=> openChart(s.id);
+    actionTd.appendChild(buyBtn); actionTd.appendChild(sellBtn); actionTd.appendChild(chartBtn);
+    tr.appendChild(nameTd); tr.appendChild(priceTd); tr.appendChild(changeTd); tr.appendChild(sectorTd); tr.appendChild(actionTd);
+    tbody.appendChild(tr);
   }
+}
 
-  function renderStocks(){
-    const tbody = document.getElementById('stocksBody'); tbody.innerHTML = '';
-    for (const s of game.stocks){
-      const tr = document.createElement('tr');
-      const nameTd = document.createElement('td'); nameTd.innerHTML = `<strong style="color:white">${s.name}</strong><div class="small muted">${s.id}</div>`;
-      const prev = (s.history.length >= 2) ? s.history[s.history.length-2] : s.history[s.history.length-1];
-      const priceTd = document.createElement('td'); priceTd.innerHTML = `<div style="font-weight:700">${money(s.price)}</div><div class="small muted">Prev: ${money(prev)}</div>`;
-      const changeTd = document.createElement('td'); changeTd.className='center';
-      const pct = s.changePct || 0;
-      if (pct > 0.0001) changeTd.innerHTML = `<span class="price-up">+${(pct*100).toFixed(2)}%</span>`;
-      else if (pct < -0.0001) changeTd.innerHTML = `<span class="price-down">${(pct*100).toFixed(2)}</span>`;
-      else changeTd.innerHTML = `<span class="small muted">0.00%</span>`;
-      const sectorTd = document.createElement('td'); sectorTd.className='center';
-      const desc = SECTOR_DESCRIPTIONS[s.sector] || SECTOR_DESCRIPTIONS.default;
-      sectorTd.innerHTML = `<div class="sector-badge">${s.sector}</div><div class="small muted">${desc}</div>`;
-      const actionTd = document.createElement('td'); actionTd.className='market-col';
-      const buyBtn = document.createElement('button'); buyBtn.className='btn-buy'; buyBtn.textContent='Buy'; buyBtn.onclick = ()=> buyStockPrompt(s.id);
-      const sellBtn = document.createElement('button'); sellBtn.className='btn-sell'; sellBtn.textContent='Sell'; sellBtn.onclick = ()=> sellStockPrompt(s.id);
-      const chartBtn = document.createElement('button'); chartBtn.className='btn-chart'; chartBtn.textContent='Chart'; chartBtn.onclick = ()=> openChart(s.id);
-      actionTd.appendChild(buyBtn); actionTd.appendChild(sellBtn); actionTd.appendChild(chartBtn);
-      tr.appendChild(nameTd); tr.appendChild(priceTd); tr.appendChild(changeTd); tr.appendChild(sectorTd); tr.appendChild(actionTd);
-      tbody.appendChild(tr);
+/* Render portfolio */
+function renderPortfolio(){
+  const list = document.getElementById('portfolioList'); list.innerHTML = '';
+  const holdings = Object.keys(game.portfolio);
+  let totalUnrealised=0, totalCostBasis=0;
+  if (holdings.length === 0){
+    list.innerHTML = `<div class="center small">You don't own any stocks yet.</div>`;
+    const tp = document.getElementById('totalProfit'); if (tp) tp.textContent = money(0);
+  } else {
+    for (const id of holdings){
+      const entry = game.portfolio[id]; const s = game.stocks.find(x=>x.id===id);
+      if(!s) continue;
+      const shares = entry.shares, avg = entry.avgPrice; const cost = round2(shares * avg); const currentVal = round2(shares * s.price);
+      const profit = round2(currentVal - cost); const profitPct = cost>0 ? round2((profit/cost)*100):0;
+      totalUnrealised += profit; totalCostBasis += cost;
+      const row = document.createElement('div'); row.className='portfolio-row';
+      row.innerHTML = `<div>
+        <div style="font-weight:800">${s.name} <span class="small muted">(${s.sector})</span></div>
+        <div class="small muted">${shares} shares · Avg buy: ${money(avg)} · Current: ${money(s.price)}</div>
+        <div class="small muted">Cost: ${money(cost)} · Value: ${money(currentVal)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+        <div class="${profit >= 0 ? 'profit-pos' : 'profit-neg'}">${profit >=0 ? '+' : ''}${money(profit)} (${profitPct >=0 ? '+' : ''}${profitPct}%)</div>
+        <button class="btn-sell" style="padding:8px 12px;" onclick="openTradeModal('sell','${s.id}')">Sell</button>
+      </div>`;
+      list.appendChild(row);
     }
+    // show total
+    const totalProfitEl = document.getElementById('totalProfit'); if (totalProfitEl) totalProfitEl.textContent = `${totalUnrealised >= 0 ? '+' : ''}${money(totalUnrealised)}`;
   }
 
-  function renderPortfolio(){
-    const list = document.getElementById('portfolioList'); list.innerHTML = '';
-    const holdings = Object.keys(game.portfolio);
-    let totalUnrealised=0, totalCostBasis=0;
-    if (holdings.length === 0){
-      list.innerHTML = `<div class="center small">You don't own any stocks yet.</div>`;
-      document.getElementById('totalProfit').textContent = money(0);
-      document.getElementById('totalProfitPct').textContent = '';
+  // update top unrealised
+  const topU = document.getElementById('unrealisedTop'); const topUPct = document.getElementById('unrealisedTopPct');
+  topU.textContent = `${totalUnrealised >= 0 ? '+' : ''}${money(totalUnrealised)}`;
+  const pctTotalForTop = totalCostBasis>0 ? round2((totalUnrealised/totalCostBasis)*100):0;
+  topUPct.textContent = pctTotalForTop !== 0 ? `(${pctTotalForTop >= 0 ? '+' : ''}${pctTotalForTop}%)` : '';
+
+  const portfolioValue = Object.keys(game.portfolio).reduce((acc,id)=>{ const entry=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return acc + (s ? s.price * entry.shares : 0); },0);
+  document.getElementById('portfolioValue').textContent = money(portfolioValue);
+  document.getElementById('cashPanel').textContent = money(game.cash);
+  document.getElementById('networth').textContent = money(portfolioValue + game.cash);
+  document.getElementById('cash').textContent = money(game.cash);
+  document.getElementById('dayNum').textContent = game.day;
+  marketStateEl.textContent = game.marketState;
+}
+
+/* Trade modal (replaces prompt/alert) */
+function openTradeModal(mode, stockId){
+  const s = game.stocks.find(x=>x.id===stockId);
+  if(!s) return;
+  tradeMode = mode; selectedStockId = stockId;
+  tradeHeadline.textContent = `${mode === 'buy' ? 'Buy' : 'Sell'} ${s.name}`;
+  const infoText = mode === 'buy' ? `Price: ${money(s.price)} — You have ${money(game.cash)} cash` : (()=>{ const owned = (game.portfolio[stockId]||{shares:0}).shares; return `Price: ${money(s.price)} — You own ${owned} shares`; })();
+  tradeInfo.textContent = infoText;
+  tradeShares.value = 1;
+  updateTradeCost();
+  tradeOverlay.style.display = 'flex';
+  tradeOverlay.setAttribute('aria-hidden','false');
+  tradeShares.focus();
+}
+function updateTradeCost(){
+  const s = game.stocks.find(x=>x.id===selectedStockId);
+  const shares = Math.max(0, Math.floor(Number(tradeShares.value) || 0));
+  const cost = round2(shares * (s ? s.price : 0));
+  tradeCost.textContent = `Cost: ${money(cost)}`;
+}
+tradeShares.addEventListener('input', updateTradeCost);
+tradeCancel.addEventListener('click', ()=>{ tradeOverlay.style.display='none'; tradeOverlay.setAttribute('aria-hidden','true'); selectedStockId = null; });
+tradeConfirm.addEventListener('click', ()=>{ 
+  const shares = Math.max(0, Math.floor(Number(tradeShares.value) || 0));
+  if (shares <= 0){ alert('Enter a positive number of shares.'); return; }
+  const s = game.stocks.find(x=>x.id===selectedStockId);
+  if (!s) return;
+  if (tradeMode === 'buy'){
+    const max = Math.floor(game.cash / s.price);
+    if (shares > max){ alert('Not enough cash to buy that many shares.'); return; }
+    const prev = game.portfolio[s.id] || {shares:0, avgPrice:0};
+    const newTotal = prev.shares + shares;
+    const newAvg = newTotal>0 ? round2(((prev.shares*prev.avgPrice) + (shares*s.price))/newTotal) : s.price;
+    game.portfolio[s.id] = { shares: newTotal, avgPrice: newAvg };
+    game.cash = round2(game.cash - shares*s.price);
+    logEvent(`Bought ${shares} × ${s.name} for ${money(shares*s.price)}.`);
+  } else {
+    const owned = (game.portfolio[s.id]||{shares:0}).shares;
+    if (owned <= 0){ alert('You do not own any shares.'); return; }
+    if (shares > owned){ alert('You do not own that many shares.'); return; }
+    game.cash = round2(game.cash + shares*s.price);
+    const remaining = owned - shares;
+    if (remaining === 0) delete game.portfolio[s.id]; else game.portfolio[s.id] = { shares: remaining, avgPrice: game.portfolio[s.id].avgPrice };
+    logEvent(`Sold ${shares} × ${s.name} for ${money(shares*s.price)}.`);
+  }
+  tradeOverlay.style.display='none'; tradeOverlay.setAttribute('aria-hidden','true'); selectedStockId = null;
+  renderPortfolio(); renderStocks(); autoSave();
+});
+
+/* Logging */
+function logEvent(text){
+  const el = document.getElementById('eventsLog'); const time = `Day ${game.day}`; const line = document.createElement('div'); line.style.padding='6px 0';
+  line.innerHTML = `<strong style="color:#2b9cf5">${time}:</strong> <span class="small muted">${text}</span>`; el.prepend(line);
+  while (el.children.length > 300) el.removeChild(el.lastChild);
+  game.events.unshift({day:game.day, text});
+}
+
+/* Market state evaluation (Bull/Bear/Sideways)
+   Uses recent market trend (average pct change across stocks over last 7 days).
+   Adds hysteresis to avoid rapid flipping. */
+function evaluateMarketState(){
+  const days = 7;
+  // compute average pct change across all stocks over last N days
+  let sumPct = 0, count = 0;
+  for (const s of game.stocks){
+    const h = s.history;
+    if (h.length < 2) continue;
+    const N = Math.min(days, h.length - 1);
+    let localSum = 0;
+    for (let i=1;i<=N;i++){
+      const prev = h[h.length-1-i], cur = h[h.length-i];
+      if (prev && prev > 0) localSum += (cur - prev)/prev;
+    }
+    if (N>0){ sumPct += localSum / N; count++; }
+  }
+  const avg = count>0 ? sumPct / count : 0;
+
+  // thresholds
+  const bullThreshold = 0.003; // ~0.3% per day average
+  const bearThreshold = -0.003;
+  const prev = game.marketState || 'Sideways';
+  let next = prev;
+
+  if (avg > bullThreshold) next = 'Bull';
+  else if (avg < bearThreshold) next = 'Bear';
+  else next = 'Sideways';
+
+  // add small randomness so it doesn't feel perfectly deterministic (keeps predictability but not certainty)
+  if (prev !== next){
+    // apply hysteresis: only switch if signal strong OR a small chance to flip
+    const strength = Math.abs(avg);
+    if (strength > 0.005 || Math.random() < 0.18) game.marketState = next;
+    // else keep previous to avoid jitter
+  } else {
+    game.marketState = prev;
+  }
+}
+
+/* News generation biased by recent sector trend and market state */
+function sectorTrends(days = 7){
+  // compute average recent % change per sector (last N days) using history if available
+  const trends = {};
+  for (const s of game.stocks){
+    const N = Math.min(days, s.history.length-1);
+    if (N <= 0) continue;
+    const recent = s.history.slice(-N-1);
+    let sumPct = 0;
+    for (let i=1;i<recent.length;i++){
+      sumPct += (recent[i] - recent[i-1]) / recent[i-1];
+    }
+    const avgPct = sumPct / (recent.length-1);
+    trends[s.sector] = (trends[s.sector] || 0) + avgPct;
+  }
+  // average across stocks in each sector
+  const counts = {};
+  for (const s of game.stocks){ counts[s.sector] = (counts[s.sector]||0) + 1; }
+  for (const sec in trends) trends[sec] = trends[sec] / (counts[sec] || 1);
+  return trends;
+}
+
+function generateWeeklyNews(){
+  // very small chance of major global event (rare): 2% chance
+  const majorRoll = Math.random();
+  if (majorRoll < 0.02){ // ~2% chance
+    const e = pick(MAJOR_EVENTS);
+    return { headline: e.title, sectors: Object.keys(e.effects), impactMap: e.effects, major:true, desc: e.desc };
+  }
+
+  // compute sector trends and bias news selection
+  evaluateMarketState(); // keep marketState updated before news selection
+  const trends = sectorTrends(7);
+
+  // choose candidate templates; weight by matching sector trend sign and marketState
+  const weighted = [];
+  for (const t of NEWS_TEMPLATES){
+    let w = 1.0;
+    const targetSectors = Object.keys(t.effects);
+
+    // bias by marketState: bull slightly favors positive mood, bear favors negative mood
+    if (game.marketState === 'Bull' && t.mood === 'pos') w *= 1.6;
+    if (game.marketState === 'Bull' && t.mood === 'neg') w *= 0.7;
+    if (game.marketState === 'Bear' && t.mood === 'neg') w *= 1.6;
+    if (game.marketState === 'Bear' && t.mood === 'pos') w *= 0.7;
+
+    if (targetSectors.includes('market')){
+      const avgTrend = Object.values(trends).reduce((a,b)=>a+(b||0),0) / Math.max(1,Object.keys(trends).length);
+      if ((avgTrend > 0.005 && t.mood === 'pos') || (avgTrend < -0.005 && t.mood === 'neg')) w *= 1.6;
+      else if ((avgTrend > 0 && t.mood === 'neg') || (avgTrend < 0 && t.mood === 'pos')) w *= 0.7;
     } else {
-      for (const id of holdings){
-        const entry = game.portfolio[id]; const s = game.stocks.find(x=>x.id===id);
-        const shares = entry.shares, avg = entry.avgPrice; const cost = round2(shares * avg); const currentVal = round2(shares * s.price);
-        const profit = round2(currentVal - cost); const profitPct = cost>0 ? round2((profit/cost)*100):0;
-        totalUnrealised += profit; totalCostBasis += cost;
-        const row = document.createElement('div'); row.className='portfolio-row';
-        row.innerHTML = `<div>
-          <div style="font-weight:700">${s.name} <span class="small muted">(${s.sector})</span></div>
-          <div class="small muted">${shares} shares · Avg buy: ${money(avg)} · Current: ${money(s.price)}</div>
-          <div class="small muted">Cost: ${money(cost)} · Value: ${money(currentVal)}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
-          <div class="${profit >= 0 ? 'profit-pos' : 'profit-neg'}">${profit >=0 ? '+' : ''}${money(profit)} (${profitPct >=0 ? '+' : ''}${profitPct}%)</div>
-          <button class="btn-sell" style="padding:6px 10px;" onclick="sellStockPrompt('${s.id}')">Sell</button>
-        </div>`;
-        list.appendChild(row);
+      for (const sec of targetSectors){
+        const tr = trends[sec] || 0;
+        if (tr > 0.005 && t.mood === 'pos') w *= 1.5;
+        if (tr < -0.005 && t.mood === 'neg') w *= 1.5;
+        if (tr > 0.005 && t.mood === 'neg') w *= 0.6;
+        if (tr < -0.005 && t.mood === 'pos') w *= 0.6;
       }
-      document.getElementById('totalProfit').textContent = `${totalUnrealised >= 0 ? '+' : ''}${money(totalUnrealised)}`;
-      const pctTotal = totalCostBasis>0 ? round2((totalUnrealised/totalCostBasis)*100):0;
-      document.getElementById('totalProfitPct').textContent = `(${pctTotal >= 0 ? '+' : ''}${pctTotal}%)`;
     }
 
-    // update top unrealised display
-    const topU = document.getElementById('unrealisedTop');
-    const topUPct = document.getElementById('unrealisedTopPct');
-    topU.textContent = `${totalUnrealised >= 0 ? '+' : ''}${money(totalUnrealised)}`;
-    const pctTotalForTop = totalCostBasis>0 ? round2((totalUnrealised/totalCostBasis)*100):0;
-    topUPct.textContent = pctTotalForTop !== 0 ? `(${pctTotalForTop >= 0 ? '+' : ''}${pctTotalForTop}%)` : '';
-
-    const portfolioValue = Object.keys(game.portfolio).reduce((acc,id)=>{ const entry=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return acc + (s.price * entry.shares); },0);
-    document.getElementById('portfolioValue').textContent = money(portfolioValue);
-    document.getElementById('cashPanel').textContent = money(game.cash);
-    document.getElementById('networth').textContent = money(portfolioValue + game.cash);
-    document.getElementById('cash').textContent = money(game.cash);
-    document.getElementById('dayNum').textContent = game.day;
+    // jitter
+    w *= rand(0.8,1.25);
+    weighted.push({t, w});
   }
 
-  // buy/sell
-  function buyStockPrompt(stockId){
-    const s = game.stocks.find(x=>x.id===stockId);
-    const maxShares = Math.floor(game.cash / s.price); if (maxShares <= 0){ alert('Not enough cash to buy any shares of ' + s.name); return; }
-    const raw = prompt(`Buy ${s.name}\nPrice: ${money(s.price)}\nYou can buy up to ${maxShares} shares.\nEnter number of shares to buy:`, "1");
-    if (raw === null) return;
-    const shares = Math.floor(Number(raw)); if (!Number.isFinite(shares) || shares <= 0) { alert('Invalid number'); return; }
-    if (shares > maxShares) { alert('You cannot afford that many shares.'); return; }
-    const prevEntry = game.portfolio[stockId] || {shares:0, avgPrice:0}; const prevShares = prevEntry.shares; const prevAvg = prevEntry.avgPrice;
-    const newTotalShares = prevShares + shares; const newAvg = newTotalShares > 0 ? round2(((prevShares * prevAvg) + (shares * s.price)) / newTotalShares) : s.price;
-    game.cash -= shares * s.price; game.portfolio[stockId] = { shares: newTotalShares, avgPrice: newAvg };
-    logEvent(`Bought ${shares} × ${s.name} for ${money(shares * s.price)} (avg buy now ${money(newAvg)})`);
-    renderPortfolio(); renderStocks();
+  const totalW = weighted.reduce((a,b)=>a+b.w,0);
+  let r = Math.random() * totalW;
+  for (const item of weighted){
+    if (r < item.w) return { headline: item.t.headline, sectors: Object.keys(item.t.effects), impactMap: item.t.effects, major:false };
+    r -= item.w;
   }
+  const t = pick(NEWS_TEMPLATES);
+  return { headline: t.headline, sectors: Object.keys(t.effects), impactMap: t.effects, major:false };
+}
 
-  function sellStockPrompt(stockId){
-    const s = game.stocks.find(x=>x.id===stockId); const entry = game.portfolio[stockId] || {shares:0, avgPrice:0}; const owned = entry.shares;
-    if (owned <= 0){ alert('You do not own any shares of ' + s.name); return; }
-    const raw = prompt(`Sell ${s.name}\nPrice: ${money(s.price)}\nYou own ${owned} shares.\nEnter number of shares to sell:`, String(owned));
-    if (raw === null) return; const shares = Math.floor(Number(raw)); if (!Number.isFinite(shares) || shares <= 0) { alert('Invalid number'); return; }
-    if (shares > owned) { alert('You do not own that many shares.'); return; }
-    game.cash += shares * s.price; const remaining = owned - shares; if (remaining === 0) delete game.portfolio[stockId]; else game.portfolio[stockId] = { shares: remaining, avgPrice: entry.avgPrice };
-    logEvent(`Sold ${shares} × ${s.name} for ${money(shares * s.price)}`); renderPortfolio(); renderStocks();
-  }
+/* Explain news simply */
+function explainNewsSimple(news){
+  if (!news || !news.headline) return 'No news to explain.';
+  if (news.major) return news.desc || 'Major event with wide impacts.';
+  const sec = news.sectors.join(', ');
+  let text = `This news affects: ${sec}.\n`;
+  text += `Short: It will likely move prices for these sectors by roughly the amounts shown in the popup.\n`;
+  text += `Tip: If you expect a positive move, consider buying early; negative — consider selling or holding safer assets.`;
+  return text;
+}
 
-  function logEvent(text){
-    const el = document.getElementById('eventsLog'); const time = `Day ${game.day}`; const line = document.createElement('div'); line.style.padding='6px 0';
-    line.innerHTML = `<strong style="color:#cfe8ff">${time}:</strong> <span class="small muted">${text}</span>`; el.prepend(line);
-    while (el.children.length > 200) el.removeChild(el.lastChild); game.events.unshift({day:game.day, text});
-  }
+/* Apply one day with weekly news: spreads weekly impact across days */
+function applySingleDayWithNews(weeklyNews){
+  const news = weeklyNews || {headline:'', sectors:[], impactMap:{}};
+  game.day++;
+  evaluateMarketState(); // update market state each day based on latest histories
 
-  function generateNews(){
-    const chanceFake = Math.random();
-    if (chanceFake < 0.12){
-      const fakeHeadlines = [ 'Local festival announced — little market reaction', 'Minor celebrity tweet — no real market effect', 'Small local event — unlikely to move markets' ];
-      const h = pick(fakeHeadlines); return { headline: h, sectors: [], impact: 0 };
+  for (const s of game.stocks){
+    // per-stock volatility includes stock.volatility, sector multiplier and a global multiplier
+    const sectorMult = SECTOR_VOLATILITY[s.sector] || 1.0;
+    const baseVol = s.volatility * STANDARD.volatilityMultiplier * sectorMult;
+    // basePct scales with baseVol
+    const basePct = (Math.random()*2 - 1) * baseVol * 0.03;
+    let totalPct = basePct;
+
+    // marketState bias (small daily directional bias)
+    if (game.marketState === 'Bull') totalPct += 0.0025; // small upward bias
+    else if (game.marketState === 'Bear') totalPct -= 0.0025; // small downward bias
+
+    // apply daily fraction of weekly effect if this stock's sector is targeted
+    if (news.impactMap){
+      if (news.impactMap.market){
+        // market-wide effects apply to all stocks
+        totalPct += (news.impactMap.market / daysPerWeek);
+      }
+      // sector-specific
+      if (news.impactMap[s.sector]){
+        // sector effects weighted by sector volatility (big sectors could move more)
+        totalPct += (news.impactMap[s.sector] / daysPerWeek) * 0.95;
+      }
+      // Also small cross-sector spill if the sector is closely related (simple heuristic)
+      // e.g., Manufacturing news slightly affects Tech/Transport etc.
+      // (kept simple: no complex mapping)
     }
-    const t = pick(NEWS_TEMPLATES); const variation = rand(0.85,1.25); return { headline: t.headline, sectors: t.sectors, impact: t.impact * variation };
+
+    s.changePct = totalPct;
+    const newPrice = Math.max(0.01, round2(s.price * (1 + totalPct)));
+    s.price = newPrice;
+    s.history.push(round2(newPrice));
+    // guard history length
+    if (s.history.length > 1000) s.history = s.history.slice(-1000);
   }
 
-  // explain (kept simple for modal)
-  function explainNewsSimple(news){
-    if (!news || !news.headline) return 'No news to explain.';
-    if (!Array.isArray(news.sectors) || news.sectors.length === 0) return 'This news is small. It probably will not change many stock prices.';
-    const sectors = news.sectors.join(', '); const sign = news.impact > 0 ? 'up' : (news.impact < 0 ? 'down' : 'no change');
-    const impactSimple = Math.abs(Math.round(news.impact * 100)) + '%';
-    let text = `This headline is about: ${sectors}.`; text += `\n\nWhat it means in simple words:\n• It likely moves the price ${sign} by about ${impactSimple} for that sector.\n• Good news makes prices go up. Bad news makes prices go down.\n\nTip: News can move prices fast, but sometimes the effect is short. Use it to practice decisions.`;
-    return text;
+  // occasional surprises (small)
+  if (Math.random() < 0.012){
+    const target = pick(game.stocks); const g = rand(0.4,1.4);
+    target.changePct += g; target.price = round2(target.price * (1+g)); target.history.push(round2(target.price)); logEvent(`${target.name} sudden surge: +${Math.round(g*100)}%`);
+  }
+  if (Math.random() < 0.008){
+    const target = pick(game.stocks); const l = rand(0.3,0.85);
+    target.changePct -= l; target.price = Math.max(0.01, round2(target.price * (1-l))); target.history.push(round2(target.price)); logEvent(`${target.name} sudden fall: -${Math.round(l*100)}%`);
   }
 
-  // modal behavior and week runner (keeps existing behavior)
-  function showNewsModalAndRunWeek(weeklyNews){
-    clearWeeklyInterval();
-    modalHeadline.innerHTML = weeklyNews.headline;
-    modalImpact.innerHTML = `Impact: ${weeklyNews.impact === 0 ? 'none' : (weeklyNews.impact>0?'+':'') + (weeklyNews.impact*100).toFixed(1) + '%'}`;
-    modalSectors.innerHTML = 'Sectors: ' + (Array.isArray(weeklyNews.sectors) && weeklyNews.sectors.length ? weeklyNews.sectors.join(', ') : 'None / Neutral');
-    explainBox.innerHTML = explainNewsSimple(weeklyNews); explainBox.style.display='none'; explainBtn.textContent='Explain impact';
-    modalOverlay.style.display = 'flex'; modalOverlay.setAttribute('aria-hidden','false');
+  // snapshot net worth
+  const portfolioValue = Object.keys(game.portfolio).reduce((acc,id)=>{ const entry=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return acc + (s ? s.price * entry.shares : 0); },0);
+  const networth = round2(game.cash + portfolioValue);
+  game.history.push({ day: game.day, networth, portfolioValue, cash: game.cash, marketState: game.marketState });
 
-    const perDayMs = Math.max(200, Math.floor(popupDurationMs / daysPerWeek));
-    let daysApplied = 0;
-    document.getElementById('newsPanel').innerHTML = `<div style="font-weight:700">Upcoming this week:</div><div class="small muted">${weeklyNews.headline} — Impact ${(weeklyNews.impact>0?'+':'') + (weeklyNews.impact*100).toFixed(1)}%</div>`;
+  renderStocks(); renderPortfolio();
+}
 
-    weeklyIntervalId = setInterval(()=>{
-      if (paused) return;
-      if (daysApplied >= daysPerWeek){ clearWeeklyInterval(); return; }
-      applySingleDayWithNews(weeklyNews);
-      daysApplied++;
-      updateProgressUsingWeeks(currentWeek, totalWeeks);
-      if (daysApplied >= daysPerWeek){
-        clearWeeklyInterval();
-        hideModalIfOpen();
-        logEvent(`Week ${currentWeek} finished (7 days simulated).`);
+/* Weekly modal & runner */
+function showNewsModalAndRunWeek(weeklyNews){
+  clearWeeklyInterval();
+  modalHeadline.textContent = weeklyNews.headline;
+  const impactText = weeklyNews.impactMap ? Object.entries(weeklyNews.impactMap).map(([k,v])=>`${k}: ${v>0?'+':''}${(v*100).toFixed(1)}%`).join(' · ') : '—';
+  modalImpact.textContent = impactText;
+  modalSectors.textContent = weeklyNews.sectors && weeklyNews.sectors.length ? weeklyNews.sectors.join(', ') : 'None / Neutral';
+  explainBox.textContent = explainNewsSimple(weeklyNews); explainBox.style.display='none'; explainBtn.textContent='Explain impact';
+  modalOverlay.style.display = 'flex'; modalOverlay.setAttribute('aria-hidden','false');
+
+  const perDayMs = Math.max(200, Math.floor(STANDARD.popupDurationMs / daysPerWeek));
+  let daysApplied = 0;
+  document.getElementById('newsPanel').innerHTML = `<div style="font-weight:700">Upcoming this week:</div><div class="small muted">${weeklyNews.headline}</div>`;
+
+  weeklyIntervalId = setInterval(()=>{
+    if (paused) return;
+    if (daysApplied >= daysPerWeek){ clearWeeklyInterval(); return; }
+    applySingleDayWithNews(weeklyNews);
+    daysApplied++;
+    updateProgressUsingWeeks(currentWeek, totalWeeks);
+    autoSave(); // autosave daily
+    if (daysApplied >= daysPerWeek){
+      clearWeeklyInterval();
+      hideModalIfOpen();
+      logEvent(`Week ${currentWeek} finished (7 days simulated).`);
+      // if cycle finished, trigger cycle complete
+      if (currentWeek >= totalWeeks){
+        setTimeout(()=>{ onCycleComplete(); }, 600);
+      } else {
         setTimeout(()=>{ runNextWeek(); }, 700);
       }
-    }, perDayMs);
-  }
-
-  function clearWeeklyInterval(){ if (weeklyIntervalId){ clearInterval(weeklyIntervalId); weeklyIntervalId = null; } }
-  function hideModalIfOpen(){ modalOverlay.style.display='none'; modalOverlay.setAttribute('aria-hidden','true'); }
-
-  ackBtn.addEventListener('click', ()=>{ hideModalIfOpen(); });
-  explainBtn.addEventListener('click', ()=>{ if (explainBox.style.display === 'none' || explainBox.style.display === '') { explainBox.style.display = 'block'; explainBtn.textContent = 'Hide explanation'; } else { explainBox.style.display = 'none'; explainBtn.textContent = 'Explain impact'; } });
-
-  // apply a single day using weekly news. IMPORTANT: push updated price into history (closing price)
-  function applySingleDayWithNews(weeklyNews){
-    const news = weeklyNews || {headline:'', sectors:[], impact:0};
-    const diff = STANDARD;
-    game.day++;
-    for (const s of game.stocks){
-      const baseVol = s.volatility * diff.volatilityMultiplier;
-      const basePct = (Math.random()*2 - 1) * baseVol * 0.03;
-      let totalPct = basePct;
-      if (Array.isArray(news.sectors) && news.sectors.includes('market')){
-        totalPct += (news.impact / daysPerWeek);
-      } else if (Array.isArray(news.sectors) && news.sectors.some(ns => ns === s.sector || s.sector.includes(ns))){
-        totalPct += (news.impact / daysPerWeek) * 0.95;
-      }
-      s.changePct = totalPct;
-      const newPrice = Math.max(0.01, round2(s.price * (1 + totalPct)));
-      s.price = newPrice;
-      s.history.push(round2(newPrice)); // IMPORTANT: record closing price
     }
+  }, perDayMs);
+}
+function hideModalIfOpen(){ modalOverlay.style.display='none'; modalOverlay.setAttribute('aria-hidden','true'); }
+function clearWeeklyInterval(){ if (weeklyIntervalId){ clearInterval(weeklyIntervalId); weeklyIntervalId = null; } }
 
-    // occasional surprises
-    if (Math.random() < diff.explosionChance * 0.08){
-      const target = pick(game.stocks); const g = rand(1.0,2.0); target.changePct += g; target.price = round2(target.price * (1+g)); target.history.push(round2(target.price)); logEvent(`${target.name} sudden surge: +${Math.round(g*100)}%`);
-    }
-    if (Math.random() < diff.collapseChance * 0.06){
-      const target = pick(game.stocks); const l = rand(0.5,0.9); target.changePct -= l; target.price = Math.max(0.01, round2(target.price * (1-l))); target.history.push(round2(target.price)); logEvent(`${target.name} sudden fall: -${Math.round(l*100)}%`);
-    }
+explainBtn.addEventListener('click', ()=>{ if (explainBox.style.display === 'none' || explainBox.style.display === '') { explainBox.style.display = 'block'; explainBtn.textContent = 'Hide explanation'; } else { explainBox.style.display = 'none'; explainBtn.textContent = 'Explain impact'; } });
+ackBtn.addEventListener('click', ()=>{ hideModalIfOpen(); });
 
-    // record day snapshot (networth / portfolio)
-    const portfolioValue = Object.keys(game.portfolio).reduce((acc,id)=>{ const entry=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return acc + (s.price * entry.shares); },0);
-    const networth = round2(game.cash + portfolioValue);
-    game.history.push({ day: game.day, networth, portfolioValue, cash: game.cash });
+/* run week loop */
+function runNextWeek(){
+  if (!runningYear) return;
+  if (paused){ setTimeout(runNextWeek, 1000); return; }
+  if (currentWeek >= totalWeeks){ runningYear = false; return; }
+  currentWeek++;
+  // generate news (biased)
+  const weeklyNews = generateWeeklyNews();
+  logEvent(`Week ${currentWeek} news announced: ${weeklyNews.headline}`);
+  showNewsModalAndRunWeek(weeklyNews);
+}
 
-    renderStocks(); renderPortfolio();
-  }
+function startYearRun(){ if (runningYear) return; runningYear = true; paused = false; currentWeek = 0; document.getElementById('pauseResume').textContent = 'Pause'; runNextWeek(); }
+pauseResumeBtn.addEventListener('click', ()=>{ paused = !paused; pauseResumeBtn.textContent = paused ? 'Resume' : 'Pause'; if (!paused && runningYear && !weeklyIntervalId) runNextWeek(); });
 
-  function runNextWeek(){
-    if (!runningYear) return;
-    if (paused){ setTimeout(runNextWeek, 1000); return; }
-    if (currentWeek >= totalWeeks){ runningYear = false; logEvent('One-year simulation complete.'); return; }
-    currentWeek++;
-    const weeklyNews = generateNews();
-    logEvent(`Week ${currentWeek} news announced: ${weeklyNews.headline}`);
-    showNewsModalAndRunWeek(weeklyNews);
-  }
+/* UI update */
+function updateProgressUsingWeeks(week, totalW){
+  const daysSoFar = Math.min(game.day, totalW*7);
+  const daysTotal = totalW*7;
+  const pct = Math.round((daysSoFar / daysTotal) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${daysSoFar}/${daysTotal} days`;
+}
+function updateUI(){ renderStocks(); renderPortfolio(); updateProgressUsingWeeks(currentWeek, totalWeeks); }
 
-  function startYearRun(){ if (runningYear) return; runningYear = true; paused = false; currentWeek = 0; document.getElementById('pauseResume').textContent = 'Pause'; runNextWeek(); }
-
-  pauseResumeBtn.addEventListener('click', ()=>{ paused = !paused; pauseResumeBtn.textContent = paused ? 'Resume' : 'Pause'; if (!paused && runningYear && !weeklyIntervalId){ runNextWeek(); }});
-
-  document.getElementById('restart').addEventListener('click', ()=>{ stopAllAndReset(); initGame(true); });
-  function stopAllAndReset(){ clearWeeklyInterval(); runningYear = false; paused = false; }
-
-  function updateProgressUsingWeeks(week, totalW){
-    const daysSoFar = Math.min(game.day, totalW*7);
-    const daysTotal = totalW*7;
-    const pct = Math.round((daysSoFar / daysTotal) * 100);
-    document.getElementById('progressBar').style.width = pct + '%';
-    document.getElementById('progressText').textContent = `${daysSoFar}/${daysTotal} days`;
-  }
-
-  function updateUI(){ renderStocks(); renderPortfolio(); updateProgressUsingWeeks(currentWeek, totalWeeks); }
-  window.addEventListener('load', ()=>{ initGame(true); });
-
-  // -----------------------
-  // Charting functions (plain canvas)
-  // -----------------------
-  function openChart(stockId){
-    selectedStockId = stockId;
+/* Charting (simple canvas) - extended to show networth series */
+function openChart(stockId){
+  selectedStockId = stockId;
+  if (stockId === 'market_networth'){
+    chartHeadline.textContent = `Net Worth · Market Overview`;
+    chartSub.textContent = `Points: ${game.history.length}`;
+    chartMode.value = 'networth';
+  } else {
     const s = game.stocks.find(x=>x.id===stockId);
     if (!s) return;
     chartHeadline.textContent = `${s.name} — ${s.sector}`;
-    chartSub.textContent = `Current: ${money(s.price)} · History points: ${s.history.length}`;
+    chartSub.textContent = `Current: ${money(s.price)} · Points: ${s.history.length}`;
     chartMode.value = 'price';
-    chartOverlay.style.display = 'flex';
-    chartOverlay.setAttribute('aria-hidden','false');
-    // give canvas a pixel-size that matches displayed size for crispness
-    setTimeout(()=> renderChart(), 60);
   }
+  chartOverlay.style.display = 'flex';
+  chartOverlay.setAttribute('aria-hidden','false');
+  setTimeout(()=> renderChart(), 40);
+}
+chartClose.addEventListener('click', ()=>{ closeChart(); });
+chartMode.addEventListener('change', ()=>{ renderChart(); });
 
-  chartClose.addEventListener('click', ()=>{ closeChart(); });
-  chartMode.addEventListener('change', ()=>{ renderChart(); });
+function closeChart(){ chartOverlay.style.display = 'none'; chartOverlay.setAttribute('aria-hidden','true'); selectedStockId = null; }
 
-  function closeChart(){
-    chartOverlay.style.display = 'none';
-    chartOverlay.setAttribute('aria-hidden','true');
-    selectedStockId = null;
-  }
+function renderChart(){
+  const rect = chartCanvas.getBoundingClientRect();
+  chartCanvas.width = Math.floor(rect.width * (window.devicePixelRatio || 1));
+  chartCanvas.height = Math.floor(rect.height * (window.devicePixelRatio || 1));
+  const ctx = chartCanvas.getContext('2d');
+  ctx.setTransform(window.devicePixelRatio || 1,0,0,window.devicePixelRatio || 1,0,0);
+  ctx.clearRect(0,0,rect.width,rect.height);
 
-  function renderChart(){
-    if (!selectedStockId) return;
+  const pad = { l:50, r:12, t:22, b:36 };
+  const W = rect.width, H = rect.height;
+  const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+
+  const mode = chartMode.value;
+
+  let series = [];
+  let label = '';
+  if (mode === 'networth'){
+    series = game.history.map(h => round2(h.networth));
+    label = 'Net Worth';
+  } else if (selectedStockId){
     const s = game.stocks.find(x=>x.id===selectedStockId);
     if (!s) return;
-    // resize canvas to match CSS pixels
-    const rect = chartCanvas.getBoundingClientRect();
-    chartCanvas.width = Math.floor(rect.width * devicePixelRatio);
-    chartCanvas.height = Math.floor(rect.height * devicePixelRatio);
-    const ctx = chartCanvas.getContext('2d');
-    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); // scale for crispness
-
-    // clear
-    ctx.clearRect(0,0,rect.width,rect.height);
-
-    // padding
-    const pad = { l:50, r:12, t:18, b:34 };
-    const W = rect.width, H = rect.height;
-    const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
-
-    // prepare series depending on mode
-    const mode = chartMode.value; // 'price' or 'value'
-    let labels = s.history.map((_,i)=> i+1); // day indices relative to history
-    let series = [];
-    if (mode === 'price'){
-      series = s.history.slice(); // prices
-    } else if (mode === 'value'){
-      const entry = game.portfolio[s.id];
-      if (!entry || entry.shares <= 0){
-        // show message: no holdings
-        ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.font = '14px system-ui, Arial';
-        ctx.fillText('You do not currently own shares of this stock — switch to Price mode to view price history.', pad.l, pad.t + 20);
-        // also draw price line in faint color for reference
-        series = s.history.slice();
-      } else {
-        series = s.history.map(p => round2(p * entry.shares)); // value series
-      }
+    if (mode === 'price') series = s.history.slice();
+    else if (mode === 'value') {
+      const shares = (game.portfolio[s.id] && game.portfolio[s.id].shares) || 0;
+      series = s.history.map(p => round2(p * shares));
     }
+    label = `${s.name} · ${s.sector}`;
+  } else return;
 
-    // compute min/max
-    let min = Math.min(...series), max = Math.max(...series);
-    if (min === max){
-      min = min * 0.98; max = max * 1.02;
-    }
-    // if value mode and user owns shares, draw cost basis line
-    let costBasisY = null;
-    if (mode === 'value'){
-      const entry = game.portfolio[s.id];
-      if (entry && entry.shares > 0){
-        const cost = round2(entry.shares * entry.avgPrice);
-        costBasisY = cost;
-        min = Math.min(min, cost); max = Math.max(max, cost);
-      }
-    }
+  const n = series.length;
+  if (n === 0) return;
 
-    // add small margin
-    const yMargin = (max - min) * 0.08;
-    min -= yMargin; max += yMargin;
+  let min = Math.min(...series), max = Math.max(...series);
+  if (min === max){ min = min*0.98; max = max*1.02; }
+  const yMargin = (max - min) * 0.08; min -= yMargin; max += yMargin;
 
-    // draw axes
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(pad.l, pad.t);
-    ctx.lineTo(pad.l, pad.t + plotH);
-    ctx.lineTo(pad.l + plotW, pad.t + plotH);
-    ctx.stroke();
+  // axes
+  ctx.strokeStyle = 'rgba(7,34,40,0.08)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l, pad.t+plotH); ctx.lineTo(pad.l+plotW, pad.t+plotH); ctx.stroke();
 
-    // y ticks (4)
-    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.font = '12px system-ui, Arial';
-    for (let i=0;i<=4;i++){
-      const y = pad.t + (plotH * i / 4);
-      const val = (max - ( (max - min) * i /4 ));
-      ctx.fillText(money(round2(val)), 6, y + 4);
-      // horizontal grid
-      ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(pad.l + plotW, y);
-      ctx.stroke();
-    }
-
-    // x ticks (3)
-    const n = series.length;
-    const step = Math.max(1, Math.floor(n / 3));
-    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    for (let i=0;i<n;i+=step){
-      const x = pad.l + (plotW * i / Math.max(1, n-1));
-      const label = String(i+1);
-      ctx.fillText(label, x-6, pad.t + plotH + 18);
-    }
-    // last label
-    ctx.fillText(String(n), pad.l + plotW - 10, pad.t + plotH + 18);
-
-    // map function
-    function xOf(i){ return pad.l + (plotW * i / Math.max(1, n-1)); }
-    function yOf(v){ return pad.t + ( (max - v) / (max - min) * plotH ); }
-
-    // draw series line
-    ctx.beginPath();
-    for (let i=0;i<n;i++){
-      const x = xOf(i), y = yOf(series[i]);
-      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    }
-    ctx.strokeStyle = (mode === 'price' ? '#9fd7ff' : '#7af0a3');
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // fill under curve lightly
-    ctx.lineTo(pad.l + plotW, pad.t + plotH);
-    ctx.lineTo(pad.l, pad.t + plotH);
-    ctx.closePath();
-    ctx.fillStyle = (mode === 'price' ? 'rgba(159,215,255,0.06)' : 'rgba(122,240,163,0.04)');
-    ctx.fill();
-
-    // draw current marker
-    const lastX = xOf(n-1), lastY = yOf(series[n-1]);
-    ctx.beginPath();
-    ctx.fillStyle = '#fff';
-    ctx.arc(lastX, lastY, 3.5, 0, Math.PI*2);
-    ctx.fill();
-
-    // draw cost basis if present
-    if (costBasisY !== null){
-      ctx.strokeStyle = 'rgba(255,185,40,0.9)';
-      ctx.setLineDash([6,6]);
-      ctx.beginPath();
-      ctx.moveTo(pad.l, yOf(costBasisY));
-      ctx.lineTo(pad.l + plotW, yOf(costBasisY));
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = 'rgba(255,185,40,0.9)';
-      ctx.fillText('Cost basis: ' + money(costBasisY), pad.l + 6, yOf(costBasisY) - 6);
-    }
-
-    // header (current)
-    ctx.fillStyle = '#d8f1ff';
-    ctx.font = '14px system-ui, Arial';
-    ctx.fillText(`${s.name} · ${s.sector}`, pad.l, 14);
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    ctx.font = '12px system-ui, Arial';
-    if (mode === 'price'){
-      ctx.fillText(`Current price: ${money(s.price)}`, pad.l + 200, 14);
-    } else {
-      const entry = game.portfolio[s.id];
-      if (entry && entry.shares>0){
-        ctx.fillText(`Shares: ${entry.shares} · Current value: ${money(series[n-1])}`, pad.l + 200, 14);
-      } else {
-        ctx.fillText(`Not owned: showing price history`, pad.l + 200, 14);
-      }
-    }
+  ctx.fillStyle = 'rgba(7,34,40,0.8)'; ctx.font = '12px system-ui, Arial';
+  for (let i=0;i<=4;i++){
+    const y = pad.t + (plotH * i / 4);
+    const val = (max - ((max - min) * i / 4));
+    ctx.fillText(money(round2(val)), 6, y + 4);
+    ctx.strokeStyle = 'rgba(7,34,40,0.04)'; ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + plotW, y); ctx.stroke();
   }
 
-  // close chart on outside click
-  chartOverlay.addEventListener('click', (e)=>{ if (e.target === chartOverlay) closeChart(); });
+  const step = Math.max(1, Math.floor(n/3));
+  for (let i=0;i<n;i+=step){
+    const x = pad.l + (plotW * i / Math.max(1, n-1));
+    ctx.fillText(String(i+1), x-6, pad.t + plotH + 18);
+  }
+  ctx.fillText(String(n), pad.l + plotW - 10, pad.t + plotH + 18);
 
-  </script>
+  function xOf(i){ return pad.l + (plotW * i / Math.max(1, n-1)); }
+  function yOf(v){ return pad.t + ((max - v) / (max - min) * plotH); }
+
+  ctx.beginPath();
+  for (let i=0;i<n;i++){
+    const x = xOf(i), y = yOf(series[i]);
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  // color by mode
+  ctx.strokeStyle = (mode === 'price' ? '#2b9cf5' : (mode === 'value' ? '#34c38f' : '#ff9f1c')); ctx.lineWidth = 2; ctx.stroke();
+
+  ctx.lineTo(pad.l + plotW, pad.t + plotH); ctx.lineTo(pad.l, pad.t + plotH); ctx.closePath();
+  ctx.fillStyle = (mode === 'price' ? 'rgba(43,156,245,0.06)' : (mode === 'value' ? 'rgba(52,195,143,0.04)' : 'rgba(255,159,28,0.04)')); ctx.fill();
+
+  const lastX = xOf(n-1), lastY = yOf(series[n-1]);
+  ctx.beginPath(); ctx.fillStyle = '#08303b'; ctx.arc(lastX, lastY, 4, 0, Math.PI*2); ctx.fill();
+
+  ctx.fillStyle = '#0b2a3a'; ctx.font = '14px system-ui, Arial'; ctx.fillText(label, pad.l, 16);
+  if (mode === 'price') ctx.fillText(`Current price: ${selectedStockId ? money(game.stocks.find(s=>s.id===selectedStockId).price) : '—'}`, pad.l + 200, 16);
+  else if (mode === 'networth') ctx.fillText(`Latest: ${money(series[n-1])} · Days: ${n}`, pad.l + 200, 16);
+  else { ctx.fillText(`Latest value: ${money(series[n-1])}`, pad.l + 200, 16); }
+}
+
+/* Cycle complete handling */
+function onCycleComplete(){
+  runningYear = false;
+  game.cyclesCompleted = (game.cyclesCompleted || 0) + 1;
+  cycleSummary.textContent = `Cycle ${game.cyclesCompleted} finished. Net worth: ${document.getElementById('networth').textContent}`;
+  cycleOverlay.style.display = 'flex'; cycleOverlay.setAttribute('aria-hidden','false');
+}
+cycleContinue.addEventListener('click', ()=>{
+  // keep portfolio & prices; reset week/day counters and start new cycle
+  cycleOverlay.style.display='none'; cycleOverlay.setAttribute('aria-hidden','true');
+  game.day = 0; currentWeek = 0; runningYear = false;
+  // preserve portfolio and current prices
+  startYearRun();
+});
+cycleEnd.addEventListener('click', ()=>{
+  cycleOverlay.style.display='none'; cycleOverlay.setAttribute('aria-hidden','true');
+  saveScoreToLeaderboard();
+});
+
+/* Leaderboard (local) */
+function getLeaderboard(){ try { return JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]'); } catch(e){ return []; } }
+function setLeaderboard(list){ localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(list)); }
+function saveScoreToLeaderboard(){
+  const name = prompt('Enter your name to save the score locally:', 'Player');
+  if (name === null) return;
+  const net = Number((document.getElementById('networth').textContent || '$0').replace(/[$,]/g,''));
+  const board = getLeaderboard();
+  board.push({ name: name || 'Player', score: net, date: new Date().toISOString() });
+  board.sort((a,b)=>b.score - a.score);
+  setLeaderboard(board.slice(0,50));
+  alert('Score saved locally to leaderboard.');
+  showLeaderboard();
+}
+function showLeaderboard(){
+  const list = getLeaderboard();
+  leaderboardList.innerHTML = '';
+  if (list.length === 0) leaderboardList.innerHTML = '<li class="small muted">No local scores yet.</li>';
+  else {
+    for (const item of list){
+      const li = document.createElement('li'); li.textContent = `${item.name} — ${money(item.score)} (${new Date(item.date).toLocaleDateString()})`; leaderboardList.appendChild(li);
+    }
+  }
+  leaderboardOverlay.style.display = 'flex'; leaderboardOverlay.setAttribute('aria-hidden','false');
+}
+leaderboardClose.addEventListener('click', ()=>{ leaderboardOverlay.style.display='none'; leaderboardOverlay.setAttribute('aria-hidden','true'); });
+leaderboardClear.addEventListener('click', ()=>{ if (confirm('Clear all local leaderboard scores?')){ setLeaderboard([]); showLeaderboard(); } });
+
+/* Save / Load game state (localStorage) */
+function autoSave(){
+  try {
+    const save = {
+      version:1, day:game.day, cyclesCompleted:game.cyclesCompleted||0, cash:game.cash, portfolio:game.portfolio,
+      stocks: game.stocks.map(s=>({id:s.id, price:s.price, history:s.history, changePct:s.changePct})),
+      currentWeek, totalWeeks, runningYear, paused, marketState: game.marketState, history: game.history
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(save));
+  } catch(e){}
+}
+function manualSave(){
+  autoSave();
+  alert('Progress saved locally (in this browser).');
+}
+function loadSaved(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) { alert('No saved progress found.'); return; }
+  try {
+    const saved = JSON.parse(raw);
+    // map saved stocks onto master set
+    const stocksMap = {};
+    for (const s of STOCKS_MASTER) stocksMap[s.id] = s;
+    game.stocks = (saved.stocks||[]).map(ss => {
+      const master = stocksMap[ss.id] || {id:ss.id, name:ss.id, sector:'default', price:ss.price, volatility:1.2};
+      return { id: master.id, name: master.name, sector: master.sector, price: ss.price, volatility: master.volatility || 1.4, changePct: ss.changePct || 0, history: ss.history || [ss.price] };
+    });
+    game.cash = saved.cash || STANDARD.startingMoney;
+    game.portfolio = saved.portfolio || {};
+    game.day = saved.day || 0;
+    game.cyclesCompleted = saved.cyclesCompleted || 0;
+    currentWeek = saved.currentWeek || 0;
+    totalWeeks = saved.totalWeeks || parseInt(document.getElementById('gameLengthWeeks').value,10) || 52;
+    game.marketState = saved.marketState || 'Sideways';
+    game.history = saved.history || [];
+    renderStocks(); renderPortfolio(); updateProgressUsingWeeks(currentWeek, totalWeeks);
+    alert('Saved progress loaded.');
+  } catch(e){
+    alert('Failed to load saved data.');
+  }
+}
+function clearSave(){
+  if (!confirm('Clear saved game progress?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  alert('Saved progress cleared.');
+}
+
+/* Auto-save on important events */
+function autoSaveSetup(){
+  // save every 15 seconds if running
+  setInterval(()=>{ if (game.running) autoSave(); }, 15000);
+}
+
+/* When cycle ends or user restarts, stop intervals */
+function clearAll(){ clearWeeklyInterval(); runningYear = false; paused = false; }
+
+/* Event handlers for top controls */
+document.getElementById('restart').addEventListener('click', ()=>{ if (!confirm('Start a new game? This will reset current progress if you do not save.')) return; clearAll(); initGame(true); });
+document.getElementById('saveBtn').addEventListener('click', manualSave);
+document.getElementById('loadBtn').addEventListener('click', loadSaved);
+document.getElementById('clearSaveBtn').addEventListener('click', clearSave);
+document.getElementById('leaderboardBtn').addEventListener('click', showLeaderboard);
+marketChartBtn.addEventListener('click', ()=>{ openChart('market_networth'); });
+
+/* Startup screen behavior */
+function showStartOverlay(){
+  startOverlay.style.display = 'flex'; startOverlay.setAttribute('aria-hidden','false');
+  // show "continue saved" if data exists
+  if (localStorage.getItem(STORAGE_KEY)) { startContinueSaved.style.display = 'inline-block'; } else startContinueSaved.style.display = 'none';
+}
+function hideStartOverlay(){ startOverlay.style.display = 'none'; startOverlay.setAttribute('aria-hidden','true'); }
+
+startBtn.addEventListener('click', ()=>{
+  hideStartOverlay();
+  setTimeout(()=> initGame(true), 150);
+});
+startContinueSaved.addEventListener('click', ()=>{
+  hideStartOverlay();
+  setTimeout(()=> { loadSaved(); startYearRun(); }, 150);
+});
+
+/* On load */
+window.addEventListener('load', ()=>{
+  showStartOverlay();
+  autoSaveSetup();
+});
+
+/* Small UI boot: initial empty render */
+renderStocks();
+renderPortfolio();
+
+/* Utility: expose openTradeModal for inline onclick from portfolio buttons */
+window.openTradeModal = openTradeModal;
+
+/* Clicking outside modals closes them (chart/trade/modal) */
+document.addEventListener('click', (e)=>{
+  if (e.target === chartOverlay) closeChart();
+  if (e.target === modalOverlay) { /* keep modal until user ack */ }
+  if (e.target === tradeOverlay) { tradeOverlay.style.display='none'; tradeOverlay.setAttribute('aria-hidden','true'); selectedStockId=null; }
+  if (e.target === cycleOverlay) { /* prefer explicit choices */ }
+  if (e.target === leaderboardOverlay) { leaderboardOverlay.style.display='none'; leaderboardOverlay.setAttribute('aria-hidden','true'); }
+});
+
+</script>
 </body>
 </html>
