@@ -1091,5 +1091,318 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('newsPanel').innerHTML = `<div class="pill">Ready</div><div class="small muted">Click a category tile to view that group's stocks. Press Start / Restart to begin or press Let's play.</div>`;
 });
 </script>
+<script>
+/* ===== Developer Testing Tools ===== */
+
+window.devTools = {
+
+  addMoney(amount){
+    if(!window.game) return console.log("Game not loaded");
+    game.cash += amount;
+    console.log("💰 Cash added:", amount);
+  },
+
+  crashMarket(){
+    if(!window.game) return console.log("Game not loaded");
+
+    game.stocks.forEach(stock=>{
+      stock.price *= 0.6;
+    });
+
+    console.log("📉 Market crash triggered");
+  },
+
+  pumpStock(name){
+    if(!window.game) return console.log("Game not loaded");
+
+    const stock = game.stocks.find(s => s.name === name);
+
+    if(stock){
+      stock.price *= 3;
+      console.log("🚀 Pumped:", stock.name);
+    } else {
+      console.log("Stock not found");
+    }
+  },
+
+  showStocks(){
+    if(!window.game) return console.log("Game not loaded");
+
+    console.table(game.stocks.map(s => ({
+      name: s.name,
+      price: s.price,
+      sector: s.sector
+    })));
+  }
+
+};
+</script>
+<script>
+/* ===============================
+   UNIVERSAL DEV TOOLS FOR _game
+   =============================== */
+
+window.devTools = {
+
+  /* ---------- BASIC GAME CONTROL ---------- */
+
+  state(){
+    console.log(_game);
+    return _game;
+  },
+
+  reset(){
+    location.reload();
+  },
+
+  cloneState(){
+    return JSON.parse(JSON.stringify(_game));
+  },
+
+  restoreState(snapshot){
+    Object.assign(_game, snapshot);
+    console.log("State restored");
+  },
+
+  /* ---------- MONEY ---------- */
+
+  addMoney(amount){
+    _game.cash += amount;
+    console.log("Cash:", _game.cash);
+  },
+
+  setMoney(amount){
+    _game.cash = amount;
+  },
+
+  multiplyMoney(mult){
+    _game.cash *= mult;
+  },
+
+  bankrupt(){
+    _game.cash = 0;
+  },
+
+  millionaire(){
+    _game.cash = 1000000;
+  },
+
+  billionaire(){
+    _game.cash = 1000000000;
+  },
+
+  /* ---------- DAY / TIME ---------- */
+
+  nextDay(days=1){
+    for(let i=0;i<days;i++){
+      if(typeof advanceDay === "function"){
+        advanceDay();
+      }
+    }
+  },
+
+  simulate(days=100){
+    for(let i=0;i<days;i++){
+      if(typeof advanceDay === "function"){
+        advanceDay();
+      }
+    }
+    console.log("Simulated",days,"days");
+  },
+
+  fastForward(days=365){
+    this.simulate(days);
+  },
+
+  /* ---------- STOCK INFO ---------- */
+
+  stocks(){
+    console.table(_game.stocks);
+  },
+
+  stock(name){
+    return _game.stocks.find(s=>s.name===name);
+  },
+
+  sectors(){
+    return [...new Set(_game.stocks.map(s=>s.sector))];
+  },
+
+  /* ---------- PRICE CONTROL ---------- */
+
+  setPrice(name,price){
+    const s=this.stock(name);
+    if(s) s.price=price;
+  },
+
+  addPrice(name,value){
+    const s=this.stock(name);
+    if(s) s.price+=value;
+  },
+
+  multiplyPrice(name,mult){
+    const s=this.stock(name);
+    if(s) s.price*=mult;
+  },
+
+  pumpStock(name){
+    const s=this.stock(name);
+    if(s) s.price*=3;
+  },
+
+  dumpStock(name){
+    const s=this.stock(name);
+    if(s) s.price*=0.4;
+  },
+
+  killStock(name){
+    const s=this.stock(name);
+    if(s) s.price=0.01;
+  },
+
+  reviveStock(name){
+    const s=this.stock(name);
+    if(s) s.price=50;
+  },
+
+  /* ---------- MARKET CONTROL ---------- */
+
+  crashMarket(){
+    _game.stocks.forEach(s=>s.price*=0.6);
+  },
+
+  megaCrash(){
+    _game.stocks.forEach(s=>s.price*=0.2);
+  },
+
+  bullMarket(){
+    _game.stocks.forEach(s=>s.price*=1.5);
+  },
+
+  moonMarket(){
+    _game.stocks.forEach(s=>s.price*=3);
+  },
+
+  randomizeMarket(){
+    _game.stocks.forEach(s=>{
+      s.price=Math.random()*200+1;
+    });
+  },
+
+  stabilize(){
+    _game.stocks.forEach(s=>{
+      s.volatility=0.01;
+    });
+  },
+
+  chaos(){
+    _game.stocks.forEach(s=>{
+      s.volatility=0.2;
+    });
+  },
+
+  /* ---------- PORTFOLIO ---------- */
+
+  portfolio(){
+    return _game.portfolio;
+  },
+
+  clearPortfolio(){
+    _game.portfolio={};
+  },
+
+  giveAllStocks(amount=100){
+    _game.stocks.forEach(s=>{
+      _game.portfolio[s.name]=amount;
+    });
+  },
+
+  /* ---------- ANALYTICS ---------- */
+
+  richestStock(){
+    let best=_game.stocks.reduce((a,b)=>a.price>b.price?a:b);
+    console.log(best);
+    return best;
+  },
+
+  cheapestStock(){
+    let worst=_game.stocks.reduce((a,b)=>a.price<b.price?a:b);
+    console.log(worst);
+    return worst;
+  },
+
+  averagePrice(){
+    let avg=_game.stocks.reduce((a,b)=>a+b.price,0)/_game.stocks.length;
+    console.log(avg);
+    return avg;
+  },
+
+  totalMarketCap(){
+    let sum=_game.stocks.reduce((a,b)=>a+b.price,0);
+    console.log(sum);
+    return sum;
+  },
+
+  /* ---------- RANDOM EVENTS ---------- */
+
+  randomPump(){
+    const s=_game.stocks[Math.floor(Math.random()*_game.stocks.length)];
+    s.price*=3;
+    console.log("Random pump:",s.name);
+  },
+
+  randomCrash(){
+    const s=_game.stocks[Math.floor(Math.random()*_game.stocks.length)];
+    s.price*=0.3;
+    console.log("Random crash:",s.name);
+  },
+
+  randomEvent(){
+    if(Math.random()>0.5){
+      this.randomPump();
+    }else{
+      this.randomCrash();
+    }
+  },
+
+  /* ---------- MASS OPERATIONS ---------- */
+
+  doubleEverything(){
+    _game.stocks.forEach(s=>s.price*=2);
+    _game.cash*=2;
+  },
+
+  halveEverything(){
+    _game.stocks.forEach(s=>s.price*=0.5);
+    _game.cash*=0.5;
+  },
+
+  destroyEconomy(){
+    _game.stocks.forEach(s=>s.price=0.1);
+  },
+
+  utopia(){
+    _game.stocks.forEach(s=>s.price*=10);
+    _game.cash*=10;
+  },
+
+  /* ---------- DEBUG HELPERS ---------- */
+
+  globals(){
+    return Object.keys(window);
+  },
+
+  findGame(){
+    for(let k in window){
+      if(window[k] && typeof window[k]==="object"){
+        if(window[k].stocks){
+          console.log("Possible game object:",k);
+        }
+      }
+    }
+  }
+
+};
+</script>
 </body>
 </html>
