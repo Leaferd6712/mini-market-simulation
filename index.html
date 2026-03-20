@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Mini Market Simulation — Category Tiles</title>
+  <title>Mini Market Simulation</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="Mini Market Simulation - category tile view.">
   <style>
@@ -30,11 +30,12 @@
     button.compact{ padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:800; font-size:14px; }
     button.primary{ background:linear-gradient(90deg,var(--accent), #00c3ff); color:white; border:none; box-shadow: 0 8px 24px rgba(43,156,245,0.14); }
     button.ghost{ background:transparent; border:1px solid rgba(7,34,40,0.06); color:var(--muted); }
+    .btn-secondary{ background:linear-gradient(90deg, rgba(7,34,40,0.06), rgba(7,34,40,0.03)); color:#20414d; border:1px solid rgba(7,34,40,0.06); }
+    .btn-primary{ background:linear-gradient(90deg,var(--accent), #00c3ff); color:white; border:none; box-shadow: 0 8px 24px rgba(43,156,245,0.14); }
 
     .panel{ background:var(--card); border:1px solid rgba(7,34,40,0.04); padding:12px; border-radius:12px; box-shadow: 0 8px 26px rgba(11,22,36,0.04); color:#07202a; }
     .status{ display:flex; gap:12px; align-items:center; font-size:14px; } .status div{ color:var(--muted) } .status strong{ color:#07303a; margin-left:6px; font-weight:900; }
 
-    /* Big category tiles (3 columns x 2 rows) */
     .category-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; margin:14px 0; }
     .cat-tile{
       padding:20px; border-radius:16px; cursor:pointer; border:1px solid rgba(7,34,40,0.06);
@@ -47,7 +48,6 @@
     .cat-tile:hover{ transform:translateY(-6px); box-shadow: 0 22px 40px rgba(43,156,245,0.10); }
     .cat-tile.active{ background:linear-gradient(90deg,#e8fbff,#eaf8ff); box-shadow: 0 26px 60px rgba(43,156,245,0.14); transform:translateY(-6px); }
 
-    /* colors for each category */
     .cat-tech{ border-left:6px solid #2b9cf5; }
     .cat-energy{ border-left:6px solid #34c38f; }
     .cat-retail{ border-left:6px solid #ffb020; }
@@ -60,7 +60,8 @@
 
     table{ width:100%; border-collapse:collapse; font-size:14px; } th, td{ text-align:left; padding:10px 10px; border-bottom:1px solid rgba(7,34,40,0.04); color:var(--muted); } th{ color:#245a86; font-weight:800; font-size:13px; }
     .price-up{ color:var(--accent-2); font-weight:800; } .price-down{ color:var(--danger); font-weight:800; } .small{ font-size:13px; color:var(--muted); }
-    .market-col{ display:flex; gap:8px; align-items:center; justify-content:flex-end; } .btn-buy, .btn-sell, .btn-chart{ border:none; padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:800; font-size:13px; box-shadow: 0 6px 12px rgba(2,6,23,0.04); transition:transform .12s ease; }
+    .market-col{ display:flex; gap:8px; align-items:center; justify-content:flex-end; }
+    .btn-buy, .btn-sell, .btn-chart{ border:none; padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:800; font-size:13px; box-shadow: 0 6px 12px rgba(2,6,23,0.04); transition:transform .12s ease; }
     .btn-buy{ background:linear-gradient(90deg, rgba(52,195,143,0.12), rgba(52,195,143,0.08)); color:var(--accent-2); } 
     .btn-sell{ background:linear-gradient(90deg, rgba(255,92,92,0.08), rgba(255,92,92,0.04)); color:var(--danger); }
     .btn-chart{ background:linear-gradient(90deg, rgba(43,156,245,0.10), rgba(43,156,245,0.06)); color:#145f8a; }
@@ -78,22 +79,30 @@
 
     .explain-box{ margin-top:10px; background: rgba(43,156,245,0.03); border-radius:8px; padding:10px; display:none; color:var(--muted); font-size:14px; line-height:1.45; }
 
-    /* Notification (kid-friendly quick popups) */
     .notif-wrap{ position:fixed; left:16px; bottom:16px; z-index:12000; display:flex; flex-direction:column; gap:10px; }
     .notif{ background:linear-gradient(90deg,#fff,#f8ffff); border-radius:10px; padding:12px 14px; box-shadow:0 8px 24px rgba(4,24,40,0.12); border:1px solid rgba(7,34,40,0.06); font-weight:800; color:#07303a; max-width:320px; }
     .notif.small{ font-weight:700; font-size:14px; }
 
-    /* Letter modal styling for paychecks/bonuses */
     .letter-content{ background:#fffef8; padding:18px; border-radius:8px; border:1px solid rgba(94,62,17,0.06); box-shadow:0 16px 48px rgba(94,62,17,0.06); color:#2b2b1f; font-family: 'Georgia', serif; }
     .letter-to{ font-weight:700; margin-bottom:6px; }
     .letter-body{ margin:12px 0; line-height:1.45; color:#3b3b2f; }
     .letter-sign{ margin-top:12px; font-style:italic; color:#5b4b2f; }
 
-    /* Loading overlay */
     .loading-overlay{ position:fixed; inset:0; background:linear-gradient(180deg,#ffffff,#eaf7ff); display:flex; align-items:center; justify-content:center; z-index:10010; flex-direction:column; gap:14px; }
     .spinner{ width:64px; height:64px; border-radius:50%; border:8px solid rgba(43,156,245,0.12); border-top-color:var(--accent); animation:spin 1s linear infinite; box-shadow: 0 8px 20px rgba(43,156,245,0.08); }
     @keyframes spin{ to { transform:rotate(360deg); } }
     .loading-text{ font-weight:800; color:#08303b; letter-spacing:0.4px; }
+
+    .profit-pos, .gain-pos{ color:var(--accent-2); font-weight:900; }
+    .profit-neg, .gain-neg{ color:var(--danger); font-weight:900; }
+    .profit-neutral{ color:var(--muted); font-weight:900; }
+
+    .trade-meta{ margin-top:10px; display:grid; gap:6px; }
+    .trade-meta .row{ display:flex; justify-content:space-between; gap:10px; }
+    .trade-quick{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+    .trade-quick button{ padding:6px 10px; border-radius:8px; font-size:12px; }
+    .trade-quick .buyq{ background:rgba(52,195,143,0.10); color:var(--accent-2); border:1px solid rgba(52,195,143,0.12); }
+    .trade-quick .sellq{ background:rgba(255,92,92,0.08); color:var(--danger); border:1px solid rgba(255,92,92,0.10); }
 
     @media (max-width:980px){
       .wrap{ grid-template-columns: 1fr; padding:12px; }
@@ -103,7 +112,6 @@
   </style>
 </head>
 <body>
-  <!-- Loading overlay (very first thing users see) -->
   <div id="loadingOverlay" class="loading-overlay" style="display:none;">
     <div class="spinner" aria-hidden="true"></div>
     <div class="loading-text">Loading Mini Market...</div>
@@ -162,10 +170,8 @@
         <div class="small muted">After each 7 days you'll see a summary then the upcoming news that will affect next week.</div>
       </div>
 
-      <!-- BIG category tiles -->
       <div class="category-grid" id="categoryGrid" role="tablist" aria-label="Categories"></div>
 
-      <!-- When a category tile is clicked, only those stocks display here (no "All" view) -->
       <div style="margin-top:12px; overflow:auto; max-height:430px;">
         <table id="stocksTable" aria-live="polite">
           <thead>
@@ -219,16 +225,13 @@
     </aside>
 
     <div class="foot">
-      <div class="small muted">Built for learning & fun — no real money involved.</div>
-      <div class="small muted">Kid-friendly predictability & explanations.</div>
+      <div class="small muted">Built for learning & fun (There is no real money involved)</div>
       <div style="margin-left:auto;font-weight:700;color:var(--muted)">Category Tile Mode</div>
     </div>
   </div>
 
-  <!-- notification stack for kid-friendly popups -->
   <div class="notif-wrap" id="notifWrap" aria-live="polite"></div>
 
-  <!-- Intro overlay (single Let's play) -->
   <div id="introOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
     <div class="modal" role="document" aria-labelledby="introTitle">
       <h2 id="introTitle">Welcome to Mini Market</h2>
@@ -252,7 +255,6 @@
     </div>
   </div>
 
-  <!-- Week Summary modal -->
   <div id="weekSummaryOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
     <div class="modal" role="document" aria-labelledby="weekSummaryTitle">
       <h2 id="weekSummaryTitle">Week Summary</h2>
@@ -265,7 +267,6 @@
     </div>
   </div>
 
-  <!-- Letter modal for paychecks and boss bonuses -->
   <div id="letterOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
     <div class="modal" role="document" aria-labelledby="letterTitle" style="max-width:560px;">
       <h2 id="letterTitle">Letter</h2>
@@ -280,7 +281,6 @@
     </div>
   </div>
 
-  <!-- End of initial 365 days overlay (prompt to continue) -->
   <div id="endYearOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
     <div class="modal" role="document" aria-labelledby="endYearTitle">
       <h2 id="endYearTitle">Simulation reached 365 days</h2>
@@ -293,7 +293,6 @@
     </div>
   </div>
 
-  <!-- NEWS modal -->
   <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
     <div class="modal" role="document" aria-labelledby="modalTitle">
       <h2 id="modalTitle">Upcoming Weekly News</h2>
@@ -310,7 +309,6 @@
     </div>
   </div>
 
-  <!-- CHART modal -->
   <div id="chartOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
     <div class="modal" role="document" aria-labelledby="chartTitle" style="max-width:920px;">
       <h2 id="chartTitle">Chart</h2>
@@ -330,18 +328,19 @@
     </div>
   </div>
 
-  <!-- TRADE modal -->
   <div id="tradeOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
     <div class="modal" role="document" aria-labelledby="tradeTitle">
       <h2 id="tradeTitle">Trade</h2>
       <div class="headline" id="tradeHeadline">—</div>
       <div class="small muted" id="tradeInfo">—</div>
+      <div class="trade-meta small muted" id="tradeMeta"></div>
       <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
         <label class="small muted">Shares:</label>
         <input id="tradeShares" type="number" min="1" value="1" style="width:110px" />
         <div style="flex:1"></div>
         <div id="tradeCost" class="small muted">Cost: $0</div>
       </div>
+      <div class="trade-quick" id="tradeQuickButtons"></div>
       <div class="controls" style="margin-top:12px;">
         <button id="tradeCancel" class="btn-secondary">Cancel</button>
         <button id="tradeConfirm" class="btn-primary">Confirm</button>
@@ -349,7 +348,6 @@
     </div>
   </div>
 
-  <!-- LEADERBOARD modal -->
   <div id="leaderboardOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
     <div class="modal" role="document" aria-labelledby="leaderboardTitle">
       <h2 id="leaderboardTitle">Local Leaderboard</h2>
@@ -365,7 +363,6 @@
   </div>
 
 <script>
-/* -------- CONFIG & DATA -------- */
 const STORAGE_KEY = 'marketSim_v6_tilemode';
 const LEADERBOARD_KEY = 'marketSim_v6_leaderboard';
 const CATEGORIES = [
@@ -378,21 +375,18 @@ const CATEGORIES = [
 ];
 const STOCKS_PER_CATEGORY = 10;
 
-/* make popups last longer and be less frequent */
-const POPUP_AUTO_ACK_MS = 10000;     // auto-close for some popups (longer so player can read)
-const NOTIF_DURATION_MS = 8000;      // notification display duration
-const NOTIF_COOLDOWN_MS = 12000;     // minimum gap between visible notifications (throttle)
-let lastNotifTime = 0;               // timestamp of last notification shown
+const POPUP_AUTO_ACK_MS = 10000;
+const NOTIF_DURATION_MS = 8000;
+const NOTIF_COOLDOWN_MS = 12000;
+let lastNotifTime = 0;
 let notifQueue = [];
 
-/* runtime tuning */
 const STANDARD = { volatilityMultiplier:0.7, startingMoney:10000 };
 const TREND_DAILY_BIAS = 0.004;
 const SHOCK_PROB_SURGE = 0.006;
 const SHOCK_PROB_FALL = 0.004;
 const SPEED_OPTIONS = [1,2,4];
 
-/* Realistic name lists for every category (10 each) */
 const REAL_TECH = ["NVIDIA","AMD","Intel","Apple","Microsoft","Alphabet","Amazon","Meta","Qualcomm","Broadcom"];
 const REAL_TRANSPORT = ["Tesla","Ford Motor Company","General Motors","Toyota","Uber","Boeing","Airbus","DHL","Maersk","Volvo"];
 const REAL_ENERGY = ["ExxonMobil","Chevron","BP","Shell","TotalEnergies","NextEra Energy","Enel","Ørsted","Origin Energy","Sempra"];
@@ -400,18 +394,13 @@ const REAL_RETAIL = ["Walmart","Target","Costco","Alibaba","IKEA","H&M","Zara","
 const REAL_FINANCE = ["JPMorgan","Goldman Sachs","Bank of America","HSBC","Commonwealth Bank","ANZ","Westpac","Barclays","Citigroup","UBS"];
 const REAL_BIOTECH = ["Pfizer","Moderna","Roche","Johnson & Johnson","Novartis","AstraZeneca","Gilead","Biogen","Regeneron","CSL"];
 
-/* -------- RANDOM / UTILS -------- */
 function money(v){ return '$' + Number(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
 function round2(v){ return Math.round(v*100)/100; }
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function rand(min,max){ return Math.random()*(max-min)+min; }
+function capArray(arr, max){ if (arr.length > max) arr.splice(0, arr.length - max); }
+function pctText(v){ return `${v >= 0 ? '+' : ''}${(v * 100).toFixed(2)}%`; }
 
-/* Ensure arrays do not grow without bound */
-function capArray(arr, max){
-  if (arr.length > max) arr.splice(0, arr.length - max);
-}
-
-/* -------- STOCKS MASTER -------- */
 function generateStocksMaster(){
   const master = [];
   const volBase = { Tech:1.4, Energy:1.2, Retail:1.0, Finance:0.9, Transport:1.1, Biotech:1.6 };
@@ -449,18 +438,17 @@ function generateStocksMaster(){
 }
 const STOCKS_MASTER = generateStocksMaster();
 
-/* -------- NEWS TEMPLATES & MAJOR EVENTS (unchanged) -------- */
 const NEWS_TEMPLATES = [
   { headline:'A new AI model that solves many tasks', pos:['Tech','Finance'], neg:['Retail','Transport'], explain:'AI product success helps tech & finance; some retailers and transport firms slow down.' },
   { headline:'Big renewable energy contract signed', pos:['Energy'], neg:[], explain:'Renewables get momentum; some older energy firms adjust.' },
   { headline:'Holiday shopping stronger than expected', pos:['Retail'], neg:['Tech'], explain:'Retailers win as shoppers spend; some tech attention moves elsewhere briefly.' },
   { headline:'Calm interest-rate news stabilises markets', pos:['Finance','Retail'], neg:['Tech'], explain:'Lower uncertainty helps banks and shops.' },
-  { headline:'Promising medical trial announced', pos:['Biotech'], neg:['Travel','Retail'], explain:'Health firms gain investor hope; travel & some retail affected.' },
-  { headline:'Shipping delays on a route', pos:['Logistics'], neg:['Retail','Transport'], explain:'Some logistics adapt; carriers face delays.' },
-  { headline:'Airlines report busy bookings', pos:['Transport','Retail'], neg:[], explain:'Travel boosts airlines and nearby retailers.' },
-  { headline:'Cloud provider breach reported', pos:['Security'], neg:['Tech'], explain:'Security firms get attention; breached firms see caution.' },
+  { headline:'Promising medical trial announced', pos:['Biotech'], neg:['Transport','Retail'], explain:'Health firms gain investor hope; transport & some retail affected.' },
+  { headline:'Shipping delays on a route', pos:['Transport'], neg:['Retail'], explain:'Some logistics adapt; carriers face delays.' },
+  { headline:'Airlines report busy bookings', pos:['Transport','Retail'], neg:[], explain:'Travel boosts transport and nearby retailers.' },
+  { headline:'Cloud provider breach reported', pos:['Tech'], neg:['Tech'], explain:'Security concerns can move tech share prices around.' },
   { headline:'Education funding increases', pos:['Tech','Retail'], neg:[], explain:'Ed-tech and services benefit; some retailers adjust.' },
-  { headline:'A new trade agreement signed', pos:['Transport','Manufacturing'], neg:[], explain:'Manufacturing & transport expect smoother trade.' }
+  { headline:'A new trade agreement signed', pos:['Transport'], neg:[], explain:'Transport expects smoother trade.' }
 ];
 
 const MAJOR_EVENTS = [
@@ -468,15 +456,14 @@ const MAJOR_EVENTS = [
   { title:'Big stimulus package', effects:{market:0.18}, desc:'A big stimulus pushes many stocks higher.' }
 ];
 
-/* -------- RUNTIME STATE -------- */
-let totalDays = 10000; // Increased for longer runs
+let totalDays = 10000;
 let totalWeeks = Math.ceil(totalDays / 7);
 
 let game = {
   stocks: [], day:0, cash: STANDARD.startingMoney, portfolio:{}, events:[], history:[], cyclesCompleted:0, marketState:'Sideways', bonusGiven:false
 };
 let currentWeek = 0, runningYear = false, paused = false;
-let disableUI = false; // Flag to disable popups during high-speed runs
+let disableUI = false;
 let pendingWeeklyNews = null;
 let weekTimer = null, daysAppliedInWeek = 0, currentWeekStartNet = 0;
 let selectedCategory = CATEGORIES[0].key;
@@ -494,12 +481,8 @@ function queueRender() {
   });
 }
 let speedIndex = 0, speedMultiplier = SPEED_OPTIONS[speedIndex];
+let perDayMsBase = 900 * 3;
 
-/* CRITICAL CHANGE: make days 3× slower than before
-   previous perDayMsBase was 900ms; multiply by 3 => 2700ms so one day takes longer to allow reading popups */
-let perDayMsBase = 900 * 3; // 2700ms per day at 1x
-
-/* DOM refs */
 const categoryGrid = document.getElementById('categoryGrid');
 const stocksBody = document.getElementById('stocksBody');
 const newsPanel = document.getElementById('newsPanel');
@@ -516,7 +499,7 @@ const modalOverlay = document.getElementById('modalOverlay'), modalHeadline = do
 
 const chartOverlay = document.getElementById('chartOverlay'), chartCanvas = document.getElementById('chartCanvas'), chartHeadline = document.getElementById('chartHeadline'), chartSub = document.getElementById('chartSub'), chartMode = document.getElementById('chartMode'), chartClose = document.getElementById('chartClose');
 
-const tradeOverlay = document.getElementById('tradeOverlay'), tradeHeadline = document.getElementById('tradeHeadline'), tradeInfo = document.getElementById('tradeInfo'), tradeShares = document.getElementById('tradeShares'), tradeCost = document.getElementById('tradeCost'), tradeConfirm = document.getElementById('tradeConfirm'), tradeCancel = document.getElementById('tradeCancel');
+const tradeOverlay = document.getElementById('tradeOverlay'), tradeHeadline = document.getElementById('tradeHeadline'), tradeInfo = document.getElementById('tradeInfo'), tradeMeta = document.getElementById('tradeMeta'), tradeShares = document.getElementById('tradeShares'), tradeCost = document.getElementById('tradeCost'), tradeConfirm = document.getElementById('tradeConfirm'), tradeCancel = document.getElementById('tradeCancel'), tradeQuickButtons = document.getElementById('tradeQuickButtons');
 
 const leaderboardOverlay = document.getElementById('leaderboardOverlay'), leaderboardList = document.getElementById('leaderboardList'), leaderboardClose = document.getElementById('leaderboardClose'), leaderboardClear = document.getElementById('leaderboardClear');
 
@@ -538,7 +521,6 @@ const letterBody = document.getElementById('letterBody');
 const letterSign = document.getElementById('letterSign');
 const letterAck = document.getElementById('letterAck');
 
-/* -------- GAME LOGIC & UI HELPERS -------- */
 function resetLiveStocks(){
   game.stocks = STOCKS_MASTER.map(s => ({ id:s.id, name:s.name, sector:s.sector, price:s.price, volatility:s.volatility, changePct:0, history:[round2(s.price)] }));
 }
@@ -568,7 +550,7 @@ function renderStocksForCategory(){
     tr.innerHTML = `
       <td><strong style="color:#0b2a3a">${s.name}</strong><div class="small muted">${s.id}</div></td>
       <td><div style="font-weight:800">${money(s.price)}</div><div class="small muted">Prev: ${money(prev)}</div></td>
-      <td class="center">${pct>0.0001?`<span class="price-up">+${(pct*100).toFixed(2)}%</span>`:(pct<-0.0001?`<span class="price-down">${(pct*100).toFixed(2)}</span>`:`<span class="small muted">0.00%</span>`)}</td>
+      <td class="center">${pct>0.0001?`<span class="price-up">+${(pct*100).toFixed(2)}%</span>`:(pct<-0.0001?`<span class="price-down">${(pct*100).toFixed(2)}%</span>`:`<span class="small muted">0.00%</span>`)}</td>
       <td class="center"><div class="sector-badge">${s.sector}</div><div class="small muted">${s.sector}</div></td>
       <td class="market-col"></td>
     `;
@@ -578,7 +560,6 @@ function renderStocksForCategory(){
     const chart = document.createElement('button'); chart.className='btn-chart'; chart.textContent='Chart'; chart.onclick = () => openChart(s.id);
     actionTd.appendChild(buy); actionTd.appendChild(sell); actionTd.appendChild(chart);
     stocksBody.appendChild(tr);
-    // cache references to frequently-updated cells for faster daily updates
     stockRowMap.set(s.id, { priceTd: tr.children[1], changeTd: tr.children[2] });
   }
   currentRenderedCategory = selectedCategory;
@@ -592,11 +573,10 @@ function updateStocksForCategory(){
     const prev = (s.history.length >= 2) ? s.history[s.history.length-2] : s.history[s.history.length-1];
     const pct = s.changePct || 0;
     row.priceTd.innerHTML = `<div style="font-weight:800">${money(s.price)}</div><div class="small muted">Prev: ${money(prev)}</div>`;
-    row.changeTd.innerHTML = pct>0.0001?`<span class="price-up">+${(pct*100).toFixed(2)}%</span>`:(pct<-0.0001?`<span class="price-down">${(pct*100).toFixed(2)}</span>`:`<span class="small muted">0.00%</span>`);
+    row.changeTd.innerHTML = pct>0.0001?`<span class="price-up">+${(pct*100).toFixed(2)}%</span>`:(pct<-0.0001?`<span class="price-down">${(pct*100).toFixed(2)}%</span>`:`<span class="small muted">0.00%</span>`);
   }
 }
 
-/* portfolio rendering */
 function renderPortfolio(){
   const listEl = document.getElementById('portfolioList'); listEl.innerHTML = '';
   const holdings = Object.keys(game.portfolio);
@@ -604,9 +584,18 @@ function renderPortfolio(){
   else {
     for (const id of holdings){
       const e = game.portfolio[id]; const s = game.stocks.find(x=>x.id===id); if (!s) continue;
-      const shares = e.shares, avg = e.avgPrice, cost = round2(shares * avg), value = round2(shares * s.price), profit = round2(value - cost);
+      const shares = e.shares, avg = e.avgPrice, cost = round2(shares * avg), value = round2(shares * s.price), profit = round2(value - cost), profitPct = cost > 0 ? (profit / cost) : 0;
       const row = document.createElement('div'); row.className = 'portfolio-row';
-      row.innerHTML = `<div><div style="font-weight:800">${s.name} <span class="small muted">(${s.sector})</span></div><div class="small muted">${shares} shares · Avg ${money(avg)} · Now ${money(s.price)}</div><div class="small muted">Cost ${money(cost)} · Value ${money(value)}</div></div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><div class="${profit>=0?'profit-pos':'profit-neg'}">${profit>=0?'+':''}${money(profit)}</div><button class="btn-sell" style="padding:6px 10px" onclick="openTradeModal('sell','${s.id}')">Sell</button></div>`;
+      row.innerHTML = `
+        <div>
+          <div style="font-weight:800">${s.name} <span class="small muted">(${s.sector})</span></div>
+          <div class="small muted">${shares} shares · Buy ${money(avg)} · Current ${money(s.price)}</div>
+          <div class="small muted">Cost ${money(cost)} · Value ${money(value)}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+          <div class="${profit>=0?'profit-pos':'profit-neg'}">${profit>=0?'+':''}${money(profit)} (${profitPct>=0?'+':''}${(profitPct*100).toFixed(2)}%)</div>
+          <button class="btn-sell" style="padding:6px 10px" onclick="openTradeModal('sell','${s.id}')">Sell</button>
+        </div>`;
       listEl.appendChild(row);
     }
   }
@@ -616,20 +605,91 @@ function renderPortfolio(){
   networthEl.textContent = money(round2(game.cash + portfolioVal));
 }
 
-/* trade modal (unchanged) */
 let currentTradeStock = null, currentTradeMode = null;
+
+function renderTradeQuickButtons(){
+  tradeQuickButtons.innerHTML = '';
+  const s = game.stocks.find(x=>x.id===currentTradeStock);
+  if (!s) return;
+
+  if (currentTradeMode === 'buy'){
+    const max = Math.max(1, Math.floor(game.cash / s.price));
+    const defs = [
+      { label:'Max', value:max, cls:'buyq' },
+      { label:'+1', value:1, cls:'buyq' },
+      { label:'+5', value:5, cls:'buyq' },
+      { label:'+10', value:10, cls:'buyq' }
+    ];
+    defs.forEach(d => {
+      const b = document.createElement('button');
+      b.className = d.cls;
+      b.textContent = d.label;
+      b.onclick = () => { tradeShares.value = Math.max(1, d.value); updateTradeCost(); };
+      tradeQuickButtons.appendChild(b);
+    });
+  } else {
+    const owned = (game.portfolio[s.id] || {shares:0}).shares;
+    const defs = [
+      { label:'-1', value:1, cls:'sellq' },
+      { label:'-5', value:5, cls:'sellq' },
+      { label:'-10', value:10, cls:'sellq' },
+      { label:'All', value:owned || 1, cls:'sellq' }
+    ];
+    defs.forEach(d => {
+      const b = document.createElement('button');
+      b.className = d.cls;
+      b.textContent = d.label;
+      b.onclick = () => {
+        if (d.label === 'All') tradeShares.value = owned || 1;
+        else tradeShares.value = Math.min(owned || 1, d.value);
+        updateTradeCost();
+      };
+      tradeQuickButtons.appendChild(b);
+    });
+  }
+}
+
+function updateTradeMeta(){
+  const s = game.stocks.find(x=>x.id===currentTradeStock);
+  if (!s) { tradeMeta.innerHTML = ''; return; }
+  const avg = (game.portfolio[s.id] && game.portfolio[s.id].avgPrice) ? game.portfolio[s.id].avgPrice : s.price;
+  const diff = s.price - avg;
+  const pct = avg > 0 ? diff / avg : 0;
+  const cls = diff >= 0 ? 'profit-pos' : 'profit-neg';
+  tradeMeta.innerHTML = `
+    <div class="row"><span>Buy price</span><strong>${money(avg)}</strong></div>
+    <div class="row"><span>Current price</span><strong>${money(s.price)}</strong></div>
+    <div class="row"><span>Move</span><strong class="${cls}">${diff>=0?'+':''}${money(diff)} (${pctText(pct)})</strong></div>
+  `;
+}
+
 function openTradeModal(mode, stockId){
   const s = game.stocks.find(x=>x.id===stockId); if(!s) return;
   currentTradeMode = mode; currentTradeStock = s.id;
   tradeHeadline.textContent = `${mode==='buy'?'Buy':'Sell'} ${s.name}`;
   tradeInfo.textContent = mode==='buy' ? `Price: ${money(s.price)} — You have ${money(game.cash)} cash` : `Price: ${money(s.price)} — You own ${(game.portfolio[s.id]||{shares:0}).shares} shares`;
-  tradeShares.value = 1; updateTradeCost();
+  tradeShares.value = mode === 'buy' ? 1 : 1;
+  updateTradeCost();
+  updateTradeMeta();
+  renderTradeQuickButtons();
   tradeOverlay.style.display = 'flex'; tradeOverlay.setAttribute('aria-hidden','false'); tradeOverlay.querySelector('.modal').classList.add(mode==='buy'?'pos':'neg','show');
   tradeShares.focus();
 }
-function updateTradeCost(){ const s=game.stocks.find(x=>x.id===currentTradeStock); const shares=Math.max(0,Math.floor(Number(tradeShares.value)||0)); tradeCost.textContent = `Cost: ${money(round2((s? s.price:0) * shares))}`; }
+
+function updateTradeCost(){
+  const s=game.stocks.find(x=>x.id===currentTradeStock);
+  const shares=Math.max(0,Math.floor(Number(tradeShares.value)||0));
+  tradeCost.textContent = currentTradeMode === 'sell'
+    ? `Sell: ${money(round2((s? s.price:0) * shares))}`
+    : `Cost: ${money(round2((s? s.price:0) * shares))}`;
+}
+
 tradeShares.addEventListener('input', updateTradeCost);
-tradeCancel.addEventListener('click', ()=>{ tradeOverlay.style.display='none'; tradeOverlay.setAttribute('aria-hidden','true'); tradeOverlay.querySelector('.modal').classList.remove('pos','neg','show'); currentTradeStock=null; });
+
+tradeCancel.addEventListener('click', ()=>{
+  tradeOverlay.style.display='none'; tradeOverlay.setAttribute('aria-hidden','true'); tradeOverlay.querySelector('.modal').classList.remove('pos','neg','show'); currentTradeStock=null;
+});
+
 tradeConfirm.addEventListener('click', ()=>{ 
   const shares = Math.max(0,Math.floor(Number(tradeShares.value)||0));
   if (shares <= 0){ alert('Enter a positive number of shares.'); return; }
@@ -652,11 +712,10 @@ tradeConfirm.addEventListener('click', ()=>{
     if (remaining === 0) delete game.portfolio[s.id]; else game.portfolio[s.id] = { shares:remaining, avgPrice: game.portfolio[s.id].avgPrice };
     logEvent(`Sold ${shares} × ${s.name}.`);
   }
-  tradeOverlay.style.display = 'none'; tradeOverlay.setAttribute('aria-hidden','true'); tradeOverlay.querySelector('.modal').classList.remove('pos','neg','show');
+  tradeOverlay.style.display='none'; tradeOverlay.setAttribute('aria-hidden','true'); tradeOverlay.querySelector('.modal').classList.remove('pos','neg','show');
   currentTradeStock = null; queueRender(); autoSave();
 });
 
-/* logging */
 function logEvent(text){
   const line = document.createElement('div'); line.style.padding='6px 0';
   line.innerHTML = `<strong style="color:#2b9cf5">Day ${game.day}:</strong> <span class="small muted">${text}</span>`;
@@ -666,7 +725,6 @@ function logEvent(text){
   capArray(game.events, 120);
 }
 
-/* market evaluation (unchanged) */
 function evaluateMarketState(){
   const days=7; let sum=0,count=0;
   for (const s of game.stocks){
@@ -681,12 +739,10 @@ function evaluateMarketState(){
   marketStateEl.textContent = game.marketState;
 }
 
-/* -------- Notifications (throttled) -------- */
 function processNotifQueue(){
   if (!notifQueue.length) return;
   const now = Date.now();
   if (now - lastNotifTime < NOTIF_COOLDOWN_MS) {
-    // schedule next attempt after remaining cooldown
     setTimeout(processNotifQueue, Math.max(200, NOTIF_COOLDOWN_MS - (now - lastNotifTime)));
     return;
   }
@@ -695,7 +751,7 @@ function processNotifQueue(){
 }
 
 function showNotifImmediate(text, ms){
-  if(disableUI) return; // Skip notifications during high-speed mode
+  if(disableUI) return;
   lastNotifTime = Date.now();
   const n = document.createElement('div'); n.className = 'notif small';
   n.textContent = text;
@@ -703,17 +759,14 @@ function showNotifImmediate(text, ms){
   setTimeout(()=> {
     try { notifWrap.removeChild(n); } catch(e) {}
   }, ms || NOTIF_DURATION_MS);
-  // attempt next queued notif after cooldown
   setTimeout(processNotifQueue, NOTIF_COOLDOWN_MS);
 }
 
 function showNotification(text, ms = NOTIF_DURATION_MS){
-  // queue the notification; the queue processor will show them spaced out so player is not overwhelmed
   notifQueue.push({ text, ms });
   processNotifQueue();
 }
 
-/* show quick buy tip based on weekly news winners (queued) */
 function showQuickTipFromNews(news){
   if (!news || !news.impactMap) return;
   const posSectors = Object.keys(news.impactMap).filter(k => k !== 'market' && news.impactMap[k] > 0);
@@ -725,7 +778,6 @@ function showQuickTipFromNews(news){
   showNotification(`Tip: ${comp.name} may rise this week — you could buy soon!`, NOTIF_DURATION_MS);
 }
 
-/* -------- applySingleDay (unchanged core behaviour) -------- */
 function applySingleDay(weeklyNews){
   game.day++;
   evaluateMarketState();
@@ -739,8 +791,6 @@ function applySingleDay(weeklyNews){
     if (weeklyNews && weeklyNews.impactMap){
       if (weeklyNews.impactMap.market) totalPct += (weeklyNews.impactMap.market / 7);
       if (weeklyNews.impactMap[s.sector]) totalPct += (weeklyNews.impactMap[s.sector] / 7);
-      if (s.sector === 'Tech' && weeklyNews.impactMap['Finance']) totalPct += (weeklyNews.impactMap['Finance'] || 0) * 0.12;
-      if (s.sector === 'Retail' && weeklyNews.impactMap['Transport']) totalPct += (weeklyNews.impactMap['Transport'] || 0) * 0.10;
     }
     s.changePct = totalPct;
     s.price = Math.max(0.01, round2(s.price * (1 + totalPct)));
@@ -748,7 +798,6 @@ function applySingleDay(weeklyNews){
     capArray(s.history, 200);
   }
 
-  // rare surprises
   if (Math.random() < SHOCK_PROB_SURGE){ const t = pick(game.stocks); const g = rand(0.25,0.9); t.changePct += g; t.price = round2(t.price * (1 + g)); t.history.push(round2(t.price)); capArray(t.history, 200); logEvent(`${t.name} had a sudden positive surprise.`); showNotification(`${t.name} jumped — consider taking a look.`); }
   if (Math.random() < SHOCK_PROB_FALL){ const t = pick(game.stocks); const l = rand(0.2,0.7); t.changePct -= l; t.price = Math.max(0.01, round2(t.price * (1 - l))); t.history.push(round2(t.price)); capArray(t.history, 200); logEvent(`${t.name} experienced a sudden drop.`); showNotification(`${t.name} dropped — be careful.`); }
 
@@ -758,13 +807,11 @@ function applySingleDay(weeklyNews){
   capArray(game.history, 200);
   queueRender();
 
-  // salary every 30 days (letter format) — gives a steady paycheck so kids can recover
   if (game.day > 0 && game.day % 30 === 0){
-    giveSalary(500); // fixed salary (can be tuned)
+    giveSalary(500);
   }
 }
 
-/* -------- weekly news generation (unchanged) -------- */
 function generateWeeklyNews(){
   if (Math.random() < 0.015){
     const e = pick(MAJOR_EVENTS);
@@ -803,21 +850,18 @@ function populateNewsModal(news){
   explainBtn.textContent = 'Explain';
 }
 
-/* -------- Salary and Boss Bonus (letter modal) -------- */
 function showLetter(toText, bodyText, signText, autoAckMs = POPUP_AUTO_ACK_MS){
-  if(disableUI) return; // Skip letter popups during high-speed mode
+  if(disableUI) return;
   letterTo.textContent = toText;
   letterBody.textContent = bodyText;
   letterSign.textContent = signText;
   letterOverlay.style.display = 'flex';
   letterOverlay.querySelector('.modal').classList.add('show');
-  // auto-acknowledge after a while so it doesn't block play
   const t = setTimeout(()=> {
     if (letterOverlay.style.display !== 'none'){
       hideLetter();
     }
   }, autoAckMs);
-  // clicking ack dismisses and clears timeout
   const ackHandler = ()=> { clearTimeout(t); hideLetter(); letterAck.removeEventListener('click', ackHandler); };
   letterAck.addEventListener('click', ackHandler);
 }
@@ -826,7 +870,6 @@ function hideLetter(){
   letterOverlay.style.display = 'none';
 }
 
-/* give salary (regular) */
 function giveSalary(amount){
   game.cash = round2(game.cash + amount);
   logEvent(`Salary received: ${money(amount)}.`);
@@ -835,7 +878,6 @@ function giveSalary(amount){
   updateProgress();
 }
 
-/* give boss bonus (occasional, bigger and praise-style) */
 function giveBossBonus(amount){
   game.cash = round2(game.cash + amount);
   logEvent(`Boss bonus: ${money(amount)} received.`);
@@ -844,18 +886,11 @@ function giveBossBonus(amount){
   updateProgress();
 }
 
-/* -------- WEEK RUNNER & SPEED (immediate) -------- */
 function getDaysPerTick(){
-  // Allow extreme speeds by applying multiple days per tick.
-  // Low speeds apply 1 day per tick; higher speeds batch more days.
   if (speedMultiplier <= 100) return 1;
-  // Scale: 1000x => ~10 days/tick, 10000x => ~100 days/tick, 1e6x => ~10000 days/tick
-  // Cap to avoid long, blocking loops.
   return Math.min(2000, Math.max(1, Math.floor(speedMultiplier / 100)));
 }
-
 function getTickMs(){
-  // Use a small fixed interval for high speeds; keep slower speeds smoother.
   if (speedMultiplier <= 200) return Math.max(10, Math.floor(perDayMsBase / speedMultiplier));
   return 10;
 }
@@ -882,7 +917,7 @@ function runTick(){
   }
 
   const start = performance.now();
-  const maxMs = 8; // avoid blocking the main thread for too long
+  const maxMs = 8;
   const maxDays = getDaysPerTick();
   let daysProcessed = 0;
 
@@ -923,7 +958,6 @@ function clearWeekTimer(){
   weekTimerRAF = false;
 }
 
-/* adjust speed immediate */
 function adjustSpeedImmediate(){
   speedLabel.textContent = speedMultiplier + 'x';
   if (weekTimer && daysAppliedInWeek > 0 && daysAppliedInWeek < 7){
@@ -933,7 +967,6 @@ function adjustSpeedImmediate(){
   }
 }
 
-/* start year run */
 function startYearRun(){
   if (runningYear) return;
   runningYear = true; paused = false; currentWeek = 0; pauseResumeBtn.textContent = 'Pause';
@@ -941,21 +974,17 @@ function startYearRun(){
   runNextWeek();
 }
 
-/* run next week */
 function runNextWeek(){
   if (!runningYear) return;
   if (paused) return;
-  // Removed stop condition for indefinite run
   currentWeek++;
   daysAppliedInWeek = 0;
   currentWeekStartNet = Number((networthEl.textContent || '$0').replace(/[$,]/g,'')) || game.cash;
   startWeekTimer(pendingWeeklyNews);
 }
 
-/* show week summary then allow viewing upcoming news; occasionally award boss bonus here (throttled) */
 function showWeekSummary(){
   if(disableUI) {
-    // Auto-continue without showing modal in high-speed mode
     pendingWeeklyNews = generateWeeklyNews();
     currentWeek++;
     daysAppliedInWeek = 0;
@@ -969,21 +998,15 @@ function showWeekSummary(){
   weekSummaryBody.textContent = `You now have ${money(afterNet)}. This week you ${diff>=0 ? 'gained' : 'lost'} ${money(Math.abs(diff))}.`;
   weekSummaryOverlay.style.display = 'flex'; weekSummaryOverlay.querySelector('.modal').classList.add('show');
 
-  // generate upcoming news for next week
   pendingWeeklyNews = generateWeeklyNews();
-
-  // show a kid-friendly tip from the upcoming news (queued)
   setTimeout(()=> { showQuickTipFromNews(pendingWeeklyNews); }, 300);
 
-  // occasional boss bonus: 15% chance after weekly summary (small chance)
   if (Math.random() < 0.15){
     const bonus = Math.round(rand(400, 1600));
-    // schedule the bonus after a small delay so player sees the summary first
     setTimeout(()=> giveBossBonus(bonus), Math.max(1000, POPUP_AUTO_ACK_MS / 2));
   }
 }
 
-/* summary modal actions */
 const viewBtn = document.getElementById('viewNewsAfterSummary'), contBtn = document.getElementById('continueAfterSummary');
 viewBtn.addEventListener('click', ()=>{
   weekSummaryOverlay.style.display='none'; weekSummaryOverlay.querySelector('.modal').classList.remove('show');
@@ -1003,7 +1026,6 @@ ackBtn.addEventListener('click', ()=>{
   if (runningYear) runNextWeek(); else { runningYear = true; runNextWeek(); }
 });
 
-/* -------- CHART (kept simple) -------- */
 function openChart(stockId){
   if (stockId === 'market_networth'){
     chartHeadline.textContent = 'Net Worth';
@@ -1045,7 +1067,6 @@ function renderChart(stockId){
   ctx.fillStyle = '#0b2a3a'; ctx.font = '14px system-ui, Arial'; ctx.fillText(label, pad.l, 16); ctx.fillText(`Latest: ${money(series[n-1])}`, pad.l + 200, 16);
 }
 
-/* -------- SAVE / LEADERBOARD -------- */
 function getLeaderboard(){ try { return JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]'); } catch(e){ return []; } }
 function setLeaderboard(list){ localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(list)); }
 function saveScoreToLeaderboard(){ const name = prompt('Enter your name to save the score locally:', 'Player'); if (name === null) return; const net = Number((networthEl.textContent || '$0').replace(/[$,]/g,'')) || 0; const board = getLeaderboard(); board.push({ name: name || 'Player', score: net, date: new Date().toISOString() }); board.sort((a,b)=>b.score - a.score); setLeaderboard(board.slice(0,50)); alert('Score saved locally.'); showLeaderboard(); }
@@ -1058,9 +1079,8 @@ function manualSave(){ autoSave(); alert('Saved locally.'); }
 function loadSaved(){ const raw = localStorage.getItem(STORAGE_KEY); if (!raw){ alert('No saved data'); return; } try { const saved = JSON.parse(raw); const byId = {}; for (const m of STOCKS_MASTER) byId[m.id] = m; game.stocks = (saved.stocks||[]).map(ss => { const master = byId[ss.id] || ss; return { id: master.id, name: master.name, sector: master.sector, price: ss.price, volatility: master.volatility||1.2, changePct:0, history: ss.history||[ss.price] }; }); game.cash = saved.cash || STANDARD.startingMoney; game.portfolio = saved.portfolio || {}; game.day = saved.day || 0; currentWeek = saved.currentWeek || 0; totalWeeks = saved.totalWeeks || Math.ceil((saved.totalDays || totalDays) / 7); totalDays = saved.totalDays || totalDays; pendingWeeklyNews = saved.pendingWeeklyNews || null; game.bonusGiven = saved.bonusGiven || false; renderCategoryTiles(); renderStocksForCategory(); renderPortfolio(); updateProgress(); alert('Loaded saved game.'); } catch(e){ alert('Failed to load'); } }
 function clearSave(){ if (!confirm('Clear saved game?')) return; localStorage.removeItem(STORAGE_KEY); alert('Saved cleared.'); }
 
-setInterval(()=>{ if (runningYear) autoSave(); }, 60000); // autosave every 60s to reduce strain
+setInterval(()=>{ if (runningYear) autoSave(); }, 60000);
 
-/* -------- UI controls & startup -------- */
 document.getElementById('restart').addEventListener('click', ()=>{ if (!confirm('Start a new game? This will reset current progress unless saved.')) return; clearWeekTimer(); initGame(true); });
 pauseResumeBtn.addEventListener('click', ()=>{ paused = !paused; pauseResumeBtn.textContent = paused ? 'Resume' : 'Pause'; if (!paused && runningYear && weekTimer==null && daysAppliedInWeek>0 && daysAppliedInWeek<7) startWeekTimer(pendingWeeklyNews); });
 saveBtn.addEventListener('click', manualSave);
@@ -1069,7 +1089,6 @@ clearSaveBtn.addEventListener('click', clearSave);
 leaderboardBtn.addEventListener('click', showLeaderboard);
 marketChartBtn.addEventListener('click', ()=> openChart('market_networth'));
 
-/* speed toggle immediate */
 speedBtn.addEventListener('click', ()=>{
   speedIndex = (speedIndex + 1) % SPEED_OPTIONS.length;
   speedMultiplier = SPEED_OPTIONS[speedIndex];
@@ -1077,16 +1096,13 @@ speedBtn.addEventListener('click', ()=>{
   adjustSpeedImmediate();
 });
 
-/* clicking outside modals closes them appropriately */
 document.addEventListener('click', (e)=>{
   if (e.target === chartOverlay) chartOverlay.style.display = 'none';
   if (e.target === tradeOverlay) { tradeOverlay.style.display = 'none'; tradeOverlay.querySelector('.modal').classList.remove('pos','neg','show'); }
   if (e.target === leaderboardOverlay) { leaderboardOverlay.style.display = 'none'; leaderboardOverlay.querySelector('.modal').classList.remove('show'); }
 });
 
-/* initial bootstrap */
 function initGame(autoStart=true){
-  // enforce fixed totalDays = 10000 at start for longer runs
   totalDays = 10000;
   totalWeeks = Math.ceil(totalDays / 7);
 
@@ -1099,7 +1115,6 @@ function initGame(autoStart=true){
   if (autoStart) startYearRun();
 }
 
-/* small helper functions */
 function updateProgress(){
   const daysSoFar = Math.min(game.day, totalDays);
   const daysTotal = totalDays;
@@ -1114,7 +1129,6 @@ function updateProgress(){
   cashPanelEl.textContent = money(game.cash);
   marketStateEl.textContent = game.marketState;
 
-  // one-time safety bonus if player falls too low (unchanged behaviour)
   const networth = round2(game.cash + portfolioVal);
   if (networth < 5000 && !game.bonusGiven){
     const bonus = 3000;
@@ -1123,11 +1137,10 @@ function updateProgress(){
     logEvent(`Your boss noticed and gave you a bonus of ${money(bonus)}!`);
     showNotification(`Boss bonus! You received ${money(bonus)} to help out.`, NOTIF_DURATION_MS);
     queueRender();
-    updateProgress(); // update with new cash
+    updateProgress();
   }
 }
 
-/* End-of-year prompt logic */
 function showEndOfYearPrompt(){
   endYearOverlay.style.display = 'flex';
   endYearOverlay.querySelector('.modal').classList.add('show');
@@ -1161,10 +1174,8 @@ endStopBtn.addEventListener('click', ()=>{
   logEvent(`Simulation paused at day ${game.day}.`);
 });
 
-/* Expose quick debug (optional) */
 window._game = game;
 
-/* -------- Loading / Intro flow (single button) -------- */
 function showLoadingThenIntro(){
   loadingOverlay.style.display = 'flex';
   setTimeout(()=>{
@@ -1174,17 +1185,14 @@ function showLoadingThenIntro(){
   }, 900);
 }
 
-/* Intro Let's play only */
 letsPlayBtn.addEventListener('click', ()=>{
   introOverlay.querySelector('.modal').classList.remove('show');
   introOverlay.style.display = 'none';
   initGame(true);
 });
 
-/* Letter ack */
 letterAck.addEventListener('click', hideLetter);
 
-/* start up (do NOT auto-start simulation until player clicks Let's play) */
 document.addEventListener('DOMContentLoaded', ()=>{
   initGame(false);
   showLoadingThenIntro();
@@ -1192,11 +1200,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('newsPanel').innerHTML = `<div class="pill">Ready</div><div class="small muted">Click a category tile to view that group's stocks. Press Start / Restart to begin or press Let's play.</div>`;
 });
 </script>
+
 <script>
-/* ===== Developer Testing Tools ===== */
-
 window.devTools = {
-
   addMoney(amount){
     if(!window.game) return console.log("Game not loaded");
     game.cash += amount;
@@ -1204,24 +1210,16 @@ window.devTools = {
     queueRender();
     updateProgress();
   },
-
   crashMarket(){
     if(!window.game) return console.log("Game not loaded");
-
-    game.stocks.forEach(stock=>{
-      stock.price *= 0.6;
-    });
-
+    game.stocks.forEach(stock=>{ stock.price *= 0.6; });
     console.log("📉 Market crash triggered");
     queueRender();
     updateProgress();
   },
-
   pumpStock(name){
     if(!window.game) return console.log("Game not loaded");
-
     const stock = game.stocks.find(s => s.name === name);
-
     if(stock){
       stock.price *= 3;
       console.log("🚀 Pumped:", stock.name);
@@ -1231,86 +1229,35 @@ window.devTools = {
       console.log("Stock not found");
     }
   },
-
   showStocks(){
     if(!window.game) return console.log("Game not loaded");
-
     console.table(game.stocks.map(s => ({
       name: s.name,
       price: s.price,
       sector: s.sector
     })));
   }
-
 };
 </script>
+
 <script>
-/* ===============================
-   UNIVERSAL DEV TOOLS FOR _game
-   =============================== */
-
 window.devTools = {
+  state(){ console.log(_game); return _game; },
+  reset(){ location.reload(); },
+  cloneState(){ return JSON.parse(JSON.stringify(_game)); },
+  restoreState(snapshot){ Object.assign(_game, snapshot); console.log("State restored"); },
 
-  /* ---------- BASIC GAME CONTROL ---------- */
-
-  state(){
-    console.log(_game);
-    return _game;
-  },
-
-  reset(){
-    location.reload();
-  },
-
-  cloneState(){
-    return JSON.parse(JSON.stringify(_game));
-  },
-
-  restoreState(snapshot){
-    Object.assign(_game, snapshot);
-    console.log("State restored");
-  },
-
-  /* ---------- MONEY ---------- */
-
-  addMoney(amount){
-    _game.cash += amount;
-    console.log("Cash:", _game.cash);
-    queueRender();
-    updateProgress();
-  },
-
-  setMoney(amount){
-    _game.cash = amount;
-  },
-
-  multiplyMoney(mult){
-    _game.cash *= mult;
-  },
-
-  bankrupt(){
-    _game.cash = 0;
-  },
-
-  millionaire(){
-    _game.cash = 1000000;
-  },
-
-  billionaire(){
-    _game.cash = 1000000000;
-  },
-
-  /* ---------- PORTFOLIO ---------- */
+  addMoney(amount){ _game.cash += amount; console.log("Cash:", _game.cash); queueRender(); updateProgress(); },
+  setMoney(amount){ _game.cash = amount; },
+  multiplyMoney(mult){ _game.cash *= mult; },
+  bankrupt(){ _game.cash = 0; },
+  millionaire(){ _game.cash = 1000000; },
+  billionaire(){ _game.cash = 1000000000; },
 
   giveAllStocks(){
-    if(!game || !game.stocks || game.stocks.length === 0) {
-      console.log("Game not loaded or no stocks");
-      return;
-    }
+    if(!game || !game.stocks || game.stocks.length === 0) { console.log("Game not loaded or no stocks"); return; }
     let totalCost = 0;
-    game.stocks.forEach(s => {
-      totalCost += 100 * s.price;
-    });
+    game.stocks.forEach(s => { totalCost += 100 * s.price; });
     if (game.cash < totalCost) {
       console.log("Not enough cash. Need:", totalCost, "Have:", game.cash);
       return;
@@ -1337,9 +1284,7 @@ window.devTools = {
     disableUI = true;
     speedMultiplier = 100;
     speedLabel.textContent = '100x';
-    if(weekTimer){
-      adjustSpeedImmediate();
-    }
+    if(weekTimer){ adjustSpeedImmediate(); }
     console.log("⚡ Speed set to 100x - UI disabled");
     return true;
   },
@@ -1348,9 +1293,7 @@ window.devTools = {
     disableUI = false;
     speedMultiplier = 1;
     speedLabel.textContent = '1x';
-    if(weekTimer){
-      adjustSpeedImmediate();
-    }
+    if(weekTimer){ adjustSpeedImmediate(); }
     console.log("⏱️ Speed set to 1x - UI enabled");
     return true;
   },
@@ -1363,260 +1306,70 @@ window.devTools = {
     disableUI = hideUI;
     speedMultiplier = multiplier;
     speedLabel.textContent = multiplier + 'x';
-    if(weekTimer){
-      adjustSpeedImmediate();
-    }
+    if(weekTimer){ adjustSpeedImmediate(); }
     console.log(`⚡ Speed set to ${multiplier}x${hideUI ? ' - UI disabled' : ''}`);
     return true;
   },
 
-  clearPortfolio(){
-    _game.portfolio = {};
-    console.log("Portfolio cleared");
-    queueRender();
-  },
-
-  /* ---------- DAY / TIME ---------- */
+  clearPortfolio(){ _game.portfolio = {}; console.log("Portfolio cleared"); queueRender(); },
 
   nextDay(days=1){
     for(let i=0;i<days;i++){
-      if(typeof advanceDay === "function"){
-        advanceDay();
-      }
+      if(typeof advanceDay === "function"){ advanceDay(); }
     }
   },
 
   simulate(days=100){
     for(let i=0;i<days;i++){
-      if(typeof advanceDay === "function"){
-        advanceDay();
-      }
+      if(typeof advanceDay === "function"){ advanceDay(); }
     }
     console.log("Simulated",days,"days");
   },
 
-  fastForward(days=365){
-    this.simulate(days);
-  },
+  fastForward(days=365){ this.simulate(days); },
 
-  /* ---------- STOCK INFO ---------- */
+  stocks(){ console.table(_game.stocks); },
+  stock(name){ return _game.stocks.find(s=>s.name===name); },
+  sectors(){ return [...new Set(_game.stocks.map(s=>s.sector))]; },
 
-  stocks(){
-    console.table(_game.stocks);
-  },
+  setPrice(name,price){ const s=this.stock(name); if(s) s.price=price; },
+  addPrice(name,value){ const s=this.stock(name); if(s) s.price+=value; },
+  multiplyPrice(name,mult){ const s=this.stock(name); if(s) s.price*=mult; },
+  pumpStock(name){ const s=this.stock(name); if(s) s.price*=3; },
+  dumpStock(name){ const s=this.stock(name); if(s) s.price*=0.4; },
+  killStock(name){ const s=this.stock(name); if(s) s.price=0.01; },
+  reviveStock(name){ const s=this.stock(name); if(s) s.price=50; },
 
-  stock(name){
-    return _game.stocks.find(s=>s.name===name);
-  },
+  crashMarket(){ _game.stocks.forEach(s=>s.price*=0.6); console.log("Market crashed"); queueRender(); updateProgress(); },
+  megaCrash(){ _game.stocks.forEach(s=>s.price*=0.2); console.log("Mega crash"); queueRender(); updateProgress(); },
+  bullMarket(){ _game.stocks.forEach(s=>s.price*=1.5); console.log("Bull market"); queueRender(); updateProgress(); },
+  moonMarket(){ _game.stocks.forEach(s=>s.price*=3); console.log("Moon market"); queueRender(); updateProgress(); },
+  randomizeMarket(){ _game.stocks.forEach(s=>{ s.price=Math.random()*200+1; }); console.log("Market randomized"); queueRender(); updateProgress(); },
+  stabilize(){ _game.stocks.forEach(s=>{ s.volatility=0.01; }); },
+  chaos(){ _game.stocks.forEach(s=>{ s.volatility=0.2; }); },
 
-  sectors(){
-    return [...new Set(_game.stocks.map(s=>s.sector))];
-  },
+  portfolio(){ return _game.portfolio; },
+  clearPortfolio(){ _game.portfolio={}; },
+  giveAllStocks(amount=100){ _game.stocks.forEach(s=>{ _game.portfolio[s.name]=amount; }); },
 
-  /* ---------- PRICE CONTROL ---------- */
+  richestStock(){ let best=_game.stocks.reduce((a,b)=>a.price>b.price?a:b); console.log(best); return best; },
+  cheapestStock(){ let worst=_game.stocks.reduce((a,b)=>a.price<b.price?a:b); console.log(worst); return worst; },
+  averagePrice(){ let avg=_game.stocks.reduce((a,b)=>a+b.price,0)/_game.stocks.length; console.log(avg); return avg; },
+  totalMarketCap(){ let sum=_game.stocks.reduce((a,b)=>a+b.price,0); console.log(sum); return sum; },
 
-  setPrice(name,price){
-    const s=this.stock(name);
-    if(s) s.price=price;
-  },
+  randomPump(){ const s=_game.stocks[Math.floor(Math.random()*_game.stocks.length)]; s.price*=3; console.log("Random pump:",s.name); },
+  randomCrash(){ const s=_game.stocks[Math.floor(Math.random()*_game.stocks.length)]; s.price*=0.3; console.log("Random crash:",s.name); },
+  randomEvent(){ if(Math.random()>0.5){ this.randomPump(); }else{ this.randomCrash(); } },
 
-  addPrice(name,value){
-    const s=this.stock(name);
-    if(s) s.price+=value;
-  },
+  doubleEverything(){ game.stocks.forEach(s=>s.price*=2); game.cash*=2; console.log("💰 Doubled everything"); queueRender(); updateProgress(); },
+  halveEverything(){ game.stocks.forEach(s=>s.price*=0.5); game.cash*=0.5; console.log("📉 Halved everything"); queueRender(); updateProgress(); },
+  destroyEconomy(){ game.stocks.forEach(s=>s.price=0.1); console.log("💥 Economy destroyed"); queueRender(); updateProgress(); },
+  utopia(){ game.stocks.forEach(s=>s.price*=10); game.cash*=10; console.log("✨ Utopia achieved"); queueRender(); updateProgress(); },
 
-  multiplyPrice(name,mult){
-    const s=this.stock(name);
-    if(s) s.price*=mult;
-  },
-
-  pumpStock(name){
-    const s=this.stock(name);
-    if(s) s.price*=3;
-  },
-
-  dumpStock(name){
-    const s=this.stock(name);
-    if(s) s.price*=0.4;
-  },
-
-  killStock(name){
-    const s=this.stock(name);
-    if(s) s.price=0.01;
-  },
-
-  reviveStock(name){
-    const s=this.stock(name);
-    if(s) s.price=50;
-  },
-
-  /* ---------- MARKET CONTROL ---------- */
-
-  crashMarket(){
-    _game.stocks.forEach(s=>s.price*=0.6);
-    console.log("Market crashed");
-    queueRender();
-    updateProgress();
-  },
-
-  megaCrash(){
-    _game.stocks.forEach(s=>s.price*=0.2);
-    console.log("Mega crash");
-    queueRender();
-    updateProgress();
-  },
-
-  bullMarket(){
-    _game.stocks.forEach(s=>s.price*=1.5);
-    console.log("Bull market");
-    queueRender();
-    updateProgress();
-  },
-
-  moonMarket(){
-    _game.stocks.forEach(s=>s.price*=3);
-    console.log("Moon market");
-    queueRender();
-    updateProgress();
-  },
-
-  randomizeMarket(){
-    _game.stocks.forEach(s=>{
-      s.price=Math.random()*200+1;
-    });
-    console.log("Market randomized");
-    queueRender();
-    updateProgress();
-  },
-
-  stabilize(){
-    _game.stocks.forEach(s=>{
-      s.volatility=0.01;
-    });
-  },
-
-  chaos(){
-    _game.stocks.forEach(s=>{
-      s.volatility=0.2;
-    });
-  },
-
-  /* ---------- PORTFOLIO ---------- */
-
-  portfolio(){
-    return _game.portfolio;
-  },
-
-  clearPortfolio(){
-    _game.portfolio={};
-  },
-
-  giveAllStocks(amount=100){
-    _game.stocks.forEach(s=>{
-      _game.portfolio[s.name]=amount;
-    });
-  },
-
-  /* ---------- ANALYTICS ---------- */
-
-  richestStock(){
-    let best=_game.stocks.reduce((a,b)=>a.price>b.price?a:b);
-    console.log(best);
-    return best;
-  },
-
-  cheapestStock(){
-    let worst=_game.stocks.reduce((a,b)=>a.price<b.price?a:b);
-    console.log(worst);
-    return worst;
-  },
-
-  averagePrice(){
-    let avg=_game.stocks.reduce((a,b)=>a+b.price,0)/_game.stocks.length;
-    console.log(avg);
-    return avg;
-  },
-
-  totalMarketCap(){
-    let sum=_game.stocks.reduce((a,b)=>a+b.price,0);
-    console.log(sum);
-    return sum;
-  },
-
-  /* ---------- RANDOM EVENTS ---------- */
-
-  randomPump(){
-    const s=_game.stocks[Math.floor(Math.random()*_game.stocks.length)];
-    s.price*=3;
-    console.log("Random pump:",s.name);
-  },
-
-  randomCrash(){
-    const s=_game.stocks[Math.floor(Math.random()*_game.stocks.length)];
-    s.price*=0.3;
-    console.log("Random crash:",s.name);
-  },
-
-  randomEvent(){
-    if(Math.random()>0.5){
-      this.randomPump();
-    }else{
-      this.randomCrash();
-    }
-  },
-
-  /* ---------- MASS OPERATIONS ---------- */
-
-  doubleEverything(){
-    game.stocks.forEach(s=>s.price*=2);
-    game.cash*=2;
-    console.log("💰 Doubled everything");
-    queueRender();
-    updateProgress();
-  },
-
-  halveEverything(){
-    game.stocks.forEach(s=>s.price*=0.5);
-    game.cash*=0.5;
-    console.log("📉 Halved everything");
-    queueRender();
-    updateProgress();
-  },
-
-  destroyEconomy(){
-    game.stocks.forEach(s=>s.price=0.1);
-    console.log("💥 Economy destroyed");
-    queueRender();
-    updateProgress();
-  },
-
-  utopia(){
-    game.stocks.forEach(s=>s.price*=10);
-    game.cash*=10;
-    console.log("✨ Utopia achieved");
-    queueRender();
-    updateProgress();
-  },
-
-  /* ---------- DEBUG HELPERS ---------- */
-
-  globals(){
-    return Object.keys(window);
-  },
-
-  findGame(){
-    for(let k in window){
-      if(window[k] && typeof window[k]==="object"){
-        if(window[k].stocks){
-          console.log("Possible game object:",k);
-        }
-      }
-    }
-  }
-
+  globals(){ return Object.keys(window); },
+  findGame(){ for(let k in window){ if(window[k] && typeof window[k]==="object"){ if(window[k].stocks){ console.log("Possible game object:",k); } } } }
 };
 
-// DevTools lock wrapper
 (() => {
   const CODE = 'opensesame12345678910';
   const state = { unlocked: false };
@@ -1657,7 +1410,7 @@ window.devTools = {
 })();
 </script>
 <script>
-window.Devtools = window.devTools; // Alias for case-insensitive access
+window.Devtools = window.devTools;
 </script>
 </body>
 </html>
