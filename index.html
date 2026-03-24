@@ -158,6 +158,7 @@
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <div class="status" style="flex-wrap:wrap">
           <div>Day <strong id="dayNum">0</strong></div>
+          <div>Level <strong id="levelDisplay">1</strong></div>
           <div>Cash <strong id="cash">$0</strong></div>
           <div>Net Worth <strong id="networth">$0</strong></div>
           <div>Profit <strong id="unrealisedTop">$0</strong></div>
@@ -362,6 +363,23 @@
     </div>
   </div>
 
+  <div id="contractOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal" role="document" aria-labelledby="contractTitle" style="max-width:620px;">
+      <h2 id="contractTitle">Employment Contract</h2>
+      <div style="background:#fafafa;padding:16px;border-radius:8px;border:1px solid rgba(7,34,40,0.06);margin:12px 0;">
+        <div class="mini" style="font-weight:800;margin-bottom:8px;">Contract Level <span id="contractLevel">1</span></div>
+        <div class="small muted" id="contractDetails" style="line-height:1.6;"></div>
+      </div>
+      <div class="letter-content" style="margin:12px 0;">
+        <div class="mini" style="font-weight:800;margin-bottom:8px;">Benefits</div>
+        <ul class="small muted" id="contractBenefits" style="padding-left:16px;margin:0;"></ul>
+      </div>
+      <div class="controls" style="margin-top:12px;">
+        <button id="contractSign" class="btn-primary">Sign Contract</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 const STORAGE_KEY = 'marketSim_v6_tilemode';
 const LEADERBOARD_KEY = 'marketSim_v6_leaderboard';
@@ -386,6 +404,37 @@ const TREND_DAILY_BIAS = 0.004;
 const SHOCK_PROB_SURGE = 0.006;
 const SHOCK_PROB_FALL = 0.004;
 const SPEED_OPTIONS = [1,2,4];
+
+// Level system
+const LEVEL_CONTRACTS = {
+  1: {
+    level: 1,
+    title: 'Junior Trader',
+    description: 'Entry-level position at our trading firm. Learn the basics and build your portfolio.',
+    monthlyBonus: 500,
+    stockLimit: 10,
+    requirements: 'Starting position - no requirements',
+    unlockAt: 0
+  },
+  2: {
+    level: 2,
+    title: 'Senior Trader',
+    description: 'Promoted! Your dedication has earned you a better position with higher compensation.',
+    monthlyBonus: 1000,
+    stockLimit: 20,
+    requirements: 'Reach $25,000 net worth',
+    unlockAt: 25000
+  },
+  3: {
+    level: 3,
+    title: 'Head of Trading',
+    description: 'You\'ve proven yourself as a top performer. Welcome to the leadership team!',
+    monthlyBonus: 2000,
+    stockLimit: 30,
+    requirements: 'Reach $100,000 net worth',
+    unlockAt: 100000
+  }
+};
 
 const REAL_TECH = ["NVIDIA","AMD","Intel","Apple","Microsoft","Alphabet","Amazon","Meta","Qualcomm","Broadcom"];
 const REAL_TRANSPORT = ["Tesla","Ford Motor Company","General Motors","Toyota","Uber","Boeing","Airbus","DHL","Maersk","Volvo"];
@@ -460,7 +509,7 @@ let totalDays = 10000;
 let totalWeeks = Math.ceil(totalDays / 7);
 
 let game = {
-  stocks: [], day:0, cash: STANDARD.startingMoney, portfolio:{}, events:[], history:[], cyclesCompleted:0, marketState:'Sideways', bonusGiven:false
+  stocks: [], day:0, cash: STANDARD.startingMoney, portfolio:{}, events:[], history:[], cyclesCompleted:0, marketState:'Sideways', bonusGiven:false, level: 1, levelUpUnlocked: {}
 };
 let currentWeek = 0, runningYear = false, paused = false;
 let disableUI = false;
@@ -487,6 +536,7 @@ const categoryGrid = document.getElementById('categoryGrid');
 const stocksBody = document.getElementById('stocksBody');
 const newsPanel = document.getElementById('newsPanel');
 const dayNumEl = document.getElementById('dayNum'), cashEl = document.getElementById('cash'), networthEl = document.getElementById('networth');
+const levelDisplay = document.getElementById('levelDisplay');
 const portfolioValueEl = document.getElementById('portfolioValue'), cashPanelEl = document.getElementById('cashPanel');
 const progressBarEl = document.getElementById('progressBar'), progressTextEl = document.getElementById('progressText');
 const marketStateEl = document.getElementById('marketState'), eventsLogEl = document.getElementById('eventsLog');
@@ -520,6 +570,14 @@ const letterTo = document.getElementById('letterTo');
 const letterBody = document.getElementById('letterBody');
 const letterSign = document.getElementById('letterSign');
 const letterAck = document.getElementById('letterAck');
+
+const contractOverlay = document.getElementById('contractOverlay');
+const contractTitle = document.getElementById('contractTitle');
+const contractLevel = document.getElementById('contractLevel');
+const contractDetails = document.getElementById('contractDetails');
+const contractBenefits = document.getElementById('contractBenefits');
+const contractSign = document.getElementById('contractSign');
+let pendingContractLevel = 0;
 
 function resetLiveStocks(){
   game.stocks = STOCKS_MASTER.map(s => ({ id:s.id, name:s.name, sector:s.sector, price:s.price, volatility:s.volatility, changePct:0, history:[round2(s.price)] }));
@@ -870,12 +928,70 @@ function hideLetter(){
   letterOverlay.style.display = 'none';
 }
 
+function showContract(levelNum){
+  if(disableUI) return;
+  const contract = LEVEL_CONTRACTS[levelNum];
+  if (!contract) return;
+  
+  pendingContractLevel = levelNum;
+  contractLevel.textContent = levelNum;
+  contractDetails.innerHTML = `
+    <div style="font-weight:800;color:#0b2a3a;margin-bottom:6px;">${contract.title}</div>
+    <div>${contract.description}</div>
+    <hr style="margin:10px 0;border:none;border-top:1px dashed rgba(7,34,40,0.06);">
+    <div class="small" style="color:var(--muted);">${contract.requirements}</div>
+  `;
+  
+  contractBenefits.innerHTML = '';
+  const benefits = [
+    `Monthly Bonus: ${money(contract.monthlyBonus)}`,
+    `Stocks Available: Up to ${contract.stockLimit}`,
+    `Level Rank: ${contract.title}`
+  ];
+  benefits.forEach(b => {
+    const li = document.createElement('li');
+    li.style.marginBottom = '6px';
+    li.textContent = b;
+    contractBenefits.appendChild(li);
+  });
+  
+  contractOverlay.style.display = 'flex';
+  contractOverlay.setAttribute('aria-hidden','false');
+  contractOverlay.querySelector('.modal').classList.add('show');
+}
+
+function hideContract(){
+  contractOverlay.querySelector('.modal').classList.remove('show');
+  contractOverlay.style.display = 'none';
+}
+
+contractSign.addEventListener('click', ()=> {
+  if (pendingContractLevel <= 0) return;
+  const contract = LEVEL_CONTRACTS[pendingContractLevel];
+  game.level = pendingContractLevel;
+  hideContract();
+  if (pendingContractLevel === 1) {
+    logEvent('Signed Level 1 contract - Junior Trader');
+  } else {
+    logEvent(`Promoted to Level ${pendingContractLevel} - ${contract.title}!`);
+    showNotification(`🎉 Level ${pendingContractLevel} - ${contract.title}!`);
+  }
+  queueRender();
+  autoSave();
+  if (pendingContractLevel === 1 && !runningYear) {
+    setTimeout(() => { startYearRun(); }, 300);
+  }
+});
+
 function giveSalary(amount){
-  game.cash = round2(game.cash + amount);
-  logEvent(`Salary received: ${money(amount)}.`);
-  showLetter('Dear Player,', `Good news — your monthly paycheck has arrived. We've deposited ${money(amount)} into your account. Keep learning and having fun!`, '— HR Department', POPUP_AUTO_ACK_MS * 1.2);
+  // Use level-based bonus if available
+  const levelBonus = LEVEL_CONTRACTS[game.level] ? LEVEL_CONTRACTS[game.level].monthlyBonus : amount;
+  game.cash = round2(game.cash + levelBonus);
+  logEvent(`Salary received: ${money(levelBonus)}.`);
+  showLetter('Dear Player,', `Good news — your monthly paycheck has arrived. We've deposited ${money(levelBonus)} into your account. Keep learning and having fun!`, '— HR Department', POPUP_AUTO_ACK_MS * 1.2);
   queueRender();
   updateProgress();
+  checkLevelUp();
 }
 
 function giveBossBonus(amount){
@@ -884,6 +1000,24 @@ function giveBossBonus(amount){
   showLetter('Dear Player,', `You've done really well! As a reward, your boss has given you a bonus of ${money(amount)}. Keep up the great work!`, '— Your Boss', POPUP_AUTO_ACK_MS * 1.5);
   queueRender();
   updateProgress();
+  checkLevelUp();
+}
+
+function checkLevelUp(){
+  const portfolioVal = Object.keys(game.portfolio).reduce((acc,id)=>{ const e=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return acc + (s? s.price * e.shares : 0); },0);
+  const networth = round2(game.cash + portfolioVal);
+  
+  // Check if player qualifies for next level
+  for (let level = 3; level >= 2; level--) {
+    const contract = LEVEL_CONTRACTS[level];
+    if (game.level < level && networth >= contract.unlockAt && !game.levelUpUnlocked[level]) {
+      game.levelUpUnlocked[level] = true;
+      setTimeout(() => {
+        showContract(level);
+      }, 500);
+      return;
+    }
+  }
 }
 
 function getDaysPerTick(){
@@ -1074,9 +1208,9 @@ function showLeaderboard(){ const list = getLeaderboard(); leaderboardList.inner
 leaderboardClose.addEventListener('click', ()=>{ leaderboardOverlay.style.display='none'; leaderboardOverlay.querySelector('.modal').classList.remove('show'); });
 leaderboardClear.addEventListener('click', ()=>{ if (confirm('Clear leaderboard?')){ setLeaderboard([]); showLeaderboard(); } });
 
-function autoSave(){ try { const save = { v:6, day:game.day, cash:game.cash, portfolio:game.portfolio, stocks:game.stocks.map(s=>({id:s.id,price:s.price,history:s.history.slice(-120)})), currentWeek, totalWeeks, totalDays, pendingWeeklyNews, bonusGiven: game.bonusGiven }; localStorage.setItem(STORAGE_KEY, JSON.stringify(save)); } catch(e){} }
+function autoSave(){ try { const save = { v:6, day:game.day, cash:game.cash, portfolio:game.portfolio, stocks:game.stocks.map(s=>({id:s.id,price:s.price,history:s.history.slice(-120)})), currentWeek, totalWeeks, totalDays, pendingWeeklyNews, bonusGiven: game.bonusGiven, level: game.level, levelUpUnlocked: game.levelUpUnlocked }; localStorage.setItem(STORAGE_KEY, JSON.stringify(save)); } catch(e){} }
 function manualSave(){ autoSave(); alert('Saved locally.'); }
-function loadSaved(){ const raw = localStorage.getItem(STORAGE_KEY); if (!raw){ alert('No saved data'); return; } try { const saved = JSON.parse(raw); const byId = {}; for (const m of STOCKS_MASTER) byId[m.id] = m; game.stocks = (saved.stocks||[]).map(ss => { const master = byId[ss.id] || ss; return { id: master.id, name: master.name, sector: master.sector, price: ss.price, volatility: master.volatility||1.2, changePct:0, history: ss.history||[ss.price] }; }); game.cash = saved.cash || STANDARD.startingMoney; game.portfolio = saved.portfolio || {}; game.day = saved.day || 0; currentWeek = saved.currentWeek || 0; totalWeeks = saved.totalWeeks || Math.ceil((saved.totalDays || totalDays) / 7); totalDays = saved.totalDays || totalDays; pendingWeeklyNews = saved.pendingWeeklyNews || null; game.bonusGiven = saved.bonusGiven || false; renderCategoryTiles(); renderStocksForCategory(); renderPortfolio(); updateProgress(); alert('Loaded saved game.'); } catch(e){ alert('Failed to load'); } }
+function loadSaved(){ const raw = localStorage.getItem(STORAGE_KEY); if (!raw){ alert('No saved data'); return; } try { const saved = JSON.parse(raw); const byId = {}; for (const m of STOCKS_MASTER) byId[m.id] = m; game.stocks = (saved.stocks||[]).map(ss => { const master = byId[ss.id] || ss; return { id: master.id, name: master.name, sector: master.sector, price: ss.price, volatility: master.volatility||1.2, changePct:0, history: ss.history||[ss.price] }; }); game.cash = saved.cash || STANDARD.startingMoney; game.portfolio = saved.portfolio || {}; game.day = saved.day || 0; game.level = saved.level || 1; game.levelUpUnlocked = saved.levelUpUnlocked || {}; currentWeek = saved.currentWeek || 0; totalWeeks = saved.totalWeeks || Math.ceil((saved.totalDays || totalDays) / 7); totalDays = saved.totalDays || totalDays; pendingWeeklyNews = saved.pendingWeeklyNews || null; game.bonusGiven = saved.bonusGiven || false; renderCategoryTiles(); renderStocksForCategory(); renderPortfolio(); updateProgress(); alert('Loaded saved game.'); } catch(e){ alert('Failed to load'); } }
 function clearSave(){ if (!confirm('Clear saved game?')) return; localStorage.removeItem(STORAGE_KEY); alert('Saved cleared.'); }
 
 setInterval(()=>{ if (runningYear) autoSave(); }, 60000);
@@ -1100,6 +1234,7 @@ document.addEventListener('click', (e)=>{
   if (e.target === chartOverlay) chartOverlay.style.display = 'none';
   if (e.target === tradeOverlay) { tradeOverlay.style.display = 'none'; tradeOverlay.querySelector('.modal').classList.remove('pos','neg','show'); }
   if (e.target === leaderboardOverlay) { leaderboardOverlay.style.display = 'none'; leaderboardOverlay.querySelector('.modal').classList.remove('show'); }
+  if (e.target === contractOverlay && runningYear) { hideContract(); }
 });
 
 function initGame(autoStart=true){
@@ -1109,10 +1244,15 @@ function initGame(autoStart=true){
   resetLiveStocks();
   game.portfolio = {};
   game.day = 0; game.cash = STANDARD.startingMoney; game.events = []; game.history = []; game.cyclesCompleted = 0; game.marketState = 'Sideways'; game.bonusGiven = false;
+  game.level = 1; game.levelUpUnlocked = {};
   pendingWeeklyNews = null; currentWeek = 0; runningYear = false; paused = false; daysAppliedInWeek = 0;
   renderCategoryTiles(); renderStocksForCategory(); renderPortfolio(); updateProgress();
   logEvent(`Simulation started. ${totalDays} days. Starting cash ${money(game.cash)}.`);
-  if (autoStart) startYearRun();
+  if (autoStart) {
+    setTimeout(() => {
+      showContract(1);
+    }, 300);
+  }
 }
 
 function updateProgress(){
@@ -1122,6 +1262,7 @@ function updateProgress(){
   progressBarEl.style.width = pct + '%';
   progressTextEl.textContent = `${daysSoFar}/${daysTotal} days`;
   dayNumEl.textContent = game.day;
+  levelDisplay.textContent = game.level;
   cashEl.textContent = money(game.cash);
   const portfolioVal = Object.keys(game.portfolio).reduce((acc,id)=>{ const e=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return acc + (s? s.price * e.shares : 0); },0);
   portfolioValueEl.textContent = money(portfolioVal);
@@ -1139,6 +1280,7 @@ function updateProgress(){
     queueRender();
     updateProgress();
   }
+  checkLevelUp();
 }
 
 function showEndOfYearPrompt(){
