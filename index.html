@@ -364,18 +364,28 @@
   </div>
 
   <div id="contractOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
-    <div class="modal" role="document" aria-labelledby="contractTitle" style="max-width:620px;">
-      <h2 id="contractTitle">Employment Contract</h2>
-      <div style="background:#fafafa;padding:16px;border-radius:8px;border:1px solid rgba(7,34,40,0.06);margin:12px 0;">
-        <div class="mini" style="font-weight:800;margin-bottom:8px;">Contract Level <span id="contractLevel">1</span></div>
-        <div class="small muted" id="contractDetails" style="line-height:1.6;"></div>
+    <div class="modal" role="document" aria-labelledby="contractTitle" style="max-width:920px;display:flex;gap:16px;">
+      <div style="flex:1;">
+        <h2 id="contractTitle">Employment Contract</h2>
+        <div style="background:#fafafa;padding:16px;border-radius:8px;border:1px solid rgba(7,34,40,0.06);margin:12px 0;">
+          <div class="mini" style="font-weight:800;margin-bottom:8px;">Contract Level <span id="contractLevel">1</span></div>
+          <div class="small muted" id="contractDetails" style="line-height:1.6;"></div>
+        </div>
+        <div style="margin:12px 0;">
+          <label class="small" style="font-weight:800;display:block;margin-bottom:6px;">Please enter your name:</label>
+          <input id="contractNameInput" type="text" placeholder="Enter your trading name" style="width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid rgba(7,34,40,0.08);font-size:14px;" />
+        </div>
+        <div class="letter-content" style="margin:12px 0;">
+          <div class="mini" style="font-weight:800;margin-bottom:8px;">Benefits</div>
+          <ul class="small muted" id="contractBenefits" style="padding-left:16px;margin:0;"></ul>
+        </div>
+        <div class="controls" style="margin-top:12px;">
+          <button id="contractSign" class="btn-primary">Sign Contract</button>
+        </div>
       </div>
-      <div class="letter-content" style="margin:12px 0;">
-        <div class="mini" style="font-weight:800;margin-bottom:8px;">Benefits</div>
-        <ul class="small muted" id="contractBenefits" style="padding-left:16px;margin:0;"></ul>
-      </div>
-      <div class="controls" style="margin-top:12px;">
-        <button id="contractSign" class="btn-primary">Sign Contract</button>
+      <div style="flex:0 0 280px;background:#f5f9ff;padding:16px;border-radius:8px;border:1px solid rgba(43,156,245,0.1);">
+        <div class="mini" style="font-weight:800;margin-bottom:12px;color:var(--accent);">Your Contract</div>
+        <div id="contractPreview" class="letter-content small" style="background:#fffef8;padding:12px;margin:0;font-size:11px;line-height:1.5;max-height:400px;overflow:auto;"></div>
       </div>
     </div>
   </div>
@@ -412,7 +422,8 @@ const LEVEL_CONTRACTS = {
     title: 'Junior Trader',
     description: 'Entry-level position at our trading firm. Learn the basics and build your portfolio.',
     monthlyBonus: 500,
-    stockLimit: 10,
+    categories: 3,
+    stocksPerCategory: 3,
     requirements: 'Starting position - no requirements',
     unlockAt: 0
   },
@@ -421,7 +432,8 @@ const LEVEL_CONTRACTS = {
     title: 'Senior Trader',
     description: 'Promoted! Your dedication has earned you a better position with higher compensation.',
     monthlyBonus: 1000,
-    stockLimit: 20,
+    categories: 5,
+    stocksPerCategory: 5,
     requirements: 'Reach $25,000 net worth',
     unlockAt: 25000
   },
@@ -430,9 +442,20 @@ const LEVEL_CONTRACTS = {
     title: 'Head of Trading',
     description: 'You\'ve proven yourself as a top performer. Welcome to the leadership team!',
     monthlyBonus: 2000,
-    stockLimit: 30,
+    categories: 6,
+    stocksPerCategory: 7,
     requirements: 'Reach $100,000 net worth',
     unlockAt: 100000
+  },
+  4: {
+    level: 4,
+    title: 'Chief Trading Officer',
+    description: 'The pinnacle of success! You now lead the entire trading division.',
+    monthlyBonus: 3000,
+    categories: 6,
+    stocksPerCategory: 10,
+    requirements: 'Reach $250,000 net worth',
+    unlockAt: 250000
   }
 };
 
@@ -509,7 +532,7 @@ let totalDays = 10000;
 let totalWeeks = Math.ceil(totalDays / 7);
 
 let game = {
-  stocks: [], day:0, cash: STANDARD.startingMoney, portfolio:{}, events:[], history:[], cyclesCompleted:0, marketState:'Sideways', bonusGiven:false, level: 1, levelUpUnlocked: {}
+  stocks: [], day:0, cash: STANDARD.startingMoney, portfolio:{}, events:[], history:[], cyclesCompleted:0, marketState:'Sideways', bonusGiven:false, level: 1, levelUpUnlocked: {}, playerName: 'Trader'
 };
 let currentWeek = 0, runningYear = false, paused = false;
 let disableUI = false;
@@ -577,6 +600,8 @@ const contractLevel = document.getElementById('contractLevel');
 const contractDetails = document.getElementById('contractDetails');
 const contractBenefits = document.getElementById('contractBenefits');
 const contractSign = document.getElementById('contractSign');
+const contractNameInput = document.getElementById('contractNameInput');
+const contractPreview = document.getElementById('contractPreview');
 let pendingContractLevel = 0;
 
 function resetLiveStocks(){
@@ -585,10 +610,12 @@ function resetLiveStocks(){
 
 function renderCategoryTiles(){
   categoryGrid.innerHTML = '';
-  for (const c of CATEGORIES){
+  const availableCategories = getAvailableCategoriesForLevel(game.level);
+  const stocksPerCat = getStocksPerCategoryForLevel(game.level);
+  for (const c of availableCategories){
     const btn = document.createElement('button');
     btn.className = `cat-tile ${c.css}` + (selectedCategory === c.key ? ' active' : '');
-    btn.innerHTML = `<div style="font-size:18px">${c.label}</div><div class="sub">View 10 stocks</div>`;
+    btn.innerHTML = `<div style="font-size:18px">${c.label}</div><div class="sub">View ${stocksPerCat} stocks</div>`;
     btn.onclick = ()=> {
       selectedCategory = c.key;
       renderCategoryTiles(); renderStocksForCategory();
@@ -600,7 +627,8 @@ function renderCategoryTiles(){
 function renderStocksForCategory(){
   stocksBody.innerHTML = '';
   stockRowMap.clear();
-  const list = game.stocks.filter(s => s.sector === selectedCategory);
+  const stocksPerCat = getStocksPerCategoryForLevel(game.level);
+  const list = game.stocks.filter(s => s.sector === selectedCategory).slice(0, stocksPerCat);
   for (const s of list){
     const prev = (s.history.length >= 2) ? s.history[s.history.length-2] : s.history[s.history.length-1];
     const pct = s.changePct || 0;
@@ -928,6 +956,19 @@ function hideLetter(){
   letterOverlay.style.display = 'none';
 }
 
+function getAvailableCategoriesForLevel(level){
+  const contract = LEVEL_CONTRACTS[level];
+  if (!contract) return CATEGORIES;
+  const count = contract.categories;
+  return CATEGORIES.slice(0, count);
+}
+
+function getStocksPerCategoryForLevel(level){
+  const contract = LEVEL_CONTRACTS[level];
+  if (!contract) return 10;
+  return contract.stocksPerCategory;
+}
+
 function showContract(levelNum){
   if(disableUI) return;
   const contract = LEVEL_CONTRACTS[levelNum];
@@ -945,7 +986,8 @@ function showContract(levelNum){
   contractBenefits.innerHTML = '';
   const benefits = [
     `Monthly Bonus: ${money(contract.monthlyBonus)}`,
-    `Stocks Available: Up to ${contract.stockLimit}`,
+    `Available Categories: ${contract.categories}`,
+    `Stocks Per Category: ${contract.stocksPerCategory}`,
     `Level Rank: ${contract.title}`
   ];
   benefits.forEach(b => {
@@ -954,6 +996,29 @@ function showContract(levelNum){
     li.textContent = b;
     contractBenefits.appendChild(li);
   });
+  
+  // Generate contract preview
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  contractPreview.innerHTML = `
+    <div style="font-weight:bold;text-align:center;margin-bottom:8px;">EMPLOYMENT AGREEMENT</div>
+    <div style="text-align:center;margin-bottom:10px;">___________________________</div>
+    <div style="margin-bottom:2px;"><span style="font-weight:bold;">Trader Name:</span> <span id="previewName">_________________</span></div>
+    <div style="margin-bottom:2px;"><span style="font-weight:bold;">Position:</span> ${contract.title}</div>
+    <div style="margin-bottom:2px;"><span style="font-weight:bold;">Level:</span> ${levelNum}</div>
+    <div style="margin-bottom:2px;"><span style="font-weight:bold;">Date:</span> ${dateStr}</div>
+    <div style="margin-top:8px;border-top:1px dashed rgba(0,0,0,0.2);padding-top:8px;text-align:center;font-style:italic;">This contract grants trading privileges...</div>
+  `;
+  
+  contractNameInput.value = game.playerName || '';
+  contractNameInput.focus();
+  
+  // Update preview name in real-time
+  const updatePreviewName = () => {
+    document.getElementById('previewName').textContent = contractNameInput.value || '_________________';
+  };
+  contractNameInput.oninput = updatePreviewName;
+  updatePreviewName();
   
   contractOverlay.style.display = 'flex';
   contractOverlay.setAttribute('aria-hidden','false');
@@ -968,14 +1033,18 @@ function hideContract(){
 contractSign.addEventListener('click', ()=> {
   if (pendingContractLevel <= 0) return;
   const contract = LEVEL_CONTRACTS[pendingContractLevel];
+  const playerName = (contractNameInput.value || 'Trader').trim();
+  game.playerName = playerName;
   game.level = pendingContractLevel;
   hideContract();
   if (pendingContractLevel === 1) {
-    logEvent('Signed Level 1 contract - Junior Trader');
+    logEvent(`Signed Level 1 contract - Junior Trader. Welcome, ${playerName}!`);
   } else {
     logEvent(`Promoted to Level ${pendingContractLevel} - ${contract.title}!`);
-    showNotification(`🎉 Level ${pendingContractLevel} - ${contract.title}!`);
+    showNotification(`🎉 Level ${pendingContractLevel} - ${contract.title}! Welcome, ${playerName}!`);
   }
+  renderCategoryTiles();
+  renderStocksForCategory();
   queueRender();
   autoSave();
   if (pendingContractLevel === 1 && !runningYear) {
@@ -1008,7 +1077,7 @@ function checkLevelUp(){
   const networth = round2(game.cash + portfolioVal);
   
   // Check if player qualifies for next level
-  for (let level = 3; level >= 2; level--) {
+  for (let level = 4; level >= 2; level--) {
     const contract = LEVEL_CONTRACTS[level];
     if (game.level < level && networth >= contract.unlockAt && !game.levelUpUnlocked[level]) {
       game.levelUpUnlocked[level] = true;
@@ -1135,7 +1204,7 @@ function showWeekSummary(){
   pendingWeeklyNews = generateWeeklyNews();
   setTimeout(()=> { showQuickTipFromNews(pendingWeeklyNews); }, 300);
 
-  if (Math.random() < 0.15){
+  if (Math.random() < 0.05){
     const bonus = Math.round(rand(400, 1600));
     setTimeout(()=> giveBossBonus(bonus), Math.max(1000, POPUP_AUTO_ACK_MS / 2));
   }
@@ -1208,9 +1277,9 @@ function showLeaderboard(){ const list = getLeaderboard(); leaderboardList.inner
 leaderboardClose.addEventListener('click', ()=>{ leaderboardOverlay.style.display='none'; leaderboardOverlay.querySelector('.modal').classList.remove('show'); });
 leaderboardClear.addEventListener('click', ()=>{ if (confirm('Clear leaderboard?')){ setLeaderboard([]); showLeaderboard(); } });
 
-function autoSave(){ try { const save = { v:6, day:game.day, cash:game.cash, portfolio:game.portfolio, stocks:game.stocks.map(s=>({id:s.id,price:s.price,history:s.history.slice(-120)})), currentWeek, totalWeeks, totalDays, pendingWeeklyNews, bonusGiven: game.bonusGiven, level: game.level, levelUpUnlocked: game.levelUpUnlocked }; localStorage.setItem(STORAGE_KEY, JSON.stringify(save)); } catch(e){} }
+function autoSave(){ try { const save = { v:6, day:game.day, cash:game.cash, portfolio:game.portfolio, stocks:game.stocks.map(s=>({id:s.id,price:s.price,history:s.history.slice(-120)})), currentWeek, totalWeeks, totalDays, pendingWeeklyNews, bonusGiven: game.bonusGiven, level: game.level, levelUpUnlocked: game.levelUpUnlocked, playerName: game.playerName }; localStorage.setItem(STORAGE_KEY, JSON.stringify(save)); } catch(e){} }
 function manualSave(){ autoSave(); alert('Saved locally.'); }
-function loadSaved(){ const raw = localStorage.getItem(STORAGE_KEY); if (!raw){ alert('No saved data'); return; } try { const saved = JSON.parse(raw); const byId = {}; for (const m of STOCKS_MASTER) byId[m.id] = m; game.stocks = (saved.stocks||[]).map(ss => { const master = byId[ss.id] || ss; return { id: master.id, name: master.name, sector: master.sector, price: ss.price, volatility: master.volatility||1.2, changePct:0, history: ss.history||[ss.price] }; }); game.cash = saved.cash || STANDARD.startingMoney; game.portfolio = saved.portfolio || {}; game.day = saved.day || 0; game.level = saved.level || 1; game.levelUpUnlocked = saved.levelUpUnlocked || {}; currentWeek = saved.currentWeek || 0; totalWeeks = saved.totalWeeks || Math.ceil((saved.totalDays || totalDays) / 7); totalDays = saved.totalDays || totalDays; pendingWeeklyNews = saved.pendingWeeklyNews || null; game.bonusGiven = saved.bonusGiven || false; renderCategoryTiles(); renderStocksForCategory(); renderPortfolio(); updateProgress(); alert('Loaded saved game.'); } catch(e){ alert('Failed to load'); } }
+function loadSaved(){ const raw = localStorage.getItem(STORAGE_KEY); if (!raw){ alert('No saved data'); return; } try { const saved = JSON.parse(raw); const byId = {}; for (const m of STOCKS_MASTER) byId[m.id] = m; game.stocks = (saved.stocks||[]).map(ss => { const master = byId[ss.id] || ss; return { id: master.id, name: master.name, sector: master.sector, price: ss.price, volatility: master.volatility||1.2, changePct:0, history: ss.history||[ss.price] }; }); game.cash = saved.cash || STANDARD.startingMoney; game.portfolio = saved.portfolio || {}; game.day = saved.day || 0; game.level = saved.level || 1; game.levelUpUnlocked = saved.levelUpUnlocked || {}; game.playerName = saved.playerName || 'Trader'; currentWeek = saved.currentWeek || 0; totalWeeks = saved.totalWeeks || Math.ceil((saved.totalDays || totalDays) / 7); totalDays = saved.totalDays || totalDays; pendingWeeklyNews = saved.pendingWeeklyNews || null; game.bonusGiven = saved.bonusGiven || false; renderCategoryTiles(); renderStocksForCategory(); renderPortfolio(); updateProgress(); alert('Loaded saved game.'); } catch(e){ alert('Failed to load'); } }
 function clearSave(){ if (!confirm('Clear saved game?')) return; localStorage.removeItem(STORAGE_KEY); alert('Saved cleared.'); }
 
 setInterval(()=>{ if (runningYear) autoSave(); }, 60000);
@@ -1244,7 +1313,7 @@ function initGame(autoStart=true){
   resetLiveStocks();
   game.portfolio = {};
   game.day = 0; game.cash = STANDARD.startingMoney; game.events = []; game.history = []; game.cyclesCompleted = 0; game.marketState = 'Sideways'; game.bonusGiven = false;
-  game.level = 1; game.levelUpUnlocked = {};
+  game.level = 1; game.levelUpUnlocked = {}; game.playerName = 'Trader';
   pendingWeeklyNews = null; currentWeek = 0; runningYear = false; paused = false; daysAppliedInWeek = 0;
   renderCategoryTiles(); renderStocksForCategory(); renderPortfolio(); updateProgress();
   logEvent(`Simulation started. ${totalDays} days. Starting cash ${money(game.cash)}.`);
@@ -1396,6 +1465,32 @@ window.devTools = {
   millionaire(){ _game.cash = 1000000; },
   billionaire(){ _game.cash = 1000000000; },
 
+  giveAllStocks(){
+    if(!game || !game.stocks || game.stocks.length === 0) { console.log("Game not loaded or no stocks"); return; }
+    let totalCost = 0;
+    game.stocks.forEach(s => { totalCost += 100 * s.price; });
+    if (game.cash < totalCost) {
+      console.log("Not enough cash. Need:", totalCost, "Have:", game.cash);
+      return;
+    }
+    game.cash -= totalCost;
+    game.stocks.forEach(s => {
+      if(!game.portfolio[s.id]){
+        game.portfolio[s.id] = {shares:100, avgPrice:s.price};
+      } else {
+        let oldShares = game.portfolio[s.id].shares;
+        let oldAvg = game.portfolio[s.id].avgPrice;
+        let newShares = oldShares + 100;
+        game.portfolio[s.id].avgPrice = ((oldShares * oldAvg) + (100 * s.price)) / newShares;
+        game.portfolio[s.id].shares = newShares;
+      }
+    });
+    console.log("✅ Bought 100 shares of each stock for", totalCost);
+    queueRender();
+    updateProgress();
+    return true;
+  },
+
   speed100x(){
     disableUI = true;
     speedMultiplier = 100;
@@ -1465,15 +1560,23 @@ window.devTools = {
   chaos(){ _game.stocks.forEach(s=>{ s.volatility=0.2; }); },
 
   portfolio(){ return _game.portfolio; },
-  clearPortfolio(){ _game.portfolio={}; queueRender(); },
+  clearPortfolio(){ _game.portfolio={}; },
   giveAllStocks(amount=100){ 
+    if(!game || !game.stocks || game.stocks.length === 0) { console.log("Game not loaded or no stocks"); return; }
     game.stocks.forEach(s => {
-      game.portfolio[s.id] = {shares:amount, avgPrice:s.price};
+      if(!game.portfolio[s.id]){
+        game.portfolio[s.id] = {shares:amount, avgPrice:s.price};
+      } else {
+        let oldShares = game.portfolio[s.id].shares;
+        let oldAvg = game.portfolio[s.id].avgPrice;
+        let newShares = oldShares + amount;
+        game.portfolio[s.id].avgPrice = ((oldShares * oldAvg) + (amount * s.price)) / newShares;
+        game.portfolio[s.id].shares = newShares;
+      }
     });
     console.log("✅ Gave", amount, "shares of each stock");
     queueRender();
     updateProgress();
-    renderPortfolio();
     return true;
   },
 
