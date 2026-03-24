@@ -1492,7 +1492,24 @@ window.devTools = {
 
   portfolio(){ return _game.portfolio; },
   clearPortfolio(){ _game.portfolio={}; },
-  giveAllStocks(amount=100){ _game.stocks.forEach(s=>{ _game.portfolio[s.name]=amount; }); },
+  giveAllStocks(amount=100){ 
+    if(!game || !game.stocks || game.stocks.length === 0) { console.log("Game not loaded or no stocks"); return; }
+    game.stocks.forEach(s => {
+      if(!game.portfolio[s.id]){
+        game.portfolio[s.id] = {shares:amount, avgPrice:s.price};
+      } else {
+        let oldShares = game.portfolio[s.id].shares;
+        let oldAvg = game.portfolio[s.id].avgPrice;
+        let newShares = oldShares + amount;
+        game.portfolio[s.id].avgPrice = ((oldShares * oldAvg) + (amount * s.price)) / newShares;
+        game.portfolio[s.id].shares = newShares;
+      }
+    });
+    console.log("✅ Gave", amount, "shares of each stock");
+    queueRender();
+    updateProgress();
+    return true;
+  },
 
   richestStock(){ let best=_game.stocks.reduce((a,b)=>a.price>b.price?a:b); console.log(best); return best; },
   cheapestStock(){ let worst=_game.stocks.reduce((a,b)=>a.price<b.price?a:b); console.log(worst); return worst; },
