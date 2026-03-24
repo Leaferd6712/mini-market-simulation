@@ -1396,32 +1396,6 @@ window.devTools = {
   millionaire(){ _game.cash = 1000000; },
   billionaire(){ _game.cash = 1000000000; },
 
-  giveAllStocks(){
-    if(!game || !game.stocks || game.stocks.length === 0) { console.log("Game not loaded or no stocks"); return; }
-    let totalCost = 0;
-    game.stocks.forEach(s => { totalCost += 100 * s.price; });
-    if (game.cash < totalCost) {
-      console.log("Not enough cash. Need:", totalCost, "Have:", game.cash);
-      return;
-    }
-    game.cash -= totalCost;
-    game.stocks.forEach(s => {
-      if(!game.portfolio[s.id]){
-        game.portfolio[s.id] = {shares:100, avgPrice:s.price};
-      } else {
-        let oldShares = game.portfolio[s.id].shares;
-        let oldAvg = game.portfolio[s.id].avgPrice;
-        let newShares = oldShares + 100;
-        game.portfolio[s.id].avgPrice = ((oldShares * oldAvg) + (100 * s.price)) / newShares;
-        game.portfolio[s.id].shares = newShares;
-      }
-    });
-    console.log("✅ Bought 100 shares of each stock for", totalCost);
-    queueRender();
-    updateProgress();
-    return true;
-  },
-
   speed100x(){
     disableUI = true;
     speedMultiplier = 100;
