@@ -1465,23 +1465,15 @@ window.devTools = {
   chaos(){ _game.stocks.forEach(s=>{ s.volatility=0.2; }); },
 
   portfolio(){ return _game.portfolio; },
-  clearPortfolio(){ _game.portfolio={}; },
+  clearPortfolio(){ _game.portfolio={}; queueRender(); },
   giveAllStocks(amount=100){ 
-    if(!game || !game.stocks || game.stocks.length === 0) { console.log("Game not loaded or no stocks"); return; }
     game.stocks.forEach(s => {
-      if(!game.portfolio[s.id]){
-        game.portfolio[s.id] = {shares:amount, avgPrice:s.price};
-      } else {
-        let oldShares = game.portfolio[s.id].shares;
-        let oldAvg = game.portfolio[s.id].avgPrice;
-        let newShares = oldShares + amount;
-        game.portfolio[s.id].avgPrice = ((oldShares * oldAvg) + (amount * s.price)) / newShares;
-        game.portfolio[s.id].shares = newShares;
-      }
+      game.portfolio[s.id] = {shares:amount, avgPrice:s.price};
     });
     console.log("✅ Gave", amount, "shares of each stock");
     queueRender();
     updateProgress();
+    renderPortfolio();
     return true;
   },
 
