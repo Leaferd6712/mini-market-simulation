@@ -7,108 +7,152 @@
   <meta name="description" content="Mini Market Simulation - category tile view.">
   <style>
     :root{
-      --bg: #f3fbff;
-      --card: #ffffff;
-      --muted: #4b6b7a;
-      --accent: #2b9cf5;
-      --accent-2: #34c38f;
-      --danger: #ff5c5c;
+      --bg: #0f1419;
+      --bg-glow: #1a1f2e;
+      --card: #1e2633;
+      --card-light: #252d3d;
+      --muted: #8b9cae;
+      --accent: #00d4ff;
+      --accent-2: #00ff88;
+      --accent-3: #ff6b9d;
+      --accent-4: #ffa500;
+      --danger: #ff6b6b;
       --gold: #ffb020;
-      --shadow: rgba(11,22,36,0.06);
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      --purple: #a78bfa;
+      --pink: #f472b6;
+      --shadow: rgba(0,0,0,0.3);
+      font-family: 'Segoe UI', system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
     }
-    html,body{ height:100%; margin:0; background: linear-gradient(180deg,#eaf7ff 0%, #f7fbff 100%); color:#072c38; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; font-size:15px; }
-    .wrap{ max-width:1200px; margin:18px auto; padding:18px; display:grid; grid-template-columns: 1fr 360px; gap:18px; align-items:start; }
-    header{ grid-column:1/-1; display:flex; gap:12px; align-items:center; justify-content:space-between; }
-    h1{ margin:0; font-size:20px; color:var(--accent); display:flex; gap:10px; align-items:center; }
-    h1 .logo-pill{ background:linear-gradient(90deg,var(--accent), #6DD3FF); color:white; font-weight:900; padding:6px 10px;border-radius:10px; box-shadow:0 8px 22px rgba(43,156,245,0.12); }
+    html,body{ height:100%; margin:0; background: linear-gradient(135deg, #0f1419 0%, #1a2a3a 50%, #0f1f2f 100%); color:#e0e8f0; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; font-size:15px; min-height:100vh; }
+    .wrap{ max-width:1400px; margin:20px auto; padding:20px; display:grid; grid-template-columns: 1fr 380px; gap:20px; align-items:start; }
+    header{ grid-column:1/-1; display:flex; gap:16px; align-items:center; justify-content:space-between; background:linear-gradient(90deg,rgba(0,212,255,0.05),rgba(255,107,157,0.05)); padding:16px 20px; border-radius:16px; border:1px solid rgba(0,212,255,0.1); }
+    h1{ margin:0; font-size:24px; background:linear-gradient(90deg,#00d4ff,#00ff88); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:flex; gap:10px; align-items:center; font-weight:900; }
+    h1 .logo-pill{ background:linear-gradient(90deg,#00d4ff,#00ff88); color:#0f1419; font-weight:900; padding:8px 14px; border-radius:12px; box-shadow:0 8px 32px rgba(0,212,255,0.25); }
 
-    .controls{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .controls .group{ display:flex; gap:8px; align-items:center; }
 
-    select, button, input[type="number"], input[type="text"]{ background:var(--card); border:1px solid rgba(7,34,40,0.06); color:var(--muted); padding:8px 10px; border-radius:10px; font-size:14px; box-shadow: 0 6px 14px var(--shadow); transition:transform .12s ease, box-shadow .12s ease; }
-    button.compact{ padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:800; font-size:14px; }
-    button.primary{ background:linear-gradient(90deg,var(--accent), #00c3ff); color:white; border:none; box-shadow: 0 8px 24px rgba(43,156,245,0.14); }
-    button.ghost{ background:transparent; border:1px solid rgba(7,34,40,0.06); color:var(--muted); }
-    .btn-secondary{ background:linear-gradient(90deg, rgba(7,34,40,0.06), rgba(7,34,40,0.03)); color:#20414d; border:1px solid rgba(7,34,40,0.06); }
-    .btn-primary{ background:linear-gradient(90deg,var(--accent), #00c3ff); color:white; border:none; box-shadow: 0 8px 24px rgba(43,156,245,0.14); }
+    select, button, input[type="number"], input[type="text"]{ background:var(--card); border:1px solid rgba(0,212,255,0.15); color:var(--muted); padding:10px 12px; border-radius:10px; font-size:14px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); transition:all .2s ease; cursor:pointer; }
+    select:hover, input:hover{ border-color:rgba(0,212,255,0.3); background:var(--card-light); }
+    button.compact{ padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:800; font-size:14px; transition:all .2s; }
+    button.compact:hover{ transform:translateY(-2px); }
+    button.primary{ background:linear-gradient(90deg,#00d4ff,#00ff88); color:#0f1419; border:none; box-shadow: 0 8px 24px rgba(0,212,255,0.3); font-weight:900; }
+    button.primary:hover{ transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,212,255,0.4); }
+    button.ghost{ background:transparent; border:1px solid rgba(0,212,255,0.2); color:var(--muted); }
+    .btn-secondary{ background:linear-gradient(90deg, rgba(0,212,255,0.1), rgba(0,255,136,0.05)); color:#00d4ff; border:1px solid rgba(0,212,255,0.2); }
+    .btn-primary{ background:linear-gradient(90deg,#00d4ff,#00ff88); color:#0f1419; border:none; box-shadow: 0 8px 24px rgba(0,212,255,0.3); font-weight:900; }
 
-    .panel{ background:var(--card); border:1px solid rgba(7,34,40,0.04); padding:12px; border-radius:12px; box-shadow: 0 8px 26px rgba(11,22,36,0.04); color:#07202a; }
-    .status{ display:flex; gap:12px; align-items:center; font-size:14px; } .status div{ color:var(--muted) } .status strong{ color:#07303a; margin-left:6px; font-weight:900; }
+    .panel{ background:linear-gradient(135deg,rgba(30,38,51,0.8),rgba(37,45,61,0.6)); border:1px solid rgba(0,212,255,0.15); padding:16px; border-radius:14px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color:#e0e8f0; backdrop-filter:blur(10px); }
+    .status{ display:flex; gap:12px; align-items:center; font-size:14px; flex-wrap:wrap; } .status div{ color:var(--muted) } .status strong{ color:#00d4ff; margin-left:6px; font-weight:900; }
 
-    .category-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; margin:14px 0; }
+    .category-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin:16px 0; }
     .cat-tile{
-      padding:20px; border-radius:16px; cursor:pointer; border:1px solid rgba(7,34,40,0.06);
-      background:linear-gradient(180deg,#ffffff,#f6fdff); box-shadow: 0 12px 28px rgba(43,156,245,0.04);
-      display:flex; flex-direction:column; gap:8px; align-items:start; justify-content:center; min-height:110px;
-      transition:transform .14s ease, box-shadow .14s ease, background .14s ease;
-      font-weight:900; font-size:16px;
+      padding:24px; border-radius:16px; cursor:pointer; border:2px solid rgba(0,212,255,0.2);
+      background:linear-gradient(135deg,rgba(30,38,51,0.6),rgba(37,45,61,0.4)); 
+      display:flex; flex-direction:column; gap:8px; align-items:start; justify-content:center; min-height:120px;
+      transition:all .3s cubic-bezier(.2,.9,.2,1);
+      font-weight:900; font-size:18px; position:relative; overflow:hidden;
     }
-    .cat-tile .sub{ font-weight:700; font-size:13px; color:var(--muted); font-weight:700; }
-    .cat-tile:hover{ transform:translateY(-6px); box-shadow: 0 22px 40px rgba(43,156,245,0.10); }
-    .cat-tile.active{ background:linear-gradient(90deg,#e8fbff,#eaf8ff); box-shadow: 0 26px 60px rgba(43,156,245,0.14); transform:translateY(-6px); }
+    .cat-tile::before{ content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(0,212,255,0.1),rgba(0,255,136,0.05)); opacity:0; transition:opacity .3s; }
+    .cat-tile .sub{ font-weight:600; font-size:13px; color:var(--muted); }
+    .cat-tile:hover{ transform:translateY(-8px) scale(1.02); border-color:rgba(0,212,255,0.4); box-shadow: 0 12px 40px rgba(0,212,255,0.25); }
+    .cat-tile:hover::before{ opacity:1; }
+    .cat-tile.active{ border-color:var(--accent); background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(0,255,136,0.08)); box-shadow: 0 16px 48px rgba(0,212,255,0.3); }
 
-    .cat-tech{ border-left:6px solid #2b9cf5; }
-    .cat-energy{ border-left:6px solid #34c38f; }
-    .cat-retail{ border-left:6px solid #ffb020; }
-    .cat-finance{ border-left:6px solid #7b61ff; }
-    .cat-transport{ border-left:6px solid #ff6b6b; }
-    .cat-biotech{ border-left:6px solid #00a3ff; }
+    .cat-tech{ --tile-color:#00d4ff; border-left:4px solid #00d4ff; }
+    .cat-energy{ --tile-color:#00ff88; border-left:4px solid #00ff88; }
+    .cat-retail{ --tile-color:#ffa500; border-left:4px solid #ffa500; }
+    .cat-finance{ --tile-color:#a78bfa; border-left:4px solid #a78bfa; }
+    .cat-transport{ --tile-color:#ff6b9d; border-left:4px solid #ff6b9d; }
+    .cat-biotech{ --tile-color:#ff6b6b; border-left:4px solid #ff6b6b; }
 
-    .news{ margin-top:6px; padding:10px; border-radius:10px; background: linear-gradient(90deg, rgba(43,156,245,0.03), rgba(52,195,143,0.02)); border:1px solid rgba(43,156,245,0.06); color:#0d3040; display:flex; align-items:center; gap:10px; }
-    .news .pill{ font-weight:700; padding:6px 10px; border-radius:999px; background:rgba(43,156,245,0.08); color:var(--accent); }
+    .news{ margin-top:10px; padding:12px; border-radius:12px; background: linear-gradient(90deg, rgba(0,212,255,0.08), rgba(0,255,136,0.05)); border:1px solid rgba(0,212,255,0.15); color:#d0d8e0; display:flex; align-items:center; gap:12px; animation:slideIn 0.4s ease; }
+    @keyframes slideIn{ from{ opacity:0; transform:translateX(-10px); } to{ opacity:1; transform:translateX(0); } }
+    .news .pill{ font-weight:700; padding:6px 12px; border-radius:8px; background:linear-gradient(90deg,rgba(0,212,255,0.2),rgba(0,212,255,0.1)); color:var(--accent); font-size:12px; }
 
-    table{ width:100%; border-collapse:collapse; font-size:14px; } th, td{ text-align:left; padding:10px 10px; border-bottom:1px solid rgba(7,34,40,0.04); color:var(--muted); } th{ color:#245a86; font-weight:800; font-size:13px; }
-    .price-up{ color:var(--accent-2); font-weight:800; } .price-down{ color:var(--danger); font-weight:800; } .small{ font-size:13px; color:var(--muted); }
+    table{ width:100%; border-collapse:collapse; font-size:14px; } 
+    th, td{ text-align:left; padding:12px; border-bottom:1px solid rgba(0,212,255,0.1); color:var(--muted); } 
+    th{ color:#00d4ff; font-weight:800; font-size:13px; }
+    tbody tr:hover{ background:rgba(0,212,255,0.05); }
+    .price-up{ color:#00ff88; font-weight:900; text-shadow:0 0 10px rgba(0,255,136,0.3); } 
+    .price-down{ color:#ff6b6b; font-weight:900; text-shadow:0 0 10px rgba(255,107,107,0.3); } 
+    .small{ font-size:13px; color:var(--muted); }
     .market-col{ display:flex; gap:8px; align-items:center; justify-content:flex-end; }
-    .btn-buy, .btn-sell, .btn-chart{ border:none; padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:800; font-size:13px; box-shadow: 0 6px 12px rgba(2,6,23,0.04); transition:transform .12s ease; }
-    .btn-buy{ background:linear-gradient(90deg, rgba(52,195,143,0.12), rgba(52,195,143,0.08)); color:var(--accent-2); } 
-    .btn-sell{ background:linear-gradient(90deg, rgba(255,92,92,0.08), rgba(255,92,92,0.04)); color:var(--danger); }
-    .btn-chart{ background:linear-gradient(90deg, rgba(43,156,245,0.10), rgba(43,156,245,0.06)); color:#145f8a; }
+    .btn-buy, .btn-sell, .btn-chart{ border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:800; font-size:13px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition:all .2s; }
+    .btn-buy{ background:linear-gradient(90deg, rgba(0,255,136,0.15), rgba(0,255,136,0.08)); color:#00ff88; border:1px solid rgba(0,255,136,0.3); } 
+    .btn-buy:hover{ background:rgba(0,255,136,0.25); }
+    .btn-sell{ background:linear-gradient(90deg, rgba(255,107,107,0.15), rgba(255,107,107,0.08)); color:#ff6b6b; border:1px solid rgba(255,107,107,0.3); }
+    .btn-sell:hover{ background:rgba(255,107,107,0.25); }
+    .btn-chart{ background:linear-gradient(90deg, rgba(0,212,255,0.15), rgba(0,212,255,0.08)); color:#00d4ff; border:1px solid rgba(0,212,255,0.3); }
+    .btn-chart:hover{ background:rgba(0,212,255,0.25); }
 
-    .portfolio-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 0; border-bottom:1px dashed rgba(7,34,40,0.03); }
-    .muted { color:var(--muted); } .center{ text-align:center; } .foot{ grid-column:1/-1; display:flex; justify-content:space-between; gap:12px; margin-top:12px; align-items:center; color:var(--muted); font-size:13px; }
+    .portfolio-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:12px 0; border-bottom:1px dashed rgba(0,212,255,0.1); transition:background .2s; }
+    .portfolio-row:hover{ background:rgba(0,212,255,0.05); padding:12px 8px; }
+    .muted { color:var(--muted); } .center{ text-align:center; } 
+    .foot{ grid-column:1/-1; display:flex; justify-content:space-between; gap:12px; margin-top:20px; align-items:center; color:var(--muted); font-size:13px; padding-top:12px; border-top:1px dashed rgba(0,212,255,0.1); }
 
-    .progress{ height:10px; background:rgba(7,34,40,0.04); border-radius:8px; overflow:hidden; } .progress > i{ display:block; height:100%; background:linear-gradient(90deg,var(--accent), var(--accent-2)); width:0%; transition:width 0.6s ease; }
+    .progress{ height:12px; background:rgba(0,212,255,0.08); border-radius:8px; overflow:hidden; border:1px solid rgba(0,212,255,0.15); } 
+    .progress > i{ display:block; height:100%; background:linear-gradient(90deg,#00d4ff,#00ff88); width:0%; transition:width 0.6s cubic-bezier(.2,.9,.2,1); box-shadow:0 0 20px rgba(0,212,255,0.5); }
 
-    .modal-overlay{ position:fixed; inset:0; background:rgba(5,25,35,0.55); display:none; align-items:center; justify-content:center; z-index:9999; }
-    .modal{ width:min(820px, 96%); background: linear-gradient(180deg,#ffffff,#fbfeff); border-radius:12px; padding:16px; box-shadow: 0 14px 48px rgba(8,18,26,0.12); color:#07202a; border:1px solid rgba(8,18,26,0.04); transform:translateY(8px) scale(.99); opacity:0; transition:transform .28s cubic-bezier(.2,.9,.2,1), opacity .22s ease; }
+    .modal-overlay{ position:fixed; inset:0; background:rgba(5,20,35,0.8); display:none; align-items:center; justify-content:center; z-index:9999; backdrop-filter:blur(3px); }
+    .modal{ width:min(820px, 96%); background:linear-gradient(135deg,rgba(30,38,51,0.95),rgba(37,45,61,0.9)); border-radius:16px; padding:24px; box-shadow: 0 20px 60px rgba(0,212,255,0.2), 0 0 40px rgba(0,212,255,0.1); color:#e0e8f0; border:1px solid rgba(0,212,255,0.2); transform:translateY(20px) scale(.95); opacity:0; transition:all .35s cubic-bezier(.2,.9,.2,1); }
     .modal.show{ transform:translateY(0) scale(1); opacity:1; }
-    .modal h2{ margin:0 0 8px 0; font-size:18px; } .modal .headline{ font-weight:900; font-size:16px; color:#0b2a3a; display:flex; gap:8px; align-items:center; }
-    .modal .controls{ display:flex; gap:10px; justify-content:flex-end; margin-top:12px; } .modal button{ padding:8px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:800; }
+    .modal h2{ margin:0 0 12px 0; font-size:20px; color:#00d4ff; font-weight:900; } 
+    .modal .headline{ font-weight:900; font-size:18px; color:#00ff88; display:flex; gap:8px; align-items:center; }
+    .modal .controls{ display:flex; gap:10px; justify-content:flex-end; margin-top:16px; } 
+    .modal button{ padding:10px 16px; border-radius:8px; border:none; cursor:pointer; font-weight:800; transition:all .2s; }
 
-    .explain-box{ margin-top:10px; background: rgba(43,156,245,0.03); border-radius:8px; padding:10px; display:none; color:var(--muted); font-size:14px; line-height:1.45; }
+    .explain-box{ margin-top:12px; background: rgba(0,212,255,0.1); border-radius:10px; padding:12px; display:none; color:#c0d0e0; font-size:14px; line-height:1.6; border:1px solid rgba(0,212,255,0.15); }
 
-    .notif-wrap{ position:fixed; left:16px; bottom:16px; z-index:12000; display:flex; flex-direction:column; gap:10px; }
-    .notif{ background:linear-gradient(90deg,#fff,#f8ffff); border-radius:10px; padding:12px 14px; box-shadow:0 8px 24px rgba(4,24,40,0.12); border:1px solid rgba(7,34,40,0.06); font-weight:800; color:#07303a; max-width:320px; }
+    .notif-wrap{ position:fixed; right:20px; top:80px; z-index:12000; display:flex; flex-direction:column; gap:12px; }
+    .notif{ background:linear-gradient(135deg,rgba(30,38,51,0.95),rgba(37,45,61,0.85)); border-radius:12px; padding:16px 18px; box-shadow:0 8px 32px rgba(0,212,255,0.25); border:1px solid rgba(0,212,255,0.3); font-weight:800; color:#00d4ff; max-width:360px; animation:popIn 0.4s cubic-bezier(.2,.9,.2,1); }
+    @keyframes popIn{ from{ opacity:0; transform:translateY(-20px) scale(0.95); } to{ opacity:1; transform:translateY(0) scale(1); } }
     .notif.small{ font-weight:700; font-size:14px; }
 
-    .letter-content{ background:#fffef8; padding:18px; border-radius:8px; border:1px solid rgba(94,62,17,0.06); box-shadow:0 16px 48px rgba(94,62,17,0.06); color:#2b2b1f; font-family: 'Georgia', serif; }
-    .letter-to{ font-weight:700; margin-bottom:6px; }
-    .letter-body{ margin:12px 0; line-height:1.45; color:#3b3b2f; }
-    .letter-sign{ margin-top:12px; font-style:italic; color:#5b4b2f; }
+    .letter-content{ background:linear-gradient(135deg,rgba(50,40,30,0.8),rgba(60,45,35,0.7)); padding:20px; border-radius:12px; border:1px solid rgba(255,165,0,0.2); box-shadow:0 8px 32px rgba(255,165,0,0.1); color:#e0d8c8; font-family: Georgia, serif; }
+    .letter-to{ font-weight:700; margin-bottom:8px; color:#ffa500; }
+    .letter-body{ margin:14px 0; line-height:1.6; color:#d8d0c0; }
+    .letter-sign{ margin-top:14px; font-style:italic; color:#f0b040; }
 
-    .loading-overlay{ position:fixed; inset:0; background:linear-gradient(180deg,#ffffff,#eaf7ff); display:flex; align-items:center; justify-content:center; z-index:10010; flex-direction:column; gap:14px; }
-    .spinner{ width:64px; height:64px; border-radius:50%; border:8px solid rgba(43,156,245,0.12); border-top-color:var(--accent); animation:spin 1s linear infinite; box-shadow: 0 8px 20px rgba(43,156,245,0.08); }
+    .loading-overlay{ position:fixed; inset:0; background:linear-gradient(135deg,#0f1419,#1a2a3a); display:flex; align-items:center; justify-content:center; z-index:10010; flex-direction:column; gap:20px; }
+    .spinner{ width:80px; height:80px; border-radius:50%; border:4px solid rgba(0,212,255,0.15); border-top-color:#00d4ff; border-right-color:#00ff88; animation:spin 1s linear infinite; box-shadow: 0 0 40px rgba(0,212,255,0.4); }
     @keyframes spin{ to { transform:rotate(360deg); } }
-    .loading-text{ font-weight:800; color:#08303b; letter-spacing:0.4px; }
+    .loading-text{ font-weight:900; color:#00d4ff; letter-spacing:1px; font-size:16px; }
 
-    .profit-pos, .gain-pos{ color:var(--accent-2); font-weight:900; }
-    .profit-neg, .gain-neg{ color:var(--danger); font-weight:900; }
+    .profit-pos, .gain-pos{ color:#00ff88; font-weight:900; text-shadow:0 0 8px rgba(0,255,136,0.3); }
+    .profit-neg, .gain-neg{ color:#ff6b6b; font-weight:900; text-shadow:0 0 8px rgba(255,107,107,0.3); }
     .profit-neutral{ color:var(--muted); font-weight:900; }
 
-    .trade-meta{ margin-top:10px; display:grid; gap:6px; }
+    .trade-meta{ margin-top:12px; display:grid; gap:8px; background:rgba(0,212,255,0.05); padding:12px; border-radius:10px; border:1px solid rgba(0,212,255,0.1); }
     .trade-meta .row{ display:flex; justify-content:space-between; gap:10px; }
-    .trade-quick{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
-    .trade-quick button{ padding:6px 10px; border-radius:8px; font-size:12px; }
-    .trade-quick .buyq{ background:rgba(52,195,143,0.10); color:var(--accent-2); border:1px solid rgba(52,195,143,0.12); }
-    .trade-quick .sellq{ background:rgba(255,92,92,0.08); color:var(--danger); border:1px solid rgba(255,92,92,0.10); }
+    .trade-quick{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+    .trade-quick button{ padding:8px 12px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; transition:all .2s; }
+    .trade-quick .buyq{ background:rgba(0,255,136,0.12); color:#00ff88; border:1px solid rgba(0,255,136,0.25); }
+    .trade-quick .buyq:hover{ background:rgba(0,255,136,0.2); }
+    .trade-quick .sellq{ background:rgba(255,107,107,0.12); color:#ff6b6b; border:1px solid rgba(255,107,107,0.25); }
+    .trade-quick .sellq:hover{ background:rgba(255,107,107,0.2); }
+
+    .achievement-badge{ display:inline-block; padding:8px 12px; border-radius:8px; font-size:12px; font-weight:700; background:linear-gradient(135deg,rgba(255,165,0,0.2),rgba(255,107,157,0.15)); border:1px solid rgba(255,165,0,0.3); color:#ffa500; margin:4px 0; animation:slideIn 0.4s ease; }
+    .achievement-icon{ display:inline-block; margin-right:6px; font-size:14px; }
+    
+    .quest-item{ display:flex; gap:10px; padding:10px; margin:6px 0; background:rgba(255,107,157,0.08); border:1px solid rgba(255,107,157,0.2); border-radius:8px; font-size:12px; align-items:flex-start; animation:slideIn 0.4s ease; }
+    .quest-icon{ font-size:16px; flex-shrink:0; }
+    .quest-info{ flex:1; }
+    .quest-title{ font-weight:700; color:#ff6b9d; margin-bottom:2px; }
+    .quest-desc{ color:var(--muted); font-size:11px; }
+    .quest-completed{ opacity:0.6; text-decoration:line-through; }
+    
+    .stat-box{ background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.15); padding:12px; border-radius:10px; margin:8px 0; }
+    .stat-label{ color:var(--muted); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+    .stat-value{ color:#00d4ff; font-size:18px; font-weight:900; margin-top:4px; }
 
     @media (max-width:980px){
       .wrap{ grid-template-columns: 1fr; padding:12px; }
       .category-grid{ grid-template-columns: repeat(2, 1fr); }
       .modal{ width:94%; }
+      .notif-wrap{ right:10px; top:70px; }
     }
+  </style>
   </style>
 </head>
 <body>
@@ -194,32 +238,53 @@
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
             <div class="mini">Portfolio</div>
-            <div class="big-number" id="portfolioValue">$0</div>
+            <div id="portfolioValue" style="font-size:20px;color:#00ff88;font-weight:900;">$0</div>
           </div>
           <div>
             <div class="mini">Cash</div>
-            <div class="big-number" id="cashPanel">$0</div>
+            <div id="cashPanel" style="font-size:20px;color:#00d4ff;font-weight:900;">$0</div>
           </div>
         </div>
 
-        <div style="margin-top:12px;">
+        <div style="margin-top:14px;">
           <div id="portfolioList" class="flex-col small muted">
             <div class="center small">You don't own any stocks yet.</div>
           </div>
         </div>
       </div>
 
-      <div class="panel" style="margin-top:12px;">
-        <div class="mini">Simulation progress</div>
-        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+      <div class="panel" style="margin-top:14px;">
+        <div class="mini" style="color:#00d4ff;font-weight:900;">📊 Simulation Progress</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
           <div style="flex:1"><div class="progress"><i id="progressBar"></i></div></div>
-          <div class="mini" id="progressText">0/0</div>
+          <div class="mini" id="progressText" style="color:var(--accent);min-width:50px;">0/0</div>
         </div>
 
-        <hr style="border:none;border-top:1px dashed rgba(7,34,40,0.04);margin:12px 0;">
+        <hr style="border:none;border-top:1px solid rgba(0,212,255,0.1);margin:12px 0;">
 
-        <div class="mini">Last events</div>
-        <div id="eventsLog" class="small muted" style="margin-top:8px; max-height:160px; overflow:auto;">
+        <div class="stat-box">
+          <div class="stat-label">🏆 Best Day Profit</div>
+          <div class="stat-value" id="bestDayProfit">$0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">📈 Total Trades</div>
+          <div class="stat-value" id="totalTrades">0</div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(0,212,255,0.1);margin:12px 0;">
+
+        <div class="mini" style="color:#00ff88;font-weight:900;">⭐ Achievements</div>
+        <div id="achievementsDisplay" style="margin-top:8px;"></div>
+
+        <hr style="border:none;border-top:1px solid rgba(0,212,255,0.1);margin:12px 0;">
+
+        <div class="mini" style="color:#ff6b9d;font-weight:900;">🎯 Daily Quests</div>
+        <div id="questsDisplay" style="margin-top:8px;"></div>
+
+        <hr style="border:none;border-top:1px solid rgba(0,212,255,0.1);margin:12px 0;">
+
+        <div class="mini" style="color:#ffa500;font-weight:900;">📋 Recent Events</div>
+        <div id="eventsLog" class="small muted" style="margin-top:8px; max-height:140px; overflow:auto;">
           <div class="center">-</div>
         </div>
       </div>
@@ -367,25 +432,25 @@
     <div class="modal" role="document" aria-labelledby="contractTitle" style="max-width:920px;display:flex;gap:16px;">
       <div style="flex:1;">
         <h2 id="contractTitle">Employment Contract</h2>
-        <div style="background:#fafafa;padding:16px;border-radius:8px;border:1px solid rgba(7,34,40,0.06);margin:12px 0;">
-          <div class="mini" style="font-weight:800;margin-bottom:8px;">Contract Level <span id="contractLevel">1</span></div>
+        <div style="background:linear-gradient(135deg,rgba(30,38,51,0.8),rgba(37,45,61,0.6));padding:16px;border-radius:8px;border:1px solid rgba(0,212,255,0.15);margin:12px 0;">
+          <div class="mini" style="font-weight:800;margin-bottom:8px;color:#00d4ff;">Contract Level <span id="contractLevel">1</span></div>
           <div class="small muted" id="contractDetails" style="line-height:1.6;"></div>
         </div>
         <div style="margin:12px 0;">
-          <label class="small" style="font-weight:800;display:block;margin-bottom:6px;">Please enter your name:</label>
-          <input id="contractNameInput" type="text" placeholder="Enter your trading name" style="width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid rgba(7,34,40,0.08);font-size:14px;" />
+          <label class="small" style="font-weight:800;display:block;margin-bottom:6px;color:#00d4ff;">Please enter your name:</label>
+          <input id="contractNameInput" type="text" placeholder="Enter your trading name" style="width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid rgba(0,212,255,0.2);font-size:14px;background:rgba(0,212,255,0.05);color:#e0e8f0;" />
         </div>
         <div class="letter-content" style="margin:12px 0;">
-          <div class="mini" style="font-weight:800;margin-bottom:8px;">Benefits</div>
+          <div class="mini" style="font-weight:800;margin-bottom:8px;color:#00ff88;">Benefits</div>
           <ul class="small muted" id="contractBenefits" style="padding-left:16px;margin:0;"></ul>
         </div>
         <div class="controls" style="margin-top:12px;">
           <button id="contractSign" class="btn-primary">Sign Contract</button>
         </div>
       </div>
-      <div style="flex:0 0 280px;background:#f5f9ff;padding:16px;border-radius:8px;border:1px solid rgba(43,156,245,0.1);">
+      <div style="flex:0 0 280px;background:linear-gradient(135deg,rgba(30,38,51,0.8),rgba(37,45,61,0.6));padding:16px;border-radius:8px;border:1px solid rgba(0,212,255,0.15);">
         <div class="mini" style="font-weight:800;margin-bottom:12px;color:var(--accent);">Your Contract</div>
-        <div id="contractPreview" class="letter-content small" style="background:#fffef8;padding:12px;margin:0;font-size:11px;line-height:1.5;max-height:400px;overflow:auto;"></div>
+        <div id="contractPreview" class="letter-content small" style="background:rgba(0,20,30,0.6);padding:12px;margin:0;font-size:11px;line-height:1.5;max-height:400px;overflow:auto;color:#d0d8e0;border:1px solid rgba(0,212,255,0.1);border-radius:6px;"></div>
       </div>
     </div>
   </div>
@@ -459,6 +524,18 @@ const LEVEL_CONTRACTS = {
   }
 };
 
+// Achievements system
+const ACHIEVEMENTS = {
+  first_trade: { id: 'first_trade', name: '🎯 First Trade', desc: 'Make your first stock purchase', icon: '📈' },
+  millionaire: { id: 'millionaire', name: '💰 Millionaire', desc: 'Reach $1,000,000 net worth', icon: '💎' },
+  day_trader: { id: 'day_trader', name: '⚡ Day Trader', desc: 'Make 100 trades', icon: '🔥' },
+  diversified: { id: 'diversified', name: '🌍 Diversified', desc: 'Own stocks in all sectors', icon: '🏆' },
+  comeback_kid: { id: 'comeback_kid', name: '🔄 Comeback Kid', desc: 'Recover from $1000 loss in a day', icon: '📈' },
+  fortune_500: { id: 'fortune_500', name: '💼 Fortune 500', desc: 'Reach Level 4 (CTO)', icon: '👑' },
+  lucky_trader: { id: 'lucky_trader', name: '🍀 Lucky Trader', desc: 'Have 10+ days with 5%+ gains', icon: '✨' },
+  market_master: { id: 'market_master', name: '📊 Market Master', desc: 'Complete 365+ days', icon: '🎓' }
+};
+
 const REAL_TECH = ["NVIDIA","AMD","Intel","Apple","Microsoft","Alphabet","Amazon","Meta","Qualcomm","Broadcom"];
 const REAL_TRANSPORT = ["Tesla","Ford Motor Company","General Motors","Toyota","Uber","Boeing","Airbus","DHL","Maersk","Volvo"];
 const REAL_ENERGY = ["ExxonMobil","Chevron","BP","Shell","TotalEnergies","NextEra Energy","Enel","Ørsted","Origin Energy","Sempra"];
@@ -528,11 +605,33 @@ const MAJOR_EVENTS = [
   { title:'Big stimulus package', effects:{market:0.18}, desc:'A big stimulus pushes many stocks higher.' }
 ];
 
+const SPECIAL_EVENTS = [
+  { title:'📰 Breaking News: CEO Resignation', desc:'A major announcement sends {{stock}} down 15%!', effect: (s)=>{ s.price *= 0.85; }, chance:0.01, reward:200 },
+  { title:'🚀 Product Launch Success', desc:'{{stock}} launches a hit product! Up 12%!', effect: (s)=>{ s.price *= 1.12; }, chance:0.02, reward:300 },
+  { title:'💎 Acquisition Offer', desc:'{{stock}} receives acquisition interest. Up 8%!', effect: (s)=>{ s.price *= 1.08; }, chance:0.015, reward:250 },
+  { title:'⚖️ Regulatory Fine', desc:'{{stock}} fined $500M. Down 10%!', effect: (s)=>{ s.price *= 0.90; }, chance:0.01, reward:150 },
+  { title:'🏆 Best in Industry Award', desc:'{{stock}} wins major award. Up 7%!', effect: (s)=>{ s.price *= 1.07; }, chance:0.02, reward:200 },
+  { title:'📊 Better Than Expected Earnings', desc:'{{stock}} crushes earnings! Up 15%!', effect: (s)=>{ s.price *= 1.15; }, chance:0.025, reward:400 },
+  { title:'⚠️ Supply Chain Issues', desc:'{{stock}} faces supply chain delays. Down 8%!', effect: (s)=>{ s.price *= 0.92; }, chance:0.015, reward:180 },
+  { title:'🤝 Partnership Announced', desc:'{{stock}} forms strategic partnership. Up 6%!', effect: (s)=>{ s.price *= 1.06; }, chance:0.02, reward:220 }
+];
+
+const DAILY_QUESTS = [
+  { id:'earn_5k', title:'💰 Earn $5,000', description:'Make a daily profit of at least $5,000', check: (game)=>{ const n=game.history.length; if(n<2)return false; const today=game.history[n-1].networth; const yday=game.history[n-2].networth; return (today-yday)>=5000; }, reward:500 },
+  { id:'buy_stocks', title:'📈 Buy 50 Shares', description:'Purchase exactly 50 shares in a single day', check: (game)=>{ return game.lastDaySharesBought >= 50; }, reward:300 },
+  { id:'diversify', title:'🌍 Own 5 Categories', description:'Hold stocks in 5 different sectors', check: (game)=>{ const cats=new Set(Object.keys(game.portfolio).map(id=>game.stocks.find(s=>s.id===id)?.sector)); return cats.size >= 5; }, reward:400 },
+  { id:'hold_week', title:'📅 Hold for 7 Days', description:'Keep a stock for 7 consecutive days', check: (game)=>{ return false; }, reward:350 },
+  { id:'sell_profit', title:'✅ Sell for 20% Profit', description:'Sell a stock for 20% or more profit', check: (game)=>{ return game.lastSaleProfitPct >= 0.20; }, reward:380 },
+  { id:'avoid_loss', title:'🛡️ No Losses Today', description:'Finish the day without losing money', check: (game)=>{ const n=game.history.length; if(n<2)return false; return game.history[n-1].networth >= game.history[n-2].networth; }, reward:450 },
+  { id:'gain_goal', title:'🎯 Reach $50k Net Worth', description:'Build your net worth to $50,000', check: (game)=>{ const n=game.history.length; return game.history[n-1].networth >= 50000; }, reward:600 }
+];
+
 let totalDays = 10000;
 let totalWeeks = Math.ceil(totalDays / 7);
 
 let game = {
-  stocks: [], day:0, cash: STANDARD.startingMoney, portfolio:{}, events:[], history:[], cyclesCompleted:0, marketState:'Sideways', bonusGiven:false, level: 1, levelUpUnlocked: {}, playerName: 'Trader'
+  stocks: [], day:0, cash: STANDARD.startingMoney, portfolio:{}, events:[], history:[], cyclesCompleted:0, marketState:'Sideways', bonusGiven:false, level: 1, levelUpUnlocked: {}, playerName: 'Trader',
+  achievements: {}, totalTrades: 0, bestDayProfit: 0, streakDays: 0, totalProfit: 0, completedQuests: {}, lastDaySharesBought: 0, lastSaleProfitPct: 0
 };
 let currentWeek = 0, runningYear = false, paused = false;
 let disableUI = false;
@@ -550,6 +649,8 @@ function queueRender() {
     renderQueued = false;
     renderPortfolio();
     updateStocksForCategory();
+    renderAchievements();
+    renderQuests();
   });
 }
 let speedIndex = 0, speedMultiplier = SPEED_OPTIONS[speedIndex];
@@ -661,6 +762,109 @@ function updateStocksForCategory(){
     row.priceTd.innerHTML = `<div style="font-weight:800">${money(s.price)}</div><div class="small muted">Prev: ${money(prev)}</div>`;
     row.changeTd.innerHTML = pct>0.0001?`<span class="price-up">+${(pct*100).toFixed(2)}%</span>`:(pct<-0.0001?`<span class="price-down">${(pct*100).toFixed(2)}%</span>`:`<span class="small muted">0.00%</span>`);
   }
+}
+
+function unlockAchievement(achievementId){
+  if (game.achievements[achievementId] || !ACHIEVEMENTS[achievementId]) return;
+  game.achievements[achievementId] = true;
+  const ach = ACHIEVEMENTS[achievementId];
+  showNotification(`🏆 Achievement Unlocked: ${ach.name}`, 6000);
+  logEvent(`Achievement: ${ach.name}`);
+  renderAchievements();
+  autoSave();
+}
+
+function checkAchievements(){
+  const portfolioVal = Object.keys(game.portfolio).reduce((acc,id)=>{ const e=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return acc + (s? s.price * e.shares : 0); },0);
+  const networth = round2(game.cash + portfolioVal);
+  
+  // First trade
+  if (game.totalTrades === 1 && !game.achievements.first_trade) unlockAchievement('first_trade');
+  
+  // Millionaire
+  if (networth >= 1000000 && !game.achievements.millionaire) unlockAchievement('millionaire');
+  
+  // Day trader
+  if (game.totalTrades >= 100 && !game.achievements.day_trader) unlockAchievement('day_trader');
+  
+  // Diversified
+  const sectors = new Set(Object.keys(game.portfolio).map(id=> game.stocks.find(s=>s.id===id)?.sector).filter(s=>s));
+  if (sectors.size === CATEGORIES.length && !game.achievements.diversified) unlockAchievement('diversified');
+  
+  // Fortune 500
+  if (game.level >= 4 && !game.achievements.fortune_500) unlockAchievement('fortune_500');
+  
+  // Market Master
+  if (game.day >= 365 && !game.achievements.market_master) unlockAchievement('market_master');
+}
+
+function renderAchievements(){
+  const display = document.getElementById('achievementsDisplay');
+  display.innerHTML = '';
+  const unlocked = Object.keys(ACHIEVEMENTS).filter(id => game.achievements[id]);
+  if (!unlocked.length) {
+    display.innerHTML = '<div class="small muted" style="text-align:center;padding:8px;">Earn achievements as you play!</div>';
+    return;
+  }
+  unlocked.forEach(id => {
+    const ach = ACHIEVEMENTS[id];
+    const badge = document.createElement('div');
+    badge.className = 'achievement-badge';
+    badge.innerHTML = `<span class="achievement-icon">${ach.icon}</span>${ach.name}`;
+    display.appendChild(badge);
+  });
+}
+
+function checkAndCompleteQuests(){
+  DAILY_QUESTS.forEach(quest => {
+    if (game.completedQuests[quest.id]) return;
+    if (quest.check(game)) {
+      game.completedQuests[quest.id] = true;
+      game.cash = round2(game.cash + quest.reward);
+      showNotification(`🎉 Quest Complete: ${quest.title}\n+${money(quest.reward)}`, 5000);
+      logEvent(`✅ ${quest.title} — earned ${money(quest.reward)}`);
+    }
+  });
+}
+
+function triggerSpecialEvent(){
+  if (Math.random() > 0.05) return; // 5% chance per day
+  const event = pick(SPECIAL_EVENTS);
+  const stock = pick(game.stocks.filter(s => game.portfolio[s.id]?.shares > 0) || game.stocks);
+  if (!stock) return;
+  
+  const title = event.title.replace('{{stock}}', stock.name);
+  const desc = event.desc.replace('{{stock}}', stock.name);
+  
+  event.effect(stock);
+  stock.history.push(round2(stock.price));
+  capArray(stock.history, 200);
+  
+  showNotification(`${title}\n${desc}`, 4000);
+  logEvent(desc);
+}
+
+function renderQuests(){
+  const display = document.getElementById('questsDisplay');
+  display.innerHTML = '';
+  const incomplete = DAILY_QUESTS.filter(q => !game.completedQuests[q.id]);
+  if (!incomplete.length) {
+    display.innerHTML = '<div class="small muted" style="text-align:center;padding:8px;">All quests completed for today!</div>';
+    return;
+  }
+  incomplete.forEach(quest => {
+    const item = document.createElement('div');
+    item.className = 'quest-item';
+    const icon = quest.title.charAt(0);
+    item.innerHTML = `
+      <div class="quest-icon">${icon}</div>
+      <div class="quest-info">
+        <div class="quest-title">${quest.title}</div>
+        <div class="quest-desc">${quest.description}</div>
+      </div>
+    `;
+    display.appendChild(item);
+  });
 }
 
 function renderPortfolio(){
@@ -789,17 +993,24 @@ tradeConfirm.addEventListener('click', ()=>{
     game.portfolio[s.id] = { shares:newTotal, avgPrice:newAvg };
     game.cash = round2(game.cash - shares*s.price);
     logEvent(`Bought ${shares} × ${s.name}.`);
+    game.lastDaySharesBought = (game.lastDaySharesBought||0) + shares;
+    game.totalTrades++;
   } else {
     const owned = (game.portfolio[s.id]||{shares:0}).shares;
     if (owned <= 0){ alert("You don't own shares"); return; }
     if (shares > owned){ alert('Not that many shares'); return; }
+    const avgPrice = game.portfolio[s.id].avgPrice;
+    const sellPrice = s.price;
+    const profitPct = avgPrice > 0 ? (sellPrice - avgPrice) / avgPrice : 0;
     game.cash = round2(game.cash + shares*s.price);
     const remaining = owned - shares;
     if (remaining === 0) delete game.portfolio[s.id]; else game.portfolio[s.id] = { shares:remaining, avgPrice: game.portfolio[s.id].avgPrice };
     logEvent(`Sold ${shares} × ${s.name}.`);
+    game.lastSaleProfitPct = Math.max(game.lastSaleProfitPct || 0, profitPct);
+    game.totalTrades++;
   }
   tradeOverlay.style.display='none'; tradeOverlay.setAttribute('aria-hidden','true'); tradeOverlay.querySelector('.modal').classList.remove('pos','neg','show');
-  currentTradeStock = null; queueRender(); autoSave();
+  currentTradeStock = null; queueRender(); autoSave(); checkAchievements();
 });
 
 function logEvent(text){
@@ -865,6 +1076,8 @@ function showQuickTipFromNews(news){
 }
 
 function applySingleDay(weeklyNews){
+  const previousNetworth = game.history.length > 0 ? game.history[game.history.length - 1].networth : game.cash;
+  
   game.day++;
   evaluateMarketState();
   for (const s of game.stocks){
@@ -884,13 +1097,24 @@ function applySingleDay(weeklyNews){
     capArray(s.history, 200);
   }
 
-  if (Math.random() < SHOCK_PROB_SURGE){ const t = pick(game.stocks); const g = rand(0.25,0.9); t.changePct += g; t.price = round2(t.price * (1 + g)); t.history.push(round2(t.price)); capArray(t.history, 200); logEvent(`${t.name} had a sudden positive surprise.`); showNotification(`${t.name} jumped — consider taking a look.`); }
-  if (Math.random() < SHOCK_PROB_FALL){ const t = pick(game.stocks); const l = rand(0.2,0.7); t.changePct -= l; t.price = Math.max(0.01, round2(t.price * (1 - l))); t.history.push(round2(t.price)); capArray(t.history, 200); logEvent(`${t.name} experienced a sudden drop.`); showNotification(`${t.name} dropped — be careful.`); }
+  if (Math.random() < SHOCK_PROB_SURGE){ const t = pick(game.stocks); const g = rand(0.25,0.9); t.changePct += g; t.price = round2(t.price * (1 + g)); t.history.push(round2(t.price)); capArray(t.history, 200); logEvent(`⚡ ${t.name} had a sudden positive surprise!`); showNotification(`📈 ${t.name} jumped +${(g*100).toFixed(1)}% — great opportunity!`); }
+  if (Math.random() < SHOCK_PROB_FALL){ const t = pick(game.stocks); const l = rand(0.2,0.7); t.changePct -= l; t.price = Math.max(0.01, round2(t.price * (1 - l))); t.history.push(round2(t.price)); capArray(t.history, 200); logEvent(`⚠️ ${t.name} experienced a sudden drop.`); showNotification(`📉 ${t.name} dropped ${(l*100).toFixed(1)}% — watch out!`); }
 
   const portfolioVal = Object.keys(game.portfolio).reduce((acc,id)=>{ const e=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return acc + (s? s.price * e.shares : 0); },0);
   const networth = round2(game.cash + portfolioVal);
+  const dayProfit = round2(networth - previousNetworth);
+  
+  // Track best day profit
+  if (dayProfit > game.bestDayProfit) game.bestDayProfit = dayProfit;
+  
   game.history.push({ day:game.day, networth, portfolioVal, cash: game.cash });
   capArray(game.history, 200);
+  
+  // Trigger special events and check quests
+  triggerSpecialEvent();
+  checkAndCompleteQuests();
+  game.lastDaySharesBought = 0; // Reset daily counter
+  
   queueRender();
 
   if (game.day > 0 && game.day % 30 === 0){
@@ -977,9 +1201,9 @@ function showContract(levelNum){
   pendingContractLevel = levelNum;
   contractLevel.textContent = levelNum;
   contractDetails.innerHTML = `
-    <div style="font-weight:800;color:#0b2a3a;margin-bottom:6px;">${contract.title}</div>
-    <div>${contract.description}</div>
-    <hr style="margin:10px 0;border:none;border-top:1px dashed rgba(7,34,40,0.06);">
+    <div style="font-weight:800;color:#00ff88;margin-bottom:6px;">${contract.title}</div>
+    <div style="color:#e0e8f0;">${contract.description}</div>
+    <hr style="margin:10px 0;border:none;border-top:1px dashed rgba(0,212,255,0.1);">
     <div class="small" style="color:var(--muted);">${contract.requirements}</div>
   `;
   
@@ -1000,14 +1224,16 @@ function showContract(levelNum){
   // Generate contract preview
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  const currentWeekNum = Math.floor(game.day / 7);
   contractPreview.innerHTML = `
-    <div style="font-weight:bold;text-align:center;margin-bottom:8px;">EMPLOYMENT AGREEMENT</div>
+    <div style="font-weight:bold;text-align:center;margin-bottom:8px;color:#00d4ff;">EMPLOYMENT AGREEMENT</div>
     <div style="text-align:center;margin-bottom:10px;">___________________________</div>
-    <div style="margin-bottom:2px;"><span style="font-weight:bold;">Trader Name:</span> <span id="previewName">_________________</span></div>
-    <div style="margin-bottom:2px;"><span style="font-weight:bold;">Position:</span> ${contract.title}</div>
-    <div style="margin-bottom:2px;"><span style="font-weight:bold;">Level:</span> ${levelNum}</div>
-    <div style="margin-bottom:2px;"><span style="font-weight:bold;">Date:</span> ${dateStr}</div>
-    <div style="margin-top:8px;border-top:1px dashed rgba(0,0,0,0.2);padding-top:8px;text-align:center;font-style:italic;">This contract grants trading privileges...</div>
+    <div style="margin-bottom:2px;color:#e0e8f0;"><span style="font-weight:bold;color:#00ff88;">Trader Name:</span> <span id="previewName" style="color:#00d4ff;">_________________</span></div>
+    <div style="margin-bottom:2px;color:#e0e8f0;"><span style="font-weight:bold;color:#00ff88;">Position:</span> <span style="color:#00d4ff;">${contract.title}</span></div>
+    <div style="margin-bottom:2px;color:#e0e8f0;"><span style="font-weight:bold;color:#00ff88;">Level:</span> <span style="color:#00d4ff;">${levelNum}</span></div>
+    <div style="margin-bottom:2px;color:#e0e8f0;"><span style="font-weight:bold;color:#00ff88;">Week:</span> <span style="color:#00d4ff;">${currentWeekNum}</span></div>
+    <div style="margin-bottom:2px;color:#e0e8f0;"><span style="font-weight:bold;color:#00ff88;">Date:</span> <span style="color:#00d4ff;">${dateStr}</span></div>
+    <div style="margin-top:8px;border-top:1px dashed rgba(0,212,255,0.2);padding-top:8px;text-align:center;font-style:italic;color:#a0a8b0;">This contract grants trading privileges...</div>
   `;
   
   contractNameInput.value = game.playerName || '';
@@ -1189,15 +1415,14 @@ function runNextWeek(){
 function showWeekSummary(){
   if(disableUI) {
     pendingWeeklyNews = generateWeeklyNews();
-    currentWeek++;
     daysAppliedInWeek = 0;
     currentWeekStartNet = Number((networthEl.textContent || '$0').replace(/[$,]/g,'')) || game.cash;
     return;
   }
-  currentWeek++;
   const afterNet = Number((networthEl.textContent || '$0').replace(/[$,]/g,'')) || game.cash;
   const diff = round2(afterNet - currentWeekStartNet);
-  weekSummaryHeadline.textContent = `Week ${currentWeek} results`;
+  const weekNum = Math.floor(game.day / 7);
+  weekSummaryHeadline.textContent = `Week ${weekNum} results`;
   weekSummaryBody.textContent = `You now have ${money(afterNet)}. This week you ${diff>=0 ? 'gained' : 'lost'} ${money(Math.abs(diff))}.`;
   weekSummaryOverlay.style.display = 'flex'; weekSummaryOverlay.querySelector('.modal').classList.add('show');
 
@@ -1338,6 +1563,10 @@ function updateProgress(){
   networthEl.textContent = money(round2(game.cash + portfolioVal));
   cashPanelEl.textContent = money(game.cash);
   marketStateEl.textContent = game.marketState;
+  
+  // Update stats display
+  document.getElementById('bestDayProfit').textContent = money(game.bestDayProfit);
+  document.getElementById('totalTrades').textContent = game.totalTrades;
 
   const networth = round2(game.cash + portfolioVal);
   if (networth < 5000 && !game.bonusGiven){
@@ -1345,11 +1574,12 @@ function updateProgress(){
     game.cash = round2(game.cash + bonus);
     game.bonusGiven = true;
     logEvent(`Your boss noticed and gave you a bonus of ${money(bonus)}!`);
-    showNotification(`Boss bonus! You received ${money(bonus)} to help out.`, NOTIF_DURATION_MS);
+    showNotification(`💰 Boss bonus! You received ${money(bonus)} to help out.`, NOTIF_DURATION_MS);
     queueRender();
     updateProgress();
   }
   checkLevelUp();
+  checkAchievements();
 }
 
 function showEndOfYearPrompt(){
