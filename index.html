@@ -151,8 +151,117 @@
       .category-grid{ grid-template-columns: repeat(2, 1fr); }
       .modal{ width:94%; }
       .notif-wrap{ right:10px; top:70px; }
+      .glossary-grid{ grid-template-columns:1fr; }
     }
-  </style>
+
+    /* ── LIGHT MODE ─────────────────────────────────────── */
+    body.light-mode{ --bg:#f0f4f8; --bg-glow:#e8eef5; --card:#ffffff; --card-light:#f5f8fc; --muted:#4a5568; --accent:#0ea5e9; --accent-2:#10b981; --accent-3:#f43f5e; --danger:#ef4444; --gold:#f59e0b; color:#1a202c; }
+    body.light-mode, body.light-mode html{ background:linear-gradient(135deg,#e8eef5 0%,#f0f4f8 50%,#e8f4fc 100%)!important; }
+    body.light-mode .panel{ background:rgba(255,255,255,0.95); border-color:rgba(14,165,233,0.25); }
+    body.light-mode header{ background:rgba(255,255,255,0.97); border-color:rgba(14,165,233,0.2); }
+    body.light-mode th{ color:#0ea5e9; } body.light-mode td{ color:#374151; border-bottom-color:rgba(14,165,233,0.12); }
+    body.light-mode select, body.light-mode button:not(.primary):not(.btn-primary):not(.btn-buy):not(.btn-sell):not(.btn-short), body.light-mode input{ background:#f5f8fc; color:#374151; border-color:rgba(14,165,233,0.25); }
+    body.light-mode .notif{ background:rgba(255,255,255,0.97); color:#0ea5e9; }
+    body.light-mode .modal{ background:rgba(255,255,255,0.98); color:#1a202c; }
+    body.light-mode .news{ background:rgba(14,165,233,0.07); }
+    body.light-mode .cat-tile{ background:rgba(255,255,255,0.9); }
+    body.light-mode .portfolio-row{ border-bottom-color:rgba(14,165,233,0.15); }
+    body.light-mode .stat-box{ background:rgba(14,165,233,0.07); }
+    body.light-mode .explain-box{ background:rgba(14,165,233,0.06); }
+    body.light-mode .trade-meta{ background:rgba(14,165,233,0.05); }
+    body.light-mode .eco-indicators{ background:rgba(14,165,233,0.05); }
+
+    /* ── SORTABLE TABLE HEADERS ────────────────────────── */
+    th.sortable{ cursor:pointer; user-select:none; transition:color .15s; position:relative; white-space:nowrap; }
+    th.sortable:hover{ color:#00ff88; }
+    th.sortable::after{ content:' ⇅'; font-size:10px; opacity:0.35; }
+    th.sort-asc::after{ content:' ↑'; opacity:1; color:#00ff88; }
+    th.sort-desc::after{ content:' ↓'; opacity:1; color:#ff6b6b; }
+
+    /* ── SEARCH BAR ─────────────────────────────────────── */
+    .search-wrap{ display:flex; gap:8px; margin-bottom:10px; align-items:center; }
+    .search-input{ flex:1; padding:9px 14px; border-radius:10px; background:var(--card); border:1px solid rgba(0,212,255,0.2); color:#e0e8f0; font-size:13px; transition:border-color .2s; }
+    body.light-mode .search-input{ color:#374151; }
+    .search-input:focus{ outline:none; border-color:rgba(0,212,255,0.5); box-shadow:0 0 0 3px rgba(0,212,255,0.08); }
+    .search-input::placeholder{ color:var(--muted); }
+
+    /* ── FLOAT PROFIT ANIMATION ─────────────────────────── */
+    @keyframes floatUp{ 0%{ opacity:1; transform:translateY(0) scale(1); } 100%{ opacity:0; transform:translateY(-90px) scale(0.7); } }
+    .float-profit{ position:fixed; pointer-events:none; font-weight:900; font-size:17px; z-index:15000; animation:floatUp 1.6s ease-out forwards; text-shadow:0 2px 8px rgba(0,0,0,0.5); }
+
+    /* ── SCREEN SHAKE ────────────────────────────────────── */
+    @keyframes screenShake{ 0%,100%{transform:translate(0,0)} 15%{transform:translate(-5px,3px)} 30%{transform:translate(5px,-3px)} 45%{transform:translate(-4px,4px)} 60%{transform:translate(4px,-2px)} 75%{transform:translate(-2px,2px)} 90%{transform:translate(2px,-1px)} }
+    body.market-crash{ animation:screenShake 0.65s ease; }
+
+    /* ── ECONOMIC INDICATORS ─────────────────────────────── */
+    .eco-bar{ display:flex; gap:12px; flex-wrap:wrap; padding:10px 14px; background:linear-gradient(90deg,rgba(0,212,255,0.06),rgba(0,255,136,0.03)); border:1px solid rgba(0,212,255,0.12); border-radius:10px; font-size:12px; margin-top:8px; }
+    .eco-item{ display:flex; flex-direction:column; gap:2px; }
+    .eco-label{ color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.5px; font-weight:700; }
+    .eco-val{ font-weight:900; font-size:14px; }
+    .eco-red{ color:#ff6b6b; } .eco-green{ color:#00ff88; } .eco-gold{ color:#ffb020; }
+
+    /* ── DIVIDEND BADGE ──────────────────────────────────── */
+    .div-badge{ display:inline-block; font-size:9px; font-weight:700; padding:2px 5px; background:rgba(255,176,32,0.2); color:#ffb020; border:1px solid rgba(255,176,32,0.3); border-radius:4px; margin-left:4px; vertical-align:middle; }
+
+    /* ── SHORT SELLING ───────────────────────────────────── */
+    .btn-short{ background:linear-gradient(90deg,rgba(167,139,250,0.15),rgba(167,139,250,0.08)); color:#a78bfa; border:1px solid rgba(167,139,250,0.3); padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:800; font-size:13px; transition:all .2s; }
+    .btn-short:hover{ background:rgba(167,139,250,0.25); }
+    .short-pos{ color:#a78bfa; font-weight:900; }
+    .short-badge{ font-size:9px; padding:2px 5px; background:rgba(167,139,250,0.2); color:#a78bfa; border-radius:4px; border:1px solid rgba(167,139,250,0.25); margin-left:4px; vertical-align:middle; }
+
+    /* ── MARGIN / LOAN ──────────────────────────────────── */
+    .margin-bar{ height:6px; background:rgba(255,107,107,0.1); border-radius:4px; overflow:hidden; margin-top:4px; }
+    .margin-bar > i{ display:block; height:100%; background:linear-gradient(90deg,#ffa500,#ff6b6b); transition:width .5s; }
+    .margin-call-warn{ color:#ff6b6b; font-weight:900; font-size:12px; }
+    @keyframes blinkWarn{ 0%,100%{ opacity:1; } 50%{ opacity:0.25; } }
+    .blink{ animation:blinkWarn 0.8s infinite; }
+
+    /* ── GLOSSARY ────────────────────────────────────────── */
+    .glossary-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; max-height:500px; overflow-y:auto; padding-right:4px; }
+    .glossary-term{ background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.12); border-radius:10px; padding:14px; }
+    .glossary-term .term{ font-weight:900; color:#00d4ff; font-size:13px; margin-bottom:5px; }
+    .glossary-term .def{ color:var(--muted); font-size:12px; line-height:1.55; }
+
+    /* ── KEYBOARD SHORTCUTS ──────────────────────────────── */
+    .kb-grid{ display:grid; grid-template-columns:auto 1fr; gap:8px 16px; margin-top:12px; align-items:center; }
+    kbd{ font-family:monospace; background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.3); border-bottom:2px solid rgba(0,212,255,0.4); border-radius:5px; padding:3px 9px; font-size:12px; color:#00d4ff; font-weight:700; }
+    .kb-desc{ color:var(--muted); font-size:13px; }
+
+    /* ── PORTFOLIO BATCH BUTTONS ─────────────────────────── */
+    .btn-sell-half{ background:rgba(255,165,0,0.12); color:#ffa500; border:1px solid rgba(255,165,0,0.3); padding:5px 9px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:700; transition:all .2s; }
+    .btn-sell-half:hover{ background:rgba(255,165,0,0.22); }
+    .btn-sell-all-q{ background:rgba(255,107,107,0.12); color:#ff6b6b; border:1px solid rgba(255,107,107,0.3); padding:5px 9px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:700; transition:all .2s; }
+    .btn-sell-all-q:hover{ background:rgba(255,107,107,0.22); }
+
+    /* ── CHART TOOLTIP ───────────────────────────────────── */
+    .chart-wrap{ position:relative; }
+    .chart-tooltip{ position:absolute; pointer-events:none; background:rgba(10,18,28,0.93); border:1px solid rgba(0,212,255,0.35); border-radius:8px; padding:8px 12px; font-size:12px; color:#e0e8f0; white-space:nowrap; box-shadow:0 4px 20px rgba(0,0,0,0.5); z-index:100; transition:opacity .1s; }
+
+    /* ── THEME TOGGLE ────────────────────────────────────── */
+    .theme-btn{ font-size:16px; padding:8px 10px; }
+
+    /* ── GLOBAL LEADERBOARD ─────────────────────────────── */
+    .lb-tabs{ display:flex; gap:6px; margin-bottom:12px; }
+    .lb-tab{ flex:1; padding:9px 0; text-align:center; border-radius:8px; border:1px solid rgba(0,212,255,0.15); cursor:pointer; font-weight:800; font-size:13px; color:var(--muted); background:transparent; transition:all .2s; }
+    .lb-tab.active{ background:linear-gradient(90deg,rgba(0,212,255,0.15),rgba(0,255,136,0.1)); color:#00d4ff; border-color:rgba(0,212,255,0.4); }
+    .lb-tab:hover:not(.active){ border-color:rgba(0,212,255,0.3); color:#e0e8f0; }
+    .lb-entry{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(0,212,255,0.07); margin-bottom:6px; }
+    .lb-entry:nth-child(1){ background:rgba(255,176,32,0.07); border-color:rgba(255,176,32,0.25); }
+    .lb-entry:nth-child(2){ background:rgba(192,192,192,0.05); border-color:rgba(192,192,192,0.18); }
+    .lb-entry:nth-child(3){ background:rgba(205,127,50,0.05); border-color:rgba(205,127,50,0.18); }
+    .lb-rank{ font-size:17px; font-weight:900; min-width:28px; text-align:center; }
+    .lb-name{ flex:1; font-weight:800; font-size:14px; color:#e0e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; }
+    .lb-score{ font-weight:900; color:#00d4ff; font-size:14px; white-space:nowrap; }
+    .lb-meta{ color:var(--muted); font-size:11px; white-space:nowrap; margin-left:auto; }
+    .lb-you{ background:rgba(0,212,255,0.09) !important; border-color:rgba(0,212,255,0.38) !important; }
+    .lb-rank-badge{ background:linear-gradient(90deg,#00d4ff,#00ff88); color:#0f1419; border-radius:8px; padding:5px 14px; font-weight:900; font-size:13px; display:inline-block; margin-bottom:12px; }
+    .lb-loading{ text-align:center; padding:30px; color:var(--muted); font-size:14px; }
+    .lb-spinner{ display:inline-block; width:18px; height:18px; border:2px solid rgba(0,212,255,0.25); border-top-color:#00d4ff; border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:middle; margin-left:8px; }
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+    .btn-submit-score{ background:linear-gradient(90deg,rgba(0,212,255,0.15),rgba(0,255,136,0.1)); color:#00d4ff; border:1px solid rgba(0,212,255,0.3); padding:10px 18px; border-radius:10px; cursor:pointer; font-weight:800; font-size:13px; transition:all .2s; }
+    .btn-submit-score:hover{ background:rgba(0,212,255,0.25); transform:translateY(-1px); }
+    .lb-error{ color:#ff6b6b; font-size:13px; padding:16px; text-align:center; }
+    .lb-config-warn{ background:rgba(255,107,107,0.08); border:1px solid rgba(255,107,107,0.25); border-radius:8px; padding:10px 14px; color:#ff6b6b; font-size:12px; margin-bottom:10px; }
   </style>
 </head>
 <body>
@@ -191,9 +300,16 @@
         </div>
 
         <div class="group">
-          <button id="leaderboardBtn" class="compact ghost">Leaderboard</button>
-          <button id="marketChartBtn" class="compact ghost">Market Chart</button>
+          <button id="leaderboardBtn" class="compact ghost">🏆 Leaderboard</button>
+          <button id="marketChartBtn" class="compact ghost">📈 Market Chart</button>
           <button id="speedBtn" class="compact ghost">Speed: <span id="speedLabel">1x</span></button>
+        </div>
+        <div class="group">
+          <button id="themeToggleBtn" class="compact ghost theme-btn" title="Toggle Light/Dark Mode">🌙</button>
+          <button id="glossaryBtn" class="compact ghost" title="Financial Glossary">📖 Glossary</button>
+          <button id="shortcutsBtn" class="compact ghost" title="Keyboard Shortcuts">⌨️</button>
+          <button id="exportSaveBtn" class="compact ghost" title="Export Save to File">💾 Export</button>
+          <button id="importSaveBtn" class="compact ghost" title="Import Save from File">📂 Import</button>
         </div>
       </div>
     </header>
@@ -215,16 +331,28 @@
         <div class="small muted">After each 7 days you'll see a summary then the upcoming news that will affect next week.</div>
       </div>
 
+      <div class="eco-bar" id="ecoBar">
+        <div class="eco-item"><span class="eco-label">🏦 Interest Rate</span><span class="eco-val eco-gold" id="ecoInterestRate">3.5%</span></div>
+        <div class="eco-item"><span class="eco-label">📊 Inflation</span><span class="eco-val eco-gold" id="ecoInflation">2.1%</span></div>
+        <div class="eco-item"><span class="eco-label">📉 Market Sentiment</span><span class="eco-val" id="ecoSentiment">Neutral</span></div>
+        <div class="eco-item"><span class="eco-label">💹 Today's Dividend</span><span class="eco-val eco-green" id="ecoDividend">—</span></div>
+        <div class="eco-item" id="ecoMarginItem" style="display:none;"><span class="eco-label">💳 Loan</span><span class="eco-val eco-red" id="ecoLoanDisplay">$0</span></div>
+      </div>
+
       <div class="category-grid" id="categoryGrid" role="tablist" aria-label="Categories"></div>
 
       <div style="margin-top:12px; overflow:auto; max-height:430px;">
+        <div class="search-wrap">
+          <input class="search-input" id="stockSearch" placeholder="🔍  Search stocks by name or sector…" autocomplete="off" />
+          <button id="loanBtn" class="compact ghost" style="white-space:nowrap;font-size:12px;" title="Take or repay a margin loan">💳 Margin</button>
+        </div>
         <table id="stocksTable" aria-live="polite">
           <thead>
             <tr>
-              <th>Stock</th>
-              <th>Price</th>
-              <th class="center">Change</th>
-              <th class="center">Sector</th>
+              <th class="sortable" data-col="name">Stock</th>
+              <th class="sortable" data-col="price">Price</th>
+              <th class="sortable center" data-col="change">Change</th>
+              <th class="sortable center" data-col="sector">Sector</th>
               <th class="market-col">Action</th>
             </tr>
           </thead>
@@ -250,6 +378,31 @@
           <div id="portfolioList" class="flex-col small muted">
             <div class="center small">You don't own any stocks yet.</div>
           </div>
+        </div>
+
+        <!-- Shorts (Short Positions) -->
+        <div id="shortsSection" style="display:none;margin-top:12px;">
+          <hr style="border:none;border-top:1px solid rgba(167,139,250,0.2);margin-bottom:10px;">
+          <div class="mini" style="color:#a78bfa;font-weight:900;">📉 Short Positions</div>
+          <div id="shortsList" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- Margin / Loan Panel -->
+      <div class="panel" id="marginPanel" style="margin-top:14px;display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="mini" style="color:#ff6b6b;font-weight:900;">💳 Margin Account</div>
+          <div id="marginCallBadge" class="margin-call-warn blink" style="display:none;">⚠️ MARGIN CALL</div>
+        </div>
+        <div style="margin-top:10px;display:grid;gap:6px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span class="muted">Loan Outstanding</span><strong id="loanBalance" style="color:#ff6b6b;">$0</strong></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span class="muted">Max Available</span><strong id="maxLoanDisplay" style="color:#ffa500;">$0</strong></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span class="muted">Daily Interest (0.5%)</span><strong id="dailyInterestDisplay" style="color:#ff6b6b;">$0</strong></div>
+          <div class="margin-bar"><i id="loanMeterBar" style="width:0%"></i></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button id="takeLoanBtn" class="compact ghost" style="flex:1;font-size:12px;">➕ Borrow</button>
+          <button id="repayLoanBtn" class="compact ghost" style="flex:1;font-size:12px;color:#00ff88;">💵 Repay</button>
         </div>
       </div>
 
@@ -415,15 +568,26 @@
   </div>
 
   <div id="leaderboardOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
-    <div class="modal" role="document" aria-labelledby="leaderboardTitle">
-      <h2 id="leaderboardTitle">Local Leaderboard</h2>
-      <div class="small muted">Top local scores (saved in this browser)</div>
-      <div style="margin-top:10px;">
-        <ol id="leaderboardList" style="padding-left:18px;margin:0;"></ol>
+    <div class="modal" role="document" aria-labelledby="leaderboardTitle" style="max-width:540px;">
+      <h2 id="leaderboardTitle">🏆 Leaderboard</h2>
+      <div class="lb-tabs">
+        <button class="lb-tab active" id="lbTabLocal" onclick="switchLbTab('local')">🏠 Local (This Browser)</button>
+        <button class="lb-tab" id="lbTabGlobal" onclick="switchLbTab('global')">🌍 Global (All Players)</button>
       </div>
-      <div class="controls" style="margin-top:10px;">
+      <!-- Local pane -->
+      <div id="lbPaneLocal">
+        <div class="small muted" style="margin-bottom:10px;">High scores saved in this browser.</div>
+        <div id="leaderboardList"></div>
+      </div>
+      <!-- Global pane -->
+      <div id="lbPaneGlobal" style="display:none;">
+        <div id="lbYourRank" style="display:none;"></div>
+        <div id="lbGlobalList"></div>
+      </div>
+      <div class="controls" style="margin-top:14px;flex-wrap:wrap;gap:8px;">
         <button id="leaderboardClose" class="btn-secondary">Close</button>
-        <button id="leaderboardClear" class="btn-secondary">Clear Local Scores</button>
+        <button id="leaderboardClear" class="btn-secondary">Clear Local</button>
+        <button id="lbSubmitBtn" class="btn-submit-score">🚀 Submit My Score</button>
       </div>
     </div>
   </div>
@@ -455,9 +619,179 @@
     </div>
   </div>
 
+  <!-- GLOSSARY MODAL -->
+  <div id="glossaryOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal" role="document" style="max-width:860px;">
+      <h2>📖 Financial Glossary</h2>
+      <div class="small muted">Learn the key terms used in stock trading and investing.</div>
+      <div class="glossary-grid" id="glossaryGrid"></div>
+      <div class="controls" style="margin-top:16px;">
+        <button id="glossaryClose" class="btn-secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEYBOARD SHORTCUTS MODAL -->
+  <div id="shortcutsOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal" role="document" style="max-width:480px;">
+      <h2>⌨️ Keyboard Shortcuts</h2>
+      <div class="small muted">Use these keys to control the game without touching the mouse.</div>
+      <div class="kb-grid">
+        <kbd>P</kbd><div class="kb-desc">Pause / Resume simulation</div>
+        <kbd>1</kbd><div class="kb-desc">Set speed to 1×</div>
+        <kbd>2</kbd><div class="kb-desc">Set speed to 2×</div>
+        <kbd>3</kbd><div class="kb-desc">Set speed to 4×</div>
+        <kbd>B</kbd><div class="kb-desc">Quick-buy first stock in current category</div>
+        <kbd>S</kbd><div class="kb-desc">Quick-sell most-held stock</div>
+        <kbd>G</kbd><div class="kb-desc">Open Glossary</div>
+        <kbd>C</kbd><div class="kb-desc">Open Market Chart (net worth)</div>
+        <kbd>M</kbd><div class="kb-desc">Open Margin / Loan panel</div>
+        <kbd>T</kbd><div class="kb-desc">Toggle Light / Dark Theme</div>
+        <kbd>Esc</kbd><div class="kb-desc">Close any open modal</div>
+      </div>
+      <div class="controls" style="margin-top:16px;">
+        <button id="shortcutsClose" class="btn-secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARGIN / LOAN MODAL -->
+  <div id="loanOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal" role="document" style="max-width:480px;">
+      <h2>💳 Margin Account</h2>
+      <div class="headline">Borrow money to invest more</div>
+      <div class="small muted" style="margin-top:8px;">Loans charge <strong style="color:#ff6b6b;">0.5% daily interest</strong>. If your net worth falls below your loan balance a <strong style="color:#ff6b6b;">Margin Call</strong> will force-sell your portfolio to repay the debt.</div>
+      <div class="trade-meta" style="margin-top:12px;">
+        <div class="row"><span>Current Loan</span><strong id="loanModalCurrent" style="color:#ff6b6b;">$0</strong></div>
+        <div class="row"><span>Your Net Worth</span><strong id="loanModalNetworth" style="color:#00ff88;">$0</strong></div>
+        <div class="row"><span>Max You Can Borrow</span><strong id="loanModalMax" style="color:#ffa500;">$0</strong></div>
+        <div class="row"><span>Daily Interest Cost</span><strong id="loanModalInterest" style="color:#ff6b6b;">$0</strong></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
+        <label class="small muted">Amount ($):</label>
+        <input id="loanAmount" type="number" min="1000" step="1000" value="10000" style="width:130px;" />
+      </div>
+      <div class="controls" style="margin-top:14px;">
+        <button id="loanCancel" class="btn-secondary">Cancel</button>
+        <button id="loanBorrow" class="btn-primary">Borrow</button>
+        <button id="loanRepay" style="background:rgba(0,255,136,0.15);color:#00ff88;border:1px solid rgba(0,255,136,0.3);padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:800;">Repay</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 const STORAGE_KEY = 'marketSim_v6_tilemode';
 const LEADERBOARD_KEY = 'marketSim_v6_leaderboard';
+const LEADERBOARD_PROMPT_PROFIT = 500;
+
+// ============================================================
+// GLOBAL LEADERBOARD — SUPABASE CONFIG
+// Step 1: Create a free project at https://supabase.com
+// Step 2: Replace the two placeholder strings below with your
+//         project URL and anon (public) key from:
+//         Supabase Dashboard → Project Settings → API
+// ============================================================
+const SUPABASE_URL     = 'https://zptvinhfqlqazttexyor.supabase.co';       // e.g. 'https://abcdefgh.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwdHZpbmhmcWxxYXp0dGV4eW9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTA3NDQsImV4cCI6MjA5MTYyNjc0NH0.w2c1t6SLIrPT6zCo6laz039qml69StYNsQ2s7IPy_Zg'; // the long 'anon public' key
+
+// The name most recently used to submit a score (used for rank lookup)
+let _globalPlayerName = null;
+
+/**
+ * Submit a score to Supabase.
+ * Returns the player's rank (number) on success, or null on failure.
+ */
+async function submitGlobalScore(playerName, score, day, level){
+  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') return null;
+  _globalPlayerName = playerName;
+  try {
+    const headers = {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+    };
+    const encodedName = encodeURIComponent(playerName);
+    const existingRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/leaderboard?player_name=eq.${encodedName}&select=id,score&order=score.desc&limit=1`,
+      { headers }
+    );
+    if (!existingRes.ok) { console.warn('Score lookup failed:', existingRes.status); return null; }
+    const existingRows = await existingRes.json();
+    const existing = existingRows[0] || null;
+
+    let effectiveScore = score;
+    if (!existing){
+      const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard`, {
+        method: 'POST',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ player_name: playerName, score, day, level })
+      });
+      if (!insertRes.ok) { console.warn('Score submit failed:', insertRes.status); return null; }
+    } else if (score > Number(existing.score || 0)) {
+      const updateRes = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?id=eq.${existing.id}`, {
+        method: 'PATCH',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ score, day, level })
+      });
+      if (!updateRes.ok) { console.warn('Score update failed:', updateRes.status); return null; }
+    } else {
+      effectiveScore = Number(existing.score || score);
+    }
+
+    // Calculate rank using deduped best scores.
+    const rankRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/leaderboard?select=player_name,score&order=score.desc`,
+      { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+    );
+    if (!rankRes.ok) return null;
+    const allRows = await rankRes.json();
+    const seen = new Set();
+    const deduped = [];
+    for (const row of allRows){
+      const key = (row.player_name || '').trim().toLowerCase();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      deduped.push(row);
+    }
+    const higher = deduped.filter(r => Number(r.score || 0) > effectiveScore).length;
+    return higher + 1;
+  } catch(e){ console.error('submitGlobalScore:', e); return null; }
+}
+
+/**
+ * Fetch top 10 global scores + current player rank.
+ * Returns { top10: [...], playerRank: number|null, total: number }
+ */
+async function fetchGlobalLeaderboard(){
+  const headers = { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` };
+  const allRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/leaderboard?select=player_name,score,day,level&order=score.desc`,
+    { headers }
+  );
+  if (!allRes.ok) throw new Error(`HTTP ${allRes.status}`);
+  const rows = await allRes.json();
+
+  const seen = new Set();
+  const uniqueRows = [];
+  for (const row of rows){
+    const key = (row.player_name || '').trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    uniqueRows.push(row);
+  }
+
+  const top10 = uniqueRows.slice(0, 10);
+  const total = uniqueRows.length;
+  let playerRank = null;
+  if (_globalPlayerName){
+    const playerKey = _globalPlayerName.trim().toLowerCase();
+    const idx = uniqueRows.findIndex(r => (r.player_name || '').trim().toLowerCase() === playerKey);
+    if (idx >= 0){
+      playerRank = idx + 1;
+    }
+  }
+  return { top10, playerRank, total };
+}
 const CATEGORIES = [
   { key:'Tech', label:'Tech', css:'cat-tech' },
   { key:'Energy', label:'Energy', css:'cat-energy' },
@@ -629,9 +963,21 @@ const DAILY_QUESTS = [
 let totalDays = 10000;
 let totalWeeks = Math.ceil(totalDays / 7);
 
+// ── DIVIDEND DATA ────────────────────────────────────────
+const DIVIDEND_YIELD = { Finance:0.015, Energy:0.012, Retail:0.010 }; // % per 7-day cycle
+
 let game = {
-  stocks: [], day:0, cash: STANDARD.startingMoney, portfolio:{}, events:[], history:[], cyclesCompleted:0, marketState:'Sideways', bonusGiven:false, level: 1, levelUpUnlocked: {}, playerName: 'Trader',
-  achievements: {}, totalTrades: 0, bestDayProfit: 0, streakDays: 0, totalProfit: 0, completedQuests: {}, lastDaySharesBought: 0, lastSaleProfitPct: 0
+  stocks:[], day:0, cash:STANDARD.startingMoney, portfolio:{}, events:[], history:[], cyclesCompleted:0, marketState:'Sideways', bonusGiven:false, level:1, levelUpUnlocked:{}, playerName:'Trader',
+  achievements:{}, totalTrades:0, bestDayProfit:0, streakDays:0, totalProfit:0, completedQuests:{}, lastDaySharesBought:0, lastSaleProfitPct:0,
+  // NEW: Economic indicators
+  interestRate: 3.5,   // percent (1–9)
+  inflation: 2.1,      // percent (0.5–7)
+  // NEW: Short positions { stockId: { shares, entryPrice } }
+  shorts: {},
+  // NEW: Margin / Loan
+  loan: 0,
+  totalDividendsEarned: 0,
+  leaderboardPromptShown: false,
 };
 let currentWeek = 0, runningYear = false, paused = false;
 let disableUI = false;
@@ -725,27 +1071,59 @@ function renderCategoryTiles(){
   }
 }
 
+// ── SORT & FILTER STATE ─────────────────────────────────
+let sortCol = null, sortDir = 1;
+let searchQuery = '';
+
 function renderStocksForCategory(){
   stocksBody.innerHTML = '';
   stockRowMap.clear();
   const stocksPerCat = getStocksPerCategoryForLevel(game.level);
-  const list = game.stocks.filter(s => s.sector === selectedCategory).slice(0, stocksPerCat);
+  let list = game.stocks.filter(s => s.sector === selectedCategory).slice(0, stocksPerCat);
+
+  // Filter by search query
+  if (searchQuery){
+    const q = searchQuery.toLowerCase();
+    list = game.stocks.filter(s => s.name.toLowerCase().includes(q) || s.sector.toLowerCase().includes(q) || s.id.toLowerCase().includes(q));
+  }
+
+  // Sort
+  if (sortCol){
+    list = [...list].sort((a,b)=>{
+      let va, vb;
+      if (sortCol==='name')  { va=a.name; vb=b.name; return sortDir*(va<vb?-1:va>vb?1:0); }
+      if (sortCol==='price') { return sortDir*(a.price - b.price); }
+      if (sortCol==='change'){ return sortDir*((a.changePct||0) - (b.changePct||0)); }
+      if (sortCol==='sector'){ va=a.sector; vb=b.sector; return sortDir*(va<vb?-1:va>vb?1:0); }
+      return 0;
+    });
+  }
+
+  // Update sort indicators on headers
+  document.querySelectorAll('#stocksTable th.sortable').forEach(th=>{
+    th.classList.remove('sort-asc','sort-desc');
+    if (th.dataset.col === sortCol) th.classList.add(sortDir===1?'sort-asc':'sort-desc');
+  });
+
   for (const s of list){
     const prev = (s.history.length >= 2) ? s.history[s.history.length-2] : s.history[s.history.length-1];
     const pct = s.changePct || 0;
+    const hasDividend = !!DIVIDEND_YIELD[s.sector];
+    const isShorted = !!game.shorts[s.id];
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><strong style="color:#0b2a3a">${s.name}</strong><div class="small muted">${s.id}</div></td>
+      <td><strong>${s.name}</strong>${hasDividend ? `<span class="div-badge">DIV</span>` : ''}${isShorted ? `<span class="short-badge">SHORT</span>` : ''}<div class="small muted">${s.id}</div></td>
       <td><div style="font-weight:800">${money(s.price)}</div><div class="small muted">Prev: ${money(prev)}</div></td>
       <td class="center">${pct>0.0001?`<span class="price-up">+${(pct*100).toFixed(2)}%</span>`:(pct<-0.0001?`<span class="price-down">${(pct*100).toFixed(2)}%</span>`:`<span class="small muted">0.00%</span>`)}</td>
-      <td class="center"><div class="sector-badge">${s.sector}</div><div class="small muted">${s.sector}</div></td>
+      <td class="center"><div class="sector-badge">${s.sector}</div></td>
       <td class="market-col"></td>
     `;
     const actionTd = tr.querySelector('.market-col');
-    const buy = document.createElement('button'); buy.className='btn-buy'; buy.textContent='Buy'; buy.onclick = () => openTradeModal('buy', s.id);
-    const sell = document.createElement('button'); sell.className='btn-sell'; sell.textContent='Sell'; sell.onclick = () => openTradeModal('sell', s.id);
+    const buy   = document.createElement('button'); buy.className='btn-buy';   buy.textContent='Buy';   buy.onclick = () => openTradeModal('buy', s.id);
+    const sell  = document.createElement('button'); sell.className='btn-sell';  sell.textContent='Sell';  sell.onclick = () => openTradeModal('sell', s.id);
+    const short = document.createElement('button'); short.className='btn-short'; short.textContent= isShorted ? 'Cover' : 'Short'; short.onclick = () => isShorted ? coverShort(s.id) : openShortModal(s.id);
     const chart = document.createElement('button'); chart.className='btn-chart'; chart.textContent='Chart'; chart.onclick = () => openChart(s.id);
-    actionTd.appendChild(buy); actionTd.appendChild(sell); actionTd.appendChild(chart);
+    actionTd.append(buy, sell, short, chart);
     stocksBody.appendChild(tr);
     stockRowMap.set(s.id, { priceTd: tr.children[1], changeTd: tr.children[2] });
   }
@@ -875,24 +1253,59 @@ function renderPortfolio(){
     for (const id of holdings){
       const e = game.portfolio[id]; const s = game.stocks.find(x=>x.id===id); if (!s) continue;
       const shares = e.shares, avg = e.avgPrice, cost = round2(shares * avg), value = round2(shares * s.price), profit = round2(value - cost), profitPct = cost > 0 ? (profit / cost) : 0;
+      const hasDividend = !!DIVIDEND_YIELD[s.sector];
       const row = document.createElement('div'); row.className = 'portfolio-row';
       row.innerHTML = `
         <div>
-          <div style="font-weight:800">${s.name} <span class="small muted">(${s.sector})</span></div>
-          <div class="small muted">${shares} shares · Buy ${money(avg)} · Current ${money(s.price)}</div>
+          <div style="font-weight:800">${s.name}${hasDividend?'<span class="div-badge">DIV</span>':''} <span class="small muted">(${s.sector})</span></div>
+          <div class="small muted">${shares} shares · Buy ${money(avg)} · Now ${money(s.price)}</div>
           <div class="small muted">Cost ${money(cost)} · Value ${money(value)}</div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
-          <div class="${profit>=0?'profit-pos':'profit-neg'}">${profit>=0?'+':''}${money(profit)} (${profitPct>=0?'+':''}${(profitPct*100).toFixed(2)}%)</div>
-          <button class="btn-sell" style="padding:6px 10px" onclick="openTradeModal('sell','${s.id}')">Sell</button>
+        <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;">
+          <div class="${profit>=0?'profit-pos':'profit-neg'}">${profit>=0?'+':''}${money(profit)} (${(profitPct*100).toFixed(2)}%)</div>
+          <div style="display:flex;gap:4px;">
+            <button class="btn-sell-half" onclick="batchSell('${s.id}',0.5)">−50%</button>
+            <button class="btn-sell-all-q" onclick="batchSell('${s.id}',1.0)">Sell All</button>
+          </div>
+          <button class="btn-sell" style="padding:5px 10px;font-size:12px;" onclick="openTradeModal('sell','${s.id}')">Custom</button>
         </div>`;
       listEl.appendChild(row);
     }
   }
+  
+  // Render short positions
+  const shortsSection = document.getElementById('shortsSection');
+  const shortsList = document.getElementById('shortsList');
+  const shortIds = Object.keys(game.shorts);
+  if (shortIds.length){
+    shortsSection.style.display = 'block';
+    shortsList.innerHTML = '';
+    for (const id of shortIds){
+      const pos = game.shorts[id]; const s = game.stocks.find(x=>x.id===id); if (!s) continue;
+      const pnl = round2(pos.shares * (pos.entryPrice - s.price));
+      const pnlPct = pos.entryPrice > 0 ? (pos.entryPrice - s.price) / pos.entryPrice : 0;
+      const div = document.createElement('div'); div.className = 'portfolio-row';
+      div.innerHTML = `
+        <div>
+          <div style="font-weight:800;color:#a78bfa">${s.name} <span class="short-badge">SHORT</span></div>
+          <div class="small muted">${pos.shares} shares · Entry ${money(pos.entryPrice)} · Now ${money(s.price)}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;">
+          <div class="${pnl>=0?'profit-pos':'profit-neg'}">${pnl>=0?'+':''}${money(pnl)} (${(pnlPct*100).toFixed(2)}%)</div>
+          <button class="btn-short" style="padding:5px 10px;font-size:12px;" onclick="coverShort('${s.id}')">Cover</button>
+        </div>`;
+      shortsList.appendChild(div);
+    }
+  } else {
+    shortsSection.style.display = 'none';
+  }
+
   const portfolioVal = Object.keys(game.portfolio).reduce((acc,id)=>{ const e=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return acc + (s? s.price * e.shares : 0); },0);
   portfolioValueEl.textContent = money(portfolioVal);
   cashPanelEl.textContent = money(game.cash);
   networthEl.textContent = money(round2(game.cash + portfolioVal));
+  
+  updateMarginPanel();
 }
 
 let currentTradeStock = null, currentTradeMode = null;
@@ -1003,11 +1416,19 @@ tradeConfirm.addEventListener('click', ()=>{
     const sellPrice = s.price;
     const profitPct = avgPrice > 0 ? (sellPrice - avgPrice) / avgPrice : 0;
     game.cash = round2(game.cash + shares*s.price);
+    const pnl = round2(shares * (sellPrice - avgPrice));
     const remaining = owned - shares;
     if (remaining === 0) delete game.portfolio[s.id]; else game.portfolio[s.id] = { shares:remaining, avgPrice: game.portfolio[s.id].avgPrice };
     logEvent(`Sold ${shares} × ${s.name}.`);
     game.lastSaleProfitPct = Math.max(game.lastSaleProfitPct || 0, profitPct);
+    game.totalProfit = round2((game.totalProfit||0) + pnl);
     game.totalTrades++;
+    // Show floating P&L
+    const cashDisp = document.getElementById('cash');
+    if (cashDisp && typeof showFloat === 'function'){
+      const r = cashDisp.getBoundingClientRect();
+      showFloat(r.left + 20, r.top - 20, `${pnl >= 0 ? '+' : ''}${money(pnl)}`, pnl >= 0 ? '#00ff88' : '#ff6b6b');
+    }
   }
   tradeOverlay.style.display='none'; tradeOverlay.setAttribute('aria-hidden','true'); tradeOverlay.querySelector('.modal').classList.remove('pos','neg','show');
   currentTradeStock = null; queueRender(); autoSave(); checkAchievements();
@@ -1080,11 +1501,32 @@ function applySingleDay(weeklyNews){
   
   game.day++;
   evaluateMarketState();
+
+  // ── ECONOMIC INDICATOR DRIFT (weekly) ──────────────────
+  if (game.day % 7 === 0) {
+    game.interestRate = Math.max(1, Math.min(9, game.interestRate + (Math.random()*1.4 - 0.7)));
+    game.inflation    = Math.max(0.5, Math.min(7, game.inflation    + (Math.random()*1.2 - 0.5)));
+    updateEcoBar();
+  }
+
+  // ── SECTOR ECONOMIC MODIFIERS ──────────────────────────
+  function getEcoMod(sector){
+    let mod = 0;
+    const ir = game.interestRate, inf = game.inflation;
+    if (sector === 'Tech')     { if (ir > 5) mod -= 0.004; if (ir < 3) mod += 0.003; }
+    if (sector === 'Finance')  { if (ir > 5) mod += 0.005; if (ir < 3) mod -= 0.002; }
+    if (sector === 'Biotech')  { if (ir > 6) mod -= 0.003; }
+    if (sector === 'Retail')   { if (inf > 4) mod -= 0.004; if (inf < 2) mod += 0.002; }
+    if (sector === 'Transport'){ if (inf > 4) mod -= 0.003; }
+    if (sector === 'Energy')   { if (inf > 4) mod += 0.004; }
+    return mod;
+  }
+
   for (const s of game.stocks){
     const sectorMult = (s.sector && {Tech:1.05,Energy:1.05,Retail:0.95,Finance:0.9,Transport:1.0,Biotech:1.15}[s.sector]) || 1;
     const baseVol = s.volatility * STANDARD.volatilityMultiplier * sectorMult;
     const basePct = (Math.random()*2 - 1) * baseVol * 0.02;
-    let totalPct = basePct;
+    let totalPct = basePct + getEcoMod(s.sector);
     if (game.marketState === 'Bull') totalPct += TREND_DAILY_BIAS;
     else if (game.marketState === 'Bear') totalPct -= TREND_DAILY_BIAS;
     if (weeklyNews && weeklyNews.impactMap){
@@ -1098,22 +1540,86 @@ function applySingleDay(weeklyNews){
   }
 
   if (Math.random() < SHOCK_PROB_SURGE){ const t = pick(game.stocks); const g = rand(0.25,0.9); t.changePct += g; t.price = round2(t.price * (1 + g)); t.history.push(round2(t.price)); capArray(t.history, 200); logEvent(`⚡ ${t.name} had a sudden positive surprise!`); showNotification(`📈 ${t.name} jumped +${(g*100).toFixed(1)}% — great opportunity!`); }
-  if (Math.random() < SHOCK_PROB_FALL){ const t = pick(game.stocks); const l = rand(0.2,0.7); t.changePct -= l; t.price = Math.max(0.01, round2(t.price * (1 - l))); t.history.push(round2(t.price)); capArray(t.history, 200); logEvent(`⚠️ ${t.name} experienced a sudden drop.`); showNotification(`📉 ${t.name} dropped ${(l*100).toFixed(1)}% — watch out!`); }
+  if (Math.random() < SHOCK_PROB_FALL){ const t = pick(game.stocks); const l = rand(0.2,0.7); t.changePct -= l; t.price = Math.max(0.01, round2(t.price * (1 - l))); t.history.push(round2(t.price)); capArray(t.history, 200); logEvent(`⚠️ ${t.name} experienced a sudden drop.`); showNotification(`📉 ${t.name} dropped ${(l*100).toFixed(1)}% — watch out!`);
+    // Screen shake on major crash
+    if (l > 0.4) { document.body.classList.add('market-crash'); setTimeout(()=>document.body.classList.remove('market-crash'), 700); }
+  }
+
+  // ── DIVIDENDS (every 7 days) ───────────────────────────
+  let dividendTotal = 0;
+  if (game.day % 7 === 0){
+    for (const [id, pos] of Object.entries(game.portfolio)){
+      if (!pos.shares) continue;
+      const s = game.stocks.find(x=>x.id===id);
+      if (!s) continue;
+      const yld = DIVIDEND_YIELD[s.sector];
+      if (!yld) continue;
+      const payout = round2(pos.shares * s.price * yld);
+      if (payout > 0){
+        game.cash = round2(game.cash + payout);
+        dividendTotal += payout;
+      }
+    }
+    if (dividendTotal > 0){
+      game.totalDividendsEarned = round2((game.totalDividendsEarned||0) + dividendTotal);
+      logEvent(`💰 Dividend payout received: ${money(dividendTotal)}`);
+      showNotification(`💰 Dividend: +${money(dividendTotal)} earned from holdings!`);
+      document.getElementById('ecoDividend').textContent = '+' + money(dividendTotal);
+      // Float animation near cash display
+      const cashEl2 = document.getElementById('cash');
+      if (cashEl2){ const r = cashEl2.getBoundingClientRect(); showFloat(r.left + 40, r.top - 10, `+${money(dividendTotal)}`, '#ffb020'); }
+      setTimeout(()=>{ document.getElementById('ecoDividend').textContent = '—'; }, 4000);
+    }
+  }
+
+  // ── LOAN DAILY INTEREST ────────────────────────────────
+  if (game.loan > 0){
+    const interest = round2(game.loan * 0.005); // 0.5% per day
+    game.cash = round2(game.cash - interest);
+    logEvent(`💳 Loan interest paid: ${money(interest)}`);
+    // Margin call check
+    const pv = Object.keys(game.portfolio).reduce((a,id)=>{ const e=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return a+(s?s.price*e.shares:0); },0);
+    const nw = round2(game.cash + pv);
+    if (nw < game.loan){
+      logEvent(`⚠️ MARGIN CALL! Selling portfolio to cover loan.`);
+      showNotification(`🚨 MARGIN CALL! Your net worth fell below your loan. Portfolio is being liquidated!`, 8000);
+      document.body.classList.add('market-crash');
+      setTimeout(()=>document.body.classList.remove('market-crash'),700);
+      // Force sell all
+      for (const id of Object.keys(game.portfolio)){
+        const s = game.stocks.find(x=>x.id===id);
+        if (!s) continue;
+        const val = round2(s.price * game.portfolio[id].shares);
+        game.cash = round2(game.cash + val);
+        delete game.portfolio[id];
+      }
+      // Repay what we can
+      const repay = Math.min(game.cash, game.loan);
+      game.cash = round2(game.cash - repay);
+      game.loan = round2(game.loan - repay);
+    }
+    updateMarginPanel();
+  }
+
+  // ── SHORT POSITION TRACKING ────────────────────────────
+  for (const [id, short] of Object.entries(game.shorts)){
+    const s = game.stocks.find(x=>x.id===id);
+    if (!s) continue;
+    // Shorts checked live; P&L calculated at cover time
+  }
 
   const portfolioVal = Object.keys(game.portfolio).reduce((acc,id)=>{ const e=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return acc + (s? s.price * e.shares : 0); },0);
   const networth = round2(game.cash + portfolioVal);
   const dayProfit = round2(networth - previousNetworth);
   
-  // Track best day profit
   if (dayProfit > game.bestDayProfit) game.bestDayProfit = dayProfit;
   
   game.history.push({ day:game.day, networth, portfolioVal, cash: game.cash });
   capArray(game.history, 200);
   
-  // Trigger special events and check quests
   triggerSpecialEvent();
   checkAndCompleteQuests();
-  game.lastDaySharesBought = 0; // Reset daily counter
+  game.lastDaySharesBought = 0;
   
   queueRender();
 
@@ -1497,14 +2003,115 @@ function renderChart(stockId){
 
 function getLeaderboard(){ try { return JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]'); } catch(e){ return []; } }
 function setLeaderboard(list){ localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(list)); }
-function saveScoreToLeaderboard(){ const name = prompt('Enter your name to save the score locally:', 'Player'); if (name === null) return; const net = Number((networthEl.textContent || '$0').replace(/[$,]/g,'')) || 0; const board = getLeaderboard(); board.push({ name: name || 'Player', score: net, date: new Date().toISOString() }); board.sort((a,b)=>b.score - a.score); setLeaderboard(board.slice(0,50)); alert('Score saved locally.'); showLeaderboard(); }
-function showLeaderboard(){ const list = getLeaderboard(); leaderboardList.innerHTML=''; if (!list.length) leaderboardList.innerHTML = '<li class="small muted">No scores yet.</li>'; else { for (const item of list){ const li=document.createElement('li'); li.textContent = `${item.name} — ${money(item.score)} (${new Date(item.date).toLocaleDateString()})`; leaderboardList.appendChild(li); } } leaderboardOverlay.style.display='flex'; leaderboardOverlay.querySelector('.modal').classList.add('show'); }
-leaderboardClose.addEventListener('click', ()=>{ leaderboardOverlay.style.display='none'; leaderboardOverlay.querySelector('.modal').classList.remove('show'); });
-leaderboardClear.addEventListener('click', ()=>{ if (confirm('Clear leaderboard?')){ setLeaderboard([]); showLeaderboard(); } });
+function saveScoreToLeaderboard(){
+  const name = prompt('Enter your name for the leaderboard:', game.playerName || 'Player');
+  if (name === null) return;
+  const cleanName = name.trim().slice(0, 30) || 'Player';
+  const net = round2(game.cash + Object.keys(game.portfolio).reduce((a,id)=>{ const e=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return a+(s?s.price*e.shares:0); },0));
+  // Save locally (one entry per player name)
+  const board = getLeaderboard();
+  const key = cleanName.toLowerCase();
+  const existingIndex = board.findIndex(entry => (entry.name || '').trim().toLowerCase() === key);
+  let keptExistingLocalBest = false;
+  if (existingIndex >= 0){
+    if (net > Number(board[existingIndex].score || 0)){
+      board[existingIndex] = { ...board[existingIndex], name: cleanName, score: net, day: game.day, level: game.level, date: new Date().toISOString() };
+    } else {
+      keptExistingLocalBest = true;
+    }
+  } else {
+    board.push({ name: cleanName, score: net, day: game.day, level: game.level, date: new Date().toISOString() });
+  }
+  board.sort((a,b)=>b.score - a.score);
+  setLeaderboard(board.slice(0, 50));
+  // Also submit globally (non-blocking)
+  submitGlobalScore(cleanName, net, game.day, game.level)
+    .then(rank => {
+      const msg = keptExistingLocalBest
+        ? (rank ? `Your best score was kept. Current global rank: #${rank}` : 'Your best local score was kept.')
+        : (rank ? `Score saved! Your global rank: #${rank}` : 'Saved locally. (Configure Supabase for global ranking.)');
+      showNotification('🏆 ' + msg, 4500);
+    });
+  showLeaderboard();
+  switchLbTab('local');
+}
 
-function autoSave(){ try { const save = { v:6, day:game.day, cash:game.cash, portfolio:game.portfolio, stocks:game.stocks.map(s=>({id:s.id,price:s.price,history:s.history.slice(-120)})), currentWeek, totalWeeks, totalDays, pendingWeeklyNews, bonusGiven: game.bonusGiven, level: game.level, levelUpUnlocked: game.levelUpUnlocked, playerName: game.playerName }; localStorage.setItem(STORAGE_KEY, JSON.stringify(save)); } catch(e){} }
+function showLeaderboard(){
+  leaderboardOverlay.style.display='flex';
+  leaderboardOverlay.querySelector('.modal').classList.add('show');
+  renderLocalLeaderboard();
+}
+
+function renderLocalLeaderboard(){
+  const list = getLeaderboard();
+  const el = document.getElementById('leaderboardList'); if (!el) return;
+  el.innerHTML = '';
+  if (!list.length){ el.innerHTML = '<div class="small muted">No local scores yet. Play and submit your score!</div>'; return; }
+  const medals = ['🥇','🥈','🥉'];
+  list.forEach((item, i)=>{
+    const div = document.createElement('div'); div.className = 'lb-entry';
+    div.innerHTML = `<span class="lb-rank">${medals[i] || '#'+(i+1)}</span><span class="lb-name">${item.name}</span><span class="lb-score">${money(item.score)}</span><span class="lb-meta">Day ${item.day||'?'} · Lv${item.level||'?'}</span>`;
+    el.appendChild(div);
+  });
+}
+
+async function renderGlobalLeaderboard(){
+  const pane = document.getElementById('lbPaneGlobal');
+  const listEl = document.getElementById('lbGlobalList');
+  const rankEl = document.getElementById('lbYourRank');
+  if (!listEl) return;
+  // Check config
+  if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY'){
+    listEl.innerHTML = '<div class="lb-config-warn">⚠️ Global leaderboard is not configured yet.<br>Follow the setup guide to connect your Supabase database.</div>';
+    rankEl.style.display = 'none';
+    return;
+  }
+  listEl.innerHTML = '<div class="lb-loading">Loading global scores<span class="lb-spinner"></span></div>';
+  rankEl.style.display = 'none';
+  try {
+    const data = await fetchGlobalLeaderboard();
+    if (!data || !data.top10){ listEl.innerHTML = '<div class="lb-error">Could not load scores. Check your connection.</div>'; return; }
+    const medals = ['🥇','🥈','🥉'];
+    listEl.innerHTML = '';
+    if (!data.top10.length){ listEl.innerHTML = '<div class="small muted" style="padding:16px;">No global scores yet — be the first!</div>'; }
+    data.top10.forEach((item, i)=>{
+      const div = document.createElement('div'); div.className = 'lb-entry';
+      div.innerHTML = `<span class="lb-rank">${medals[i] || '#'+(i+1)}</span><span class="lb-name">${item.player_name}</span><span class="lb-score">${money(item.score)}</span><span class="lb-meta">Day ${item.day||'?'} · Lv${item.level||'?'}</span>`;
+      listEl.appendChild(div);
+    });
+    if (data.playerRank){
+      rankEl.style.display = 'block';
+      rankEl.innerHTML = `<div class="lb-rank-badge">Your Global Rank: #${data.playerRank} of ${data.total}</div>`;
+    }
+  } catch(e){
+    listEl.innerHTML = '<div class="lb-error">Failed to load global scores. Check console for details.</div>';
+    console.error('Global leaderboard error:', e);
+  }
+}
+
+function switchLbTab(tab){
+  const localPane = document.getElementById('lbPaneLocal');
+  const globalPane = document.getElementById('lbPaneGlobal');
+  const localTab = document.getElementById('lbTabLocal');
+  const globalTab = document.getElementById('lbTabGlobal');
+  if (tab === 'local'){
+    localPane.style.display = 'block'; globalPane.style.display = 'none';
+    localTab.classList.add('active'); globalTab.classList.remove('active');
+    renderLocalLeaderboard();
+  } else {
+    localPane.style.display = 'none'; globalPane.style.display = 'block';
+    localTab.classList.remove('active'); globalTab.classList.add('active');
+    renderGlobalLeaderboard();
+  }
+}
+
+leaderboardClose.addEventListener('click', ()=>{ leaderboardOverlay.style.display='none'; leaderboardOverlay.querySelector('.modal').classList.remove('show'); });
+leaderboardClear.addEventListener('click', ()=>{ if (confirm('Clear local leaderboard?')){ setLeaderboard([]); renderLocalLeaderboard(); } });
+document.getElementById('lbSubmitBtn').addEventListener('click', saveScoreToLeaderboard);
+
+function autoSave(){ try { const save = { v:6, day:game.day, cash:game.cash, portfolio:game.portfolio, stocks:game.stocks.map(s=>({id:s.id,price:s.price,history:s.history.slice(-120)})), currentWeek, totalWeeks, totalDays, pendingWeeklyNews, bonusGiven: game.bonusGiven, level: game.level, levelUpUnlocked: game.levelUpUnlocked, playerName: game.playerName, leaderboardPromptShown: game.leaderboardPromptShown }; localStorage.setItem(STORAGE_KEY, JSON.stringify(save)); } catch(e){} }
 function manualSave(){ autoSave(); alert('Saved locally.'); }
-function loadSaved(){ const raw = localStorage.getItem(STORAGE_KEY); if (!raw){ alert('No saved data'); return; } try { const saved = JSON.parse(raw); const byId = {}; for (const m of STOCKS_MASTER) byId[m.id] = m; game.stocks = (saved.stocks||[]).map(ss => { const master = byId[ss.id] || ss; return { id: master.id, name: master.name, sector: master.sector, price: ss.price, volatility: master.volatility||1.2, changePct:0, history: ss.history||[ss.price] }; }); game.cash = saved.cash || STANDARD.startingMoney; game.portfolio = saved.portfolio || {}; game.day = saved.day || 0; game.level = saved.level || 1; game.levelUpUnlocked = saved.levelUpUnlocked || {}; game.playerName = saved.playerName || 'Trader'; currentWeek = saved.currentWeek || 0; totalWeeks = saved.totalWeeks || Math.ceil((saved.totalDays || totalDays) / 7); totalDays = saved.totalDays || totalDays; pendingWeeklyNews = saved.pendingWeeklyNews || null; game.bonusGiven = saved.bonusGiven || false; renderCategoryTiles(); renderStocksForCategory(); renderPortfolio(); updateProgress(); alert('Loaded saved game.'); } catch(e){ alert('Failed to load'); } }
+function loadSaved(){ const raw = localStorage.getItem(STORAGE_KEY); if (!raw){ alert('No saved data'); return; } try { const saved = JSON.parse(raw); const byId = {}; for (const m of STOCKS_MASTER) byId[m.id] = m; game.stocks = (saved.stocks||[]).map(ss => { const master = byId[ss.id] || ss; return { id: master.id, name: master.name, sector: master.sector, price: ss.price, volatility: master.volatility||1.2, changePct:0, history: ss.history||[ss.price] }; }); game.cash = saved.cash || STANDARD.startingMoney; game.portfolio = saved.portfolio || {}; game.day = saved.day || 0; game.level = saved.level || 1; game.levelUpUnlocked = saved.levelUpUnlocked || {}; game.playerName = saved.playerName || 'Trader'; game.leaderboardPromptShown = !!saved.leaderboardPromptShown; currentWeek = saved.currentWeek || 0; totalWeeks = saved.totalWeeks || Math.ceil((saved.totalDays || totalDays) / 7); totalDays = saved.totalDays || totalDays; pendingWeeklyNews = saved.pendingWeeklyNews || null; game.bonusGiven = saved.bonusGiven || false; renderCategoryTiles(); renderStocksForCategory(); renderPortfolio(); updateProgress(); alert('Loaded saved game.'); } catch(e){ alert('Failed to load'); } }
 function clearSave(){ if (!confirm('Clear saved game?')) return; localStorage.removeItem(STORAGE_KEY); alert('Saved cleared.'); }
 
 setInterval(()=>{ if (runningYear) autoSave(); }, 60000);
@@ -1539,6 +2146,7 @@ function initGame(autoStart=true){
   game.portfolio = {};
   game.day = 0; game.cash = STANDARD.startingMoney; game.events = []; game.history = []; game.cyclesCompleted = 0; game.marketState = 'Sideways'; game.bonusGiven = false;
   game.level = 1; game.levelUpUnlocked = {}; game.playerName = 'Trader';
+  game.leaderboardPromptShown = false;
   pendingWeeklyNews = null; currentWeek = 0; runningYear = false; paused = false; daysAppliedInWeek = 0;
   renderCategoryTiles(); renderStocksForCategory(); renderPortfolio(); updateProgress();
   logEvent(`Simulation started. ${totalDays} days. Starting cash ${money(game.cash)}.`);
@@ -1569,6 +2177,14 @@ function updateProgress(){
   document.getElementById('totalTrades').textContent = game.totalTrades;
 
   const networth = round2(game.cash + portfolioVal);
+  const profit = round2(networth - STANDARD.startingMoney);
+  if (!game.leaderboardPromptShown && profit >= LEADERBOARD_PROMPT_PROFIT){
+    game.leaderboardPromptShown = true;
+    const wantsUpload = confirm(`Nice work! You made ${money(profit)} profit. Upload your score to the leaderboard now?`);
+    if (wantsUpload){
+      saveScoreToLeaderboard();
+    }
+  }
   if (networth < 5000 && !game.bonusGiven){
     const bonus = 3000;
     game.cash = round2(game.cash + bonus);
@@ -1639,7 +2255,507 @@ document.addEventListener('DOMContentLoaded', ()=>{
   showLoadingThenIntro();
   speedLabel.textContent = speedMultiplier + 'x';
   document.getElementById('newsPanel').innerHTML = `<div class="pill">Ready</div><div class="small muted">Click a category tile to view that group's stocks. Press Start / Restart to begin or press Let's play.</div>`;
+  initNewFeatures();
 });
+
+// ============================================================
+// FLOATING PROFIT/LOSS ANIMATION
+// ============================================================
+function showFloat(x, y, text, color){
+  const el = document.createElement('div');
+  el.className = 'float-profit';
+  el.style.cssText = `left:${x}px;top:${y}px;color:${color};`;
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(()=> el.remove(), 1500);
+}
+
+// ============================================================
+// ECONOMIC INDICATORS BAR UPDATE
+// ============================================================
+function updateEcoBar(){
+  const irEl = document.getElementById('ecoInterestRate');
+  const infEl = document.getElementById('ecoInflation');
+  const sentEl = document.getElementById('ecoSentiment');
+  const marginItem = document.getElementById('ecoMarginItem');
+  const loanDisplay = document.getElementById('ecoLoanDisplay');
+  if (!irEl) return;   const ir = game.interestRate;
+  irEl.textContent = ir.toFixed(1) + '%';
+  irEl.className = 'eco-val ' + (ir > 6 ? 'eco-red' : ir < 4 ? 'eco-green' : 'eco-gold');
+  const inf = game.inflation;
+  infEl.textContent = inf.toFixed(1) + '%';
+  infEl.className = 'eco-val ' + (inf > 4 ? 'eco-red' : inf < 2 ? 'eco-green' : 'eco-gold');
+  const avgChange = game.stocks.length
+    ? (game.stocks.reduce((a,s)=> a + (s.changePct||0), 0) / game.stocks.length)
+    : 0;
+  sentEl.textContent = avgChange > 0.01 ? 'Bullish 📈' : avgChange < -0.01 ? 'Bearish 📉' : 'Neutral';
+  sentEl.className = 'eco-val ' + (avgChange > 0.01 ? 'eco-green' : avgChange < -0.01 ? 'eco-red' : 'eco-gold');
+  if (game.loan > 0){
+    marginItem.style.display = 'flex';
+    loanDisplay.textContent = money(game.loan);
+  } else {
+    marginItem.style.display = 'none';
+  }
+}
+
+// ============================================================
+// MARGIN / LOAN PANEL (SIDEBAR)
+// ============================================================
+function updateMarginPanel(){
+  const panel = document.getElementById('marginPanel');
+  if (!panel) return;
+  const portfolioVal = Object.keys(game.portfolio).reduce((acc,id)=>{
+    const e = game.portfolio[id]; const s = game.stocks.find(x=>x.id===id);
+    return acc + (s ? s.price * e.shares : 0);
+  }, 0);
+  const networth = round2(game.cash + portfolioVal);
+  const maxLoan = Math.min(500000, round2(networth * 2));
+  const dailyInterest = round2(game.loan * 0.005);
+  const loanPct = maxLoan > 0 ? Math.min(100, (game.loan / maxLoan) * 100) : 0;
+
+  if (game.loan > 0){
+    panel.style.display = 'block';
+    const lbEl = document.getElementById('loanBalance');
+    const mlEl = document.getElementById('maxLoanDisplay');
+    const diEl = document.getElementById('dailyInterestDisplay');
+    const meterEl = document.getElementById('loanMeterBar');
+    const warnEl = document.getElementById('marginCallBadge');
+    if (lbEl) lbEl.textContent = money(game.loan);
+    if (mlEl) mlEl.textContent = money(maxLoan);
+    if (diEl) diEl.textContent = money(dailyInterest) + '/day';
+    if (meterEl) meterEl.style.width = loanPct + '%';
+    if (warnEl) warnEl.style.display = networth < game.loan ? 'block' : 'none';
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
+// ============================================================
+// SHORT SELLING
+// ============================================================
+function openShortModal(stockId){
+  const s = game.stocks.find(x=>x.id===stockId); if (!s) return;
+  if (game.portfolio[stockId] && game.portfolio[stockId].shares > 0){
+    showNotification('You own this stock — sell your position first before going short.', 3500); return;
+  }
+  const maxShares = game.cash > 0 ? Math.floor(game.cash / s.price) : 0;
+  if (maxShares < 1){ showNotification('Not enough cash to open a short position.', 3500); return; }
+  const shares = parseInt(prompt(`Short ${s.name} (${money(s.price)}/share)\nYou can short up to ${maxShares} shares.\nHow many shares to short?`, '1'), 10);
+  if (!shares || isNaN(shares) || shares < 1){ return; }
+  if (shares > maxShares){ showNotification('Not enough cash for that short.', 3000); return; }
+  const collateral = round2(shares * s.price);
+  game.cash = round2(game.cash - collateral);   // hold collateral
+  game.shorts[stockId] = { shares, entryPrice: s.price };
+  logEvent(`Opened short: ${shares}× ${s.name} @ ${money(s.price)}. Collateral held: ${money(collateral)}.`);
+  showNotification(`📉 Short opened: ${shares}× ${s.name} @ ${money(s.price)}`, 3000);
+  queueRender(); autoSave();
+}
+
+function coverShort(stockId){
+  const pos = game.shorts[stockId]; if (!pos) return;
+  const s = game.stocks.find(x=>x.id===stockId); if (!s) return;
+  const collateral = round2(pos.shares * pos.entryPrice);
+  const current = round2(pos.shares * s.price);
+  const pnl = round2(collateral - current);   // profit when price fell
+  game.cash = round2(game.cash + collateral + pnl);
+  delete game.shorts[stockId];
+  if (pnl < 0) game.totalProfit += pnl;
+  logEvent(`Covered short: ${pos.shares}× ${s.name}. P&L: ${pnl >= 0 ? '+' : ''}${money(pnl)}`);
+  showNotification(`${pnl >= 0 ? '📈 Short profit' : '📉 Short loss'}: ${pnl >= 0 ? '+' : ''}${money(pnl)}`, 3500);
+  const el = document.getElementById('networth');
+  if (el){ const r = el.getBoundingClientRect(); showFloat(r.left + 20, r.top - 10, `${pnl >= 0 ? '+' : ''}${money(pnl)}`, pnl >= 0 ? '#00ff88' : '#ff6b6b'); }
+  queueRender(); autoSave();
+}
+
+// ============================================================
+// BATCH SELL
+// ============================================================
+function batchSell(stockId, fraction){
+  const pos = game.portfolio[stockId]; if (!pos || pos.shares < 1) return;
+  const s = game.stocks.find(x=>x.id===stockId); if (!s) return;
+  const sharesToSell = fraction >= 1 ? pos.shares : Math.max(1, Math.floor(pos.shares * fraction));
+  const proceeds = round2(sharesToSell * s.price);
+  const cost = round2(sharesToSell * pos.avgPrice);
+  const profit = round2(proceeds - cost);
+  game.cash = round2(game.cash + proceeds);
+  game.totalProfit += profit;
+  game.totalTrades++;
+  game.lastSaleProfitPct = pos.avgPrice > 0 ? (s.price - pos.avgPrice) / pos.avgPrice : 0;
+  pos.shares -= sharesToSell;
+  if (pos.shares <= 0) delete game.portfolio[stockId];
+  logEvent(`Sold ${sharesToSell}× ${s.name} @ ${money(s.price)}. Proceeds: ${money(proceeds)}. P&L: ${profit >= 0 ? '+' : ''}${money(profit)}`);
+  showNotification(`${profit >= 0 ? '💰' : '📉'} Sold ${sharesToSell}× ${s.name} for ${money(proceeds)}`, 3000);
+  const cashEl2 = document.getElementById('cash');
+  if (cashEl2){ const r = cashEl2.getBoundingClientRect(); showFloat(r.left + 20, r.top - 20, `${profit >= 0 ? '+' : ''}${money(profit)}`, profit >= 0 ? '#00ff88' : '#ff6b6b'); }
+  queueRender(); autoSave(); checkAchievements();
+}
+
+// ============================================================
+// GLOSSARY
+// ============================================================
+const GLOSSARY_TERMS = [
+  { term:'Stock (Share)', def:'A unit of ownership in a company. When you buy a share, you own a small piece of that business and can profit if its value rises.' },
+  { term:'Portfolio', def:'Your total collection of investments — all the stocks you currently own, plus your uninvested cash.' },
+  { term:'Dividend', def:'A payment companies make to shareholders from profits. Finance, Energy, and Retail stocks in this game pay dividends every 7 days.' },
+  { term:'Short Selling', def:'Betting that a stock will go down. You borrow shares, sell them, and buy them back later at a lower price to profit from the fall.' },
+  { term:'Margin / Leverage', def:'Borrowing money to invest more than you actually have. Amplifies both gains and losses. A loan fee is charged daily.' },
+  { term:'Margin Call', def:'When your net worth falls below your outstanding loan, the broker forces you to sell assets to repay the debt immediately.' },
+  { term:'Bull Market', def:'A period when stock prices are rising and investor confidence is high. Good time to hold stocks.' },
+  { term:'Bear Market', def:'A period of falling stock prices, often by 20% or more. Experienced traders may short stocks during this period.' },
+  { term:'Volatility', def:'How much a stock\'s price moves up and down. High-volatility stocks (Biotech, Tech) can bring big profits or big losses.' },
+  { term:'Sector', def:'A category of businesses that do similar things — e.g. Tech, Energy, Finance. News events often affect entire sectors at once.' },
+  { term:'Interest Rate', def:'The rate set by central banks. High rates make borrowing expensive and can hurt Tech/Biotech while helping Finance stocks.' },
+  { term:'Inflation', def:'The rate at which prices rise. High inflation hurts Retail and Transport stocks but can benefit Energy companies.' },
+  { term:'Net Worth', def:'Your total wealth: cash + current value of all stock holdings. The main measure of your progress in this game.' },
+  { term:'Buy & Hold', def:'Buying stocks and keeping them for a long time, ignoring short-term price swings. Works well for stable, dividend-paying stocks.' },
+  { term:'P&L (Profit & Loss)', def:'The difference between what you paid for something and what it\'s worth (or sold for) now. Positive = profit; negative = loss.' },
+  { term:'Market Sentiment', def:'The overall mood of investors — Bullish (optimistic) or Bearish (pessimistic). Shown in the economic bar at the top.' },
+  { term:'IPO', def:'Initial Public Offering — when a company first sells shares to the public. Often comes with high volatility early on.' },
+  { term:'Diversification', def:'Spreading investments across different sectors so a bad event in one area doesn\'t wipe out your whole portfolio.' },
+  { term:'Averaging Down', def:'Buying more shares when the price has dropped to lower your average price per share. Risky if the stock keeps falling.' },
+  { term:'Take Profit / Stop Loss', def:'Setting a target price to automatically sell — either to lock in gains (take profit) or limit losses (stop loss).' },
+];
+
+function renderGlossary(){
+  const grid = document.getElementById('glossaryGrid'); if (!grid) return;
+  grid.innerHTML = GLOSSARY_TERMS.map(t=>`
+    <div class="glossary-term">
+      <div class="term">${t.term}</div>
+      <div class="def">${t.def}</div>
+    </div>`).join('');
+}
+
+// ============================================================
+// CHART HOVER TOOLTIP
+// ============================================================
+let chartStockId = null;
+function attachChartTooltip(){
+  const canvas = document.getElementById('chartCanvas'); if (!canvas) return;
+  const wrap = canvas.parentElement;
+  let tip = document.getElementById('chartTooltipEl');
+  if (!tip){
+    tip = document.createElement('div'); tip.id = 'chartTooltipEl'; tip.className = 'chart-tooltip';
+    wrap.style.position = 'relative'; wrap.appendChild(tip);
+  }
+  canvas.addEventListener('mousemove', (e)=>{
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const mode = document.getElementById('chartMode') ? document.getElementById('chartMode').value : 'stock';
+    let series = [];
+    if (mode === 'networth'){ series = game.history.map(h=>h.networth); }
+    else if (chartStockId){ const s = game.stocks.find(x=>x.id===chartStockId); if (s) series = s.history.slice(); }
+    if (!series.length){ tip.style.display='none'; return; }
+    const pad = { l:50, r:12 }; const plotW = rect.width - pad.l - pad.r;
+    const idx = Math.min(Math.max(0, Math.round(((mx - pad.l) / plotW) * (series.length - 1))), series.length - 1);
+    const val = series[idx];
+    tip.textContent = `Day ${idx+1}: ${money(round2(val))}`;
+    tip.style.display = 'block';
+    tip.style.left = Math.min(mx + 12, rect.width - 140) + 'px';
+    tip.style.top = '12px';
+  });
+  canvas.addEventListener('mouseleave', ()=>{ tip.style.display='none'; });
+}
+
+// ============================================================
+// LOAN / MARGIN MODAL LOGIC
+// ============================================================
+function openLoanModal(){
+  const portfolioVal = Object.keys(game.portfolio).reduce((acc,id)=>{
+    const e = game.portfolio[id]; const s = game.stocks.find(x=>x.id===id);
+    return acc + (s ? s.price * e.shares : 0);
+  }, 0);
+  const networth = round2(game.cash + portfolioVal);
+  const maxLoan = Math.min(500000, round2(networth * 2));
+  const available = Math.max(0, maxLoan - game.loan);
+  const dailyInterest = round2(game.loan * 0.005);
+  const cur = document.getElementById('loanModalCurrent');
+  const nw  = document.getElementById('loanModalNetworth');
+  const mx  = document.getElementById('loanModalMax');
+  const di  = document.getElementById('loanModalInterest');
+  if (cur) cur.textContent = money(game.loan);
+  if (nw)  nw.textContent  = money(networth);
+  if (mx)  mx.textContent  = money(available);
+  if (di)  di.textContent  = money(dailyInterest) + '/day';
+  const amtInput = document.getElementById('loanAmount');
+  if (amtInput) amtInput.value = Math.min(10000, available);
+  const overlay = document.getElementById('loanOverlay');
+  overlay.style.display = 'flex'; overlay.querySelector('.modal').classList.add('show');
+}
+
+document.getElementById('loanBorrow').addEventListener('click', ()=>{
+  const amount = parseFloat(document.getElementById('loanAmount').value) || 0;
+  if (amount < 1000){ alert('Minimum loan is $1,000.'); return; }
+  const portfolioVal = Object.keys(game.portfolio).reduce((acc,id)=>{
+    const e = game.portfolio[id]; const s = game.stocks.find(x=>x.id===id);
+    return acc + (s ? s.price * e.shares : 0);
+  }, 0);
+  const networth = round2(game.cash + portfolioVal);
+  const maxLoan = Math.min(500000, round2(networth * 2));
+  const available = Math.max(0, maxLoan - game.loan);
+  if (amount > available){ alert(`You can only borrow up to ${money(available)}.`); return; }
+  game.loan = round2(game.loan + amount);
+  game.cash = round2(game.cash + amount);
+  logEvent(`Borrowed ${money(amount)}. Total loan: ${money(game.loan)}. Daily interest: ${money(round2(game.loan * 0.005))}.`);
+  showNotification(`💳 Borrowed ${money(amount)}. Daily interest: ${money(round2(game.loan * 0.005))}`, 4000);
+  const overlay = document.getElementById('loanOverlay');
+  overlay.querySelector('.modal').classList.remove('show'); overlay.style.display = 'none';
+  queueRender(); updateMarginPanel(); updateEcoBar(); autoSave();
+});
+
+document.getElementById('loanRepay').addEventListener('click', ()=>{
+  if (game.loan <= 0){ alert('No outstanding loan.'); return; }
+  const amount = Math.min(parseFloat(document.getElementById('loanAmount').value) || 0, game.loan);
+  if (amount < 1){ alert('Enter a repayment amount.'); return; }
+  if (game.cash < amount){ alert('Not enough cash to repay that amount.'); return; }
+  game.loan = round2(game.loan - amount);
+  game.cash = round2(game.cash - amount);
+  logEvent(`Repaid ${money(amount)}. Remaining loan: ${money(game.loan)}.`);
+  showNotification(`✅ Repaid ${money(amount)}. Remaining: ${money(game.loan)}`, 3000);
+  const overlay = document.getElementById('loanOverlay');
+  overlay.querySelector('.modal').classList.remove('show'); overlay.style.display = 'none';
+  queueRender(); updateMarginPanel(); updateEcoBar(); autoSave();
+});
+
+document.getElementById('loanCancel').addEventListener('click', ()=>{
+  const overlay = document.getElementById('loanOverlay');
+  overlay.querySelector('.modal').classList.remove('show'); overlay.style.display = 'none';
+});
+
+// ============================================================
+// THEME TOGGLE
+// ============================================================
+function applyTheme(light){
+  document.body.classList.toggle('light-mode', light);
+  const btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.textContent = light ? '☀️' : '🌙';
+  try { localStorage.setItem('mms_theme', light ? 'light' : 'dark'); } catch(e){}
+}
+
+document.getElementById('themeToggleBtn').addEventListener('click', ()=>{
+  applyTheme(!document.body.classList.contains('light-mode'));
+});
+
+// ============================================================
+// EXPORT / IMPORT SAVE
+// ============================================================
+document.getElementById('exportSaveBtn').addEventListener('click', ()=>{
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw){ alert('No saved game to export.'); return; }
+    const blob = new Blob([raw], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'minimarket-save.json'; document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 1000);
+  } catch(er){ alert('Export failed.'); }
+});
+
+document.getElementById('importSaveBtn').addEventListener('click', ()=>{
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json,application/json';
+  input.onchange = (e)=>{
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      try {
+        JSON.parse(ev.target.result); // validate JSON
+        localStorage.setItem(STORAGE_KEY, ev.target.result);
+        alert('Save imported! The page will reload to apply it.');
+        location.reload();
+      } catch(er){ alert('Invalid save file. Please use a file exported from this game.'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+});
+
+// ============================================================
+// GLOSSARY & SHORTCUTS MODAL OPEN/CLOSE
+// ============================================================
+document.getElementById('glossaryBtn').addEventListener('click', ()=>{
+  renderGlossary();
+  const o = document.getElementById('glossaryOverlay');
+  o.style.display = 'flex'; o.querySelector('.modal').classList.add('show');
+});
+document.getElementById('glossaryClose').addEventListener('click', ()=>{
+  const o = document.getElementById('glossaryOverlay');
+  o.querySelector('.modal').classList.remove('show'); o.style.display = 'none';
+});
+
+document.getElementById('shortcutsBtn').addEventListener('click', ()=>{
+  const o = document.getElementById('shortcutsOverlay');
+  o.style.display = 'flex'; o.querySelector('.modal').classList.add('show');
+});
+document.getElementById('shortcutsClose').addEventListener('click', ()=>{
+  const o = document.getElementById('shortcutsOverlay');
+  o.querySelector('.modal').classList.remove('show'); o.style.display = 'none';
+});
+
+document.getElementById('loanBtn').addEventListener('click', openLoanModal);
+
+// ============================================================
+// SEARCH + SORTABLE TABLE EVENT WIRING
+// ============================================================
+function wireSearchSort(){
+  const searchEl = document.getElementById('stockSearch');
+  if (searchEl){
+    searchEl.addEventListener('input', (e)=>{
+      searchQuery = e.target.value.trim();
+      renderStocksForCategory();
+    });
+  }
+  document.querySelectorAll('#stocksTable th.sortable').forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const col = th.dataset.col;
+      if (sortCol === col){ sortDir *= -1; }
+      else { sortCol = col; sortDir = 1; }
+      renderStocksForCategory();
+    });
+  });
+}
+
+// ============================================================
+// KEYBOARD SHORTCUTS
+// ============================================================
+document.addEventListener('keydown', (e)=>{
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const key = e.key.toUpperCase();
+  // Close any open overlay with Escape
+  if (e.key === 'Escape'){
+    document.querySelectorAll('.modal-overlay').forEach(o=>{
+      if (o.style.display !== 'none'){ o.querySelector('.modal')?.classList.remove('show','pos','neg'); o.style.display='none'; }
+    });
+    return;
+  }
+  if (!runningYear && key !== 'P') return; // only pause works before game starts
+  switch(key){
+    case 'P': pauseResumeBtn?.click(); break;
+    case '1': if(speedBtn){ speedMultiplier=1; speedLabel.textContent='1x'; clearWeekTimer(); if(runningYear&&!paused) startWeekTimer(pendingWeeklyNews); } break;
+    case '2': if(speedBtn){ speedMultiplier=2; speedLabel.textContent='2x'; clearWeekTimer(); if(runningYear&&!paused) startWeekTimer(pendingWeeklyNews); } break;
+    case '3': if(speedBtn){ speedMultiplier=4; speedLabel.textContent='4x'; clearWeekTimer(); if(runningYear&&!paused) startWeekTimer(pendingWeeklyNews); } break;
+    case 'G':
+      document.getElementById('glossaryBtn')?.click(); break;
+    case 'C':
+      document.getElementById('marketChartBtn')?.click(); break;
+    case 'M':
+      openLoanModal(); break;
+    case 'T':
+      applyTheme(!document.body.classList.contains('light-mode')); break;
+    case 'B':{
+      // Quick-buy first stock in current category
+      const visible = game.stocks.filter(s=> s.sector === selectedCategory);
+      if (visible.length) openTradeModal('buy', visible[0].id);
+      break;
+    }
+    case 'S':{
+      // Quick-sell most-held stock (by value)
+      const ids = Object.keys(game.portfolio);
+      if (!ids.length) break;
+      const best = ids.reduce((a,b)=>{
+        const va = (game.portfolio[a].shares||0) * ((game.stocks.find(x=>x.id===a)||{price:0}).price);
+        const vb = (game.portfolio[b].shares||0) * ((game.stocks.find(x=>x.id===b)||{price:0}).price);
+        return va >= vb ? a : b;
+      });
+      openTradeModal('sell', best); break;
+    }
+  }
+});
+
+// ============================================================
+// INIT NEW FEATURES AFTER DOMContentLoaded
+// ============================================================
+function initNewFeatures(){
+  wireSearchSort();
+  attachChartTooltip();
+  // Restore theme preference
+  try {
+    const t = localStorage.getItem('mms_theme');
+    if (t === 'light') applyTheme(true);
+  } catch(e){}
+  updateEcoBar();
+}
+
+// ============================================================
+// PATCH autoSave + loadSaved TO PERSIST NEW FIELDS
+// ============================================================
+(function patchSaveLoad(){
+  const origAutoSave = autoSave;
+  autoSave = function(){
+    try {
+      const portfolioVal = Object.keys(game.portfolio).reduce((acc,id)=>{
+        const e=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id);
+        return acc + (s ? s.price*e.shares : 0);
+      }, 0);
+      const save = {
+        v:6, day:game.day, cash:game.cash, portfolio:game.portfolio,
+        stocks:game.stocks.map(s=>({id:s.id,price:s.price,history:s.history.slice(-120)})),
+        currentWeek, totalWeeks, totalDays, pendingWeeklyNews,
+        bonusGiven:game.bonusGiven, level:game.level, levelUpUnlocked:game.levelUpUnlocked,
+        playerName:game.playerName,
+        shorts:game.shorts||{}, loan:game.loan||0,
+        interestRate:game.interestRate||3.5, inflation:game.inflation||2.1,
+        totalDividendsEarned:game.totalDividendsEarned||0
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(save));
+    } catch(e){}
+  };
+
+  const origLoad = loadSaved;
+  loadSaved = function(){
+    const raw = localStorage.getItem(STORAGE_KEY); if (!raw){ alert('No saved data'); return; }
+    try {
+      const saved = JSON.parse(raw);
+      const byId = {}; for (const m of STOCKS_MASTER) byId[m.id] = m;
+      game.stocks = (saved.stocks||[]).map(ss=>{ const master=byId[ss.id]||ss; return { id:master.id, name:master.name, sector:master.sector, price:ss.price, volatility:master.volatility||1.2, changePct:0, history:ss.history||[ss.price] }; });
+      game.cash = saved.cash || STANDARD.startingMoney;
+      game.portfolio = saved.portfolio || {};
+      game.day = saved.day || 0;
+      game.level = saved.level || 1;
+      game.levelUpUnlocked = saved.levelUpUnlocked || {};
+      game.playerName = saved.playerName || 'Trader';
+      game.bonusGiven = saved.bonusGiven || false;
+      game.shorts = saved.shorts || {};
+      game.loan = saved.loan || 0;
+      game.interestRate = saved.interestRate || 3.5;
+      game.inflation = saved.inflation || 2.1;
+      game.totalDividendsEarned = saved.totalDividendsEarned || 0;
+      currentWeek = saved.currentWeek || 0;
+      totalWeeks = saved.totalWeeks || Math.ceil((saved.totalDays||totalDays)/7);
+      totalDays = saved.totalDays || totalDays;
+      pendingWeeklyNews = saved.pendingWeeklyNews || null;
+      renderCategoryTiles(); renderStocksForCategory(); renderPortfolio(); updateProgress();
+      updateEcoBar(); updateMarginPanel();
+      alert('Loaded saved game.');
+    } catch(e){ alert('Failed to load'); }
+  };
+})();
+
+// Patch initGame to reset new fields
+(function patchInitGame(){
+  const orig = initGame;
+  initGame = function(autoStart=true){
+    orig(autoStart);
+    game.shorts = {};
+    game.loan = 0;
+    game.interestRate = 3.5;
+    game.inflation = 2.1;
+    game.totalDividendsEarned = 0;
+    updateEcoBar();
+    updateMarginPanel();
+  };
+})();
+
+// Wire chart open to track which stock is being shown
+(function patchChartOpen(){
+  const orig = renderChart;
+  renderChart = function(stockId){
+    chartStockId = stockId || null;
+    orig(stockId);
+    // Re-attach tooltip wiring each time chart is shown
+    attachChartTooltip();
+  };
+})();
 </script>
 
 <script>
