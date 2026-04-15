@@ -595,7 +595,7 @@
         <div class="score-label">Your Current Net Worth</div>
       </div>
       <div style="margin-top:4px;">
-        <label class="small" style="font-weight:800;display:block;margin-bottom:6px;color:#00d4ff;">Your name on the leaderboard:</label>
+        <label for="submitScoreName" class="small" style="font-weight:800;display:block;margin-bottom:6px;color:#00d4ff;">Your name on the leaderboard:</label>
         <input id="submitScoreName" class="submit-name-input" type="text" maxlength="30" placeholder="Enter your trader name" autocomplete="off" />
       </div>
       <div class="controls" style="margin-top:16px;gap:10px;">
@@ -2762,7 +2762,7 @@ try { _soundEnabled = localStorage.getItem('mms_sound') !== 'false'; } catch(e){
 
 function _getAudioCtx(){
   if (!_audioCtx){ try { _audioCtx = new AudioCtx(); } catch(e){ return null; } }
-  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume().catch(()=>{});
   return _audioCtx;
 }
 
