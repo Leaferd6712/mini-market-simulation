@@ -193,6 +193,24 @@
     @keyframes screenShake{ 0%,100%{transform:translate(0,0)} 15%{transform:translate(-5px,3px)} 30%{transform:translate(5px,-3px)} 45%{transform:translate(-4px,4px)} 60%{transform:translate(4px,-2px)} 75%{transform:translate(-2px,2px)} 90%{transform:translate(2px,-1px)} }
     body.market-crash{ animation:screenShake 0.65s ease; }
 
+    /* ── CONFETTI ────────────────────────────────────────── */
+    @keyframes confettiFall{ 0%{opacity:1;transform:translateY(0) rotate(0deg) scale(1)} 80%{opacity:1} 100%{opacity:0;transform:translateY(105vh) rotate(900deg) scale(0.5)} }
+    .confetti-piece{ position:fixed; pointer-events:none; z-index:20000; animation:confettiFall linear forwards; border-radius:2px; }
+
+    /* ── SCORE SUBMIT MODAL ──────────────────────────────── */
+    .submit-score-amount{ text-align:center; padding:18px; margin:10px 0; background:linear-gradient(135deg,rgba(0,212,255,0.1),rgba(0,255,136,0.07)); border:1px solid rgba(0,212,255,0.25); border-radius:12px; }
+    .submit-score-amount .big-score{ font-size:32px; font-weight:900; background:linear-gradient(90deg,#00d4ff,#00ff88); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .submit-score-amount .score-label{ font-size:12px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-top:4px; }
+    .submit-name-input{ width:100%; box-sizing:border-box; padding:12px 14px; border-radius:10px; border:1px solid rgba(0,212,255,0.3); font-size:15px; background:rgba(0,212,255,0.06); color:#e0e8f0; font-weight:700; margin-top:10px; transition:border-color .2s; }
+    .submit-name-input:focus{ outline:none; border-color:rgba(0,212,255,0.6); box-shadow:0 0 0 3px rgba(0,212,255,0.1); }
+    body.light-mode .submit-name-input{ color:#1a202c; background:rgba(14,165,233,0.06); }
+    .submit-score-btn{ background:linear-gradient(90deg,#00d4ff,#00ff88); color:#0f1419; border:none; font-weight:900; padding:12px 28px; border-radius:10px; font-size:15px; cursor:pointer; transition:all .2s; box-shadow:0 8px 24px rgba(0,212,255,0.3); }
+    .submit-score-btn:hover{ transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,212,255,0.45); }
+
+    /* ── MUTE BUTTON ─────────────────────────────────────── */
+    .mute-btn{ font-size:16px; padding:8px 10px; transition:opacity .2s; }
+    .mute-btn.muted{ opacity:0.45; }
+
     /* ── ECONOMIC INDICATORS ─────────────────────────────── */
     .eco-bar{ display:flex; gap:12px; flex-wrap:wrap; padding:10px 14px; background:linear-gradient(90deg,rgba(0,212,255,0.06),rgba(0,255,136,0.03)); border:1px solid rgba(0,212,255,0.12); border-radius:10px; font-size:12px; margin-top:8px; }
     .eco-item{ display:flex; flex-direction:column; gap:2px; }
@@ -306,6 +324,7 @@
         </div>
         <div class="group">
           <button id="themeToggleBtn" class="compact ghost theme-btn" title="Toggle Light/Dark Mode">🌙</button>
+          <button id="soundToggleBtn" class="compact ghost mute-btn" title="Toggle Sound">🔊</button>
           <button id="glossaryBtn" class="compact ghost" title="Financial Glossary">📖 Glossary</button>
           <button id="shortcutsBtn" class="compact ghost" title="Keyboard Shortcuts">⌨️</button>
           <button id="exportSaveBtn" class="compact ghost" title="Export Save to File">💾 Export</button>
@@ -563,6 +582,25 @@
       <div class="controls" style="margin-top:12px;">
         <button id="tradeCancel" class="btn-secondary">Cancel</button>
         <button id="tradeConfirm" class="btn-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBMIT SCORE MODAL -->
+  <div id="submitScoreOverlay" class="modal-overlay" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal" role="document" style="max-width:420px;">
+      <h2>🚀 Submit Your Score</h2>
+      <div class="submit-score-amount">
+        <div class="big-score" id="submitScoreAmount">$0</div>
+        <div class="score-label">Your Current Net Worth</div>
+      </div>
+      <div style="margin-top:4px;">
+        <label class="small" style="font-weight:800;display:block;margin-bottom:6px;color:#00d4ff;">Your name on the leaderboard:</label>
+        <input id="submitScoreName" class="submit-name-input" type="text" maxlength="30" placeholder="Enter your trader name" autocomplete="off" />
+      </div>
+      <div class="controls" style="margin-top:16px;gap:10px;">
+        <button id="submitScoreCancel" class="btn-secondary">Cancel</button>
+        <button id="submitScoreConfirm" class="submit-score-btn">Submit to Global 🌍</button>
       </div>
     </div>
   </div>
@@ -1148,6 +1186,7 @@ function unlockAchievement(achievementId){
   const ach = ACHIEVEMENTS[achievementId];
   showNotification(`🏆 Achievement Unlocked: ${ach.name}`, 6000);
   logEvent(`Achievement: ${ach.name}`);
+  playAchievementSound();
   renderAchievements();
   autoSave();
 }
@@ -1408,6 +1447,7 @@ tradeConfirm.addEventListener('click', ()=>{
     logEvent(`Bought ${shares} × ${s.name}.`);
     game.lastDaySharesBought = (game.lastDaySharesBought||0) + shares;
     game.totalTrades++;
+    playBuySound();
   } else {
     const owned = (game.portfolio[s.id]||{shares:0}).shares;
     if (owned <= 0){ alert("You don't own shares"); return; }
@@ -1423,6 +1463,8 @@ tradeConfirm.addEventListener('click', ()=>{
     game.lastSaleProfitPct = Math.max(game.lastSaleProfitPct || 0, profitPct);
     game.totalProfit = round2((game.totalProfit||0) + pnl);
     game.totalTrades++;
+    // Play sound based on profit/loss
+    if (pnl >= 0) playSellProfitSound(); else playSellLossSound();
     // Show floating P&L
     const cashDisp = document.getElementById('cash');
     if (cashDisp && typeof showFloat === 'function'){
@@ -1542,7 +1584,7 @@ function applySingleDay(weeklyNews){
   if (Math.random() < SHOCK_PROB_SURGE){ const t = pick(game.stocks); const g = rand(0.25,0.9); t.changePct += g; t.price = round2(t.price * (1 + g)); t.history.push(round2(t.price)); capArray(t.history, 200); logEvent(`⚡ ${t.name} had a sudden positive surprise!`); showNotification(`📈 ${t.name} jumped +${(g*100).toFixed(1)}% — great opportunity!`); }
   if (Math.random() < SHOCK_PROB_FALL){ const t = pick(game.stocks); const l = rand(0.2,0.7); t.changePct -= l; t.price = Math.max(0.01, round2(t.price * (1 - l))); t.history.push(round2(t.price)); capArray(t.history, 200); logEvent(`⚠️ ${t.name} experienced a sudden drop.`); showNotification(`📉 ${t.name} dropped ${(l*100).toFixed(1)}% — watch out!`);
     // Screen shake on major crash
-    if (l > 0.4) { document.body.classList.add('market-crash'); setTimeout(()=>document.body.classList.remove('market-crash'), 700); }
+    if (l > 0.4) { document.body.classList.add('market-crash'); setTimeout(()=>document.body.classList.remove('market-crash'), 700); playCrashSound(); }
   }
 
   // ── DIVIDENDS (every 7 days) ───────────────────────────
@@ -1774,6 +1816,7 @@ contractSign.addEventListener('click', ()=> {
   } else {
     logEvent(`Promoted to Level ${pendingContractLevel} - ${contract.title}!`);
     showNotification(`🎉 Level ${pendingContractLevel} - ${contract.title}! Welcome, ${playerName}!`);
+    playLevelUpSound();
   }
   renderCategoryTiles();
   renderStocksForCategory();
@@ -2003,11 +2046,28 @@ function renderChart(stockId){
 
 function getLeaderboard(){ try { return JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]'); } catch(e){ return []; } }
 function setLeaderboard(list){ localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(list)); }
-function saveScoreToLeaderboard(){
-  const name = prompt('Enter your name for the leaderboard:', game.playerName || 'Player');
-  if (name === null) return;
-  const cleanName = name.trim().slice(0, 30) || 'Player';
+
+function openSubmitScoreModal(){
   const net = round2(game.cash + Object.keys(game.portfolio).reduce((a,id)=>{ const e=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return a+(s?s.price*e.shares:0); },0));
+  const nameInput = document.getElementById('submitScoreName');
+  nameInput.value = game.playerName && game.playerName !== 'Trader' ? game.playerName : (_globalPlayerName || '');
+  document.getElementById('submitScoreAmount').textContent = money(net);
+  const overlay = document.getElementById('submitScoreOverlay');
+  overlay.style.display = 'flex';
+  overlay.querySelector('.modal').classList.add('show');
+  setTimeout(()=> nameInput.focus(), 200);
+}
+
+function saveScoreToLeaderboard(nameOverride){
+  const nameInput = document.getElementById('submitScoreName');
+  const rawName = nameOverride !== undefined ? nameOverride : (nameInput ? nameInput.value : (game.playerName || 'Player'));
+  const cleanName = rawName.trim().slice(0, 30) || 'Player';
+  const net = round2(game.cash + Object.keys(game.portfolio).reduce((a,id)=>{ const e=game.portfolio[id]; const s=game.stocks.find(x=>x.id===id); return a+(s?s.price*e.shares:0); },0));
+
+  // Close submit modal if open
+  const submitOverlay = document.getElementById('submitScoreOverlay');
+  if (submitOverlay) { submitOverlay.style.display='none'; submitOverlay.querySelector('.modal').classList.remove('show'); }
+
   // Save locally (one entry per player name)
   const board = getLeaderboard();
   const key = cleanName.toLowerCase();
@@ -2024,16 +2084,31 @@ function saveScoreToLeaderboard(){
   }
   board.sort((a,b)=>b.score - a.score);
   setLeaderboard(board.slice(0, 50));
-  // Also submit globally (non-blocking)
+
+  // Update player name in game state
+  if (cleanName && cleanName !== 'Player') game.playerName = cleanName;
+
+  // Set player name for rank lookup before opening leaderboard
+  _globalPlayerName = cleanName;
+
+  // Open leaderboard on global tab immediately
+  showLeaderboard();
+  switchLbTab('global');
+
+  // Submit globally (async)
   submitGlobalScore(cleanName, net, game.day, game.level)
     .then(rank => {
       const msg = keptExistingLocalBest
-        ? (rank ? `Your best score was kept. Current global rank: #${rank}` : 'Your best local score was kept.')
-        : (rank ? `Score saved! Your global rank: #${rank}` : 'Saved locally. (Configure Supabase for global ranking.)');
-      showNotification('🏆 ' + msg, 4500);
-    });
-  showLeaderboard();
-  switchLbTab('local');
+        ? (rank ? `Your all-time best was kept. Global rank: #${rank} 🌍` : 'Your local best score was kept.')
+        : (rank ? `Score saved! Global rank: #${rank} 🌍` : 'Score saved locally.');
+      showNotification('🏆 ' + msg, 5000);
+      // Fire confetti for top-10 finishes
+      if (rank && rank <= 10) showConfetti();
+      // Refresh global leaderboard pane if still open
+      const globalPane = document.getElementById('lbPaneGlobal');
+      if (globalPane && globalPane.style.display !== 'none') renderGlobalLeaderboard();
+    })
+    .catch(()=> showNotification('Score saved locally. Global submit failed.', 4000));
 }
 
 function showLeaderboard(){
@@ -2076,7 +2151,9 @@ async function renderGlobalLeaderboard(){
     if (!data.top10.length){ listEl.innerHTML = '<div class="small muted" style="padding:16px;">No global scores yet — be the first!</div>'; }
     data.top10.forEach((item, i)=>{
       const div = document.createElement('div'); div.className = 'lb-entry';
-      div.innerHTML = `<span class="lb-rank">${medals[i] || '#'+(i+1)}</span><span class="lb-name">${item.player_name}</span><span class="lb-score">${money(item.score)}</span><span class="lb-meta">Day ${item.day||'?'} · Lv${item.level||'?'}</span>`;
+      const isYou = _globalPlayerName && item.player_name.trim().toLowerCase() === _globalPlayerName.trim().toLowerCase();
+      if (isYou) div.classList.add('lb-you');
+      div.innerHTML = `<span class="lb-rank">${medals[i] || '#'+(i+1)}</span><span class="lb-name">${item.player_name}${isYou ? ' <span style="font-size:10px;color:#00d4ff;font-weight:700;">(you)</span>' : ''}</span><span class="lb-score">${money(item.score)}</span><span class="lb-meta">Day ${item.day||'?'} · Lv${item.level||'?'}</span>`;
       listEl.appendChild(div);
     });
     if (data.playerRank){
@@ -2107,7 +2184,22 @@ function switchLbTab(tab){
 
 leaderboardClose.addEventListener('click', ()=>{ leaderboardOverlay.style.display='none'; leaderboardOverlay.querySelector('.modal').classList.remove('show'); });
 leaderboardClear.addEventListener('click', ()=>{ if (confirm('Clear local leaderboard?')){ setLeaderboard([]); renderLocalLeaderboard(); } });
-document.getElementById('lbSubmitBtn').addEventListener('click', saveScoreToLeaderboard);
+document.getElementById('lbSubmitBtn').addEventListener('click', openSubmitScoreModal);
+
+// Submit score modal handlers
+document.getElementById('submitScoreCancel').addEventListener('click', ()=>{
+  const overlay = document.getElementById('submitScoreOverlay');
+  overlay.style.display = 'none'; overlay.querySelector('.modal').classList.remove('show');
+});
+document.getElementById('submitScoreConfirm').addEventListener('click', ()=>{
+  const nameVal = document.getElementById('submitScoreName').value.trim();
+  if (!nameVal){ document.getElementById('submitScoreName').focus(); return; }
+  playSubmitSound();
+  saveScoreToLeaderboard();
+});
+document.getElementById('submitScoreName').addEventListener('keydown', (e)=>{
+  if (e.key === 'Enter') document.getElementById('submitScoreConfirm').click();
+});
 
 function autoSave(){ try { const save = { v:6, day:game.day, cash:game.cash, portfolio:game.portfolio, stocks:game.stocks.map(s=>({id:s.id,price:s.price,history:s.history.slice(-120)})), currentWeek, totalWeeks, totalDays, pendingWeeklyNews, bonusGiven: game.bonusGiven, level: game.level, levelUpUnlocked: game.levelUpUnlocked, playerName: game.playerName, leaderboardPromptShown: game.leaderboardPromptShown }; localStorage.setItem(STORAGE_KEY, JSON.stringify(save)); } catch(e){} }
 function manualSave(){ autoSave(); alert('Saved locally.'); }
@@ -2180,10 +2272,8 @@ function updateProgress(){
   const profit = round2(networth - STANDARD.startingMoney);
   if (!game.leaderboardPromptShown && profit >= LEADERBOARD_PROMPT_PROFIT){
     game.leaderboardPromptShown = true;
-    const wantsUpload = confirm(`Nice work! You made ${money(profit)} profit. Upload your score to the leaderboard now?`);
-    if (wantsUpload){
-      saveScoreToLeaderboard();
-    }
+    showNotification(`🚀 You're up ${money(profit)}! Submit your score to the global leaderboard?`, 8000);
+    setTimeout(()=> openSubmitScoreModal(), 800);
   }
   if (networth < 5000 && !game.bonusGiven){
     const bonus = 3000;
@@ -2663,6 +2753,89 @@ document.addEventListener('keydown', (e)=>{
 });
 
 // ============================================================
+// SOUND SYSTEM (Web Audio API)
+// ============================================================
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let _audioCtx = null;
+let _soundEnabled = true;
+try { _soundEnabled = localStorage.getItem('mms_sound') !== 'false'; } catch(e){}
+
+function _getAudioCtx(){
+  if (!_audioCtx){ try { _audioCtx = new AudioCtx(); } catch(e){ return null; } }
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+
+function _playTone(freq, type, duration, gainVal, startDelay=0){
+  if (!_soundEnabled) return;
+  try {
+    const ctx = _getAudioCtx(); if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = type; osc.frequency.value = freq;
+    const t = ctx.currentTime + startDelay;
+    gain.gain.setValueAtTime(gainVal, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+    osc.start(t); osc.stop(t + duration + 0.01);
+  } catch(e){}
+}
+
+function playBuySound(){
+  _playTone(440,'sine',0.08,0.18,0);
+  _playTone(550,'sine',0.08,0.18,0.07);
+}
+function playSellProfitSound(){
+  _playTone(523,'sine',0.10,0.2,0);
+  _playTone(659,'sine',0.10,0.2,0.08);
+  _playTone(784,'sine',0.14,0.2,0.16);
+}
+function playSellLossSound(){
+  _playTone(330,'sawtooth',0.12,0.2,0);
+  _playTone(262,'sawtooth',0.16,0.15,0.10);
+}
+function playAchievementSound(){
+  [880,1108,1320].forEach((f,i)=> _playTone(f,'sine',0.14,0.22,i*0.08));
+}
+function playLevelUpSound(){
+  [523,659,784,1047].forEach((f,i)=> _playTone(f,'sine',0.18,0.25,i*0.09));
+}
+function playCrashSound(){
+  [200,150,100].forEach((f,i)=> _playTone(f,'sawtooth',0.22,0.35,i*0.11));
+}
+function playSubmitSound(){
+  [440,554,659,880].forEach((f,i)=> _playTone(f,'sine',0.16,0.28,i*0.10));
+}
+
+function _updateMuteBtn(){
+  const btn = document.getElementById('soundToggleBtn');
+  if (!btn) return;
+  btn.textContent = _soundEnabled ? '🔊' : '🔇';
+  btn.classList.toggle('muted', !_soundEnabled);
+  btn.title = _soundEnabled ? 'Mute Sound' : 'Unmute Sound';
+}
+
+// ============================================================
+// CONFETTI ANIMATION
+// ============================================================
+function showConfetti(duration=3000){
+  const colors = ['#00d4ff','#00ff88','#ffa500','#ff6b9d','#a78bfa','#ffb020','#ffffff'];
+  const count = 70;
+  for (let i=0; i<count; i++){
+    setTimeout(()=>{
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      const size = 6 + Math.random() * 9;
+      const startX = Math.random() * 100;
+      const fallDur = 1.8 + Math.random() * 1.8;
+      el.style.cssText = `left:${startX}vw;top:-14px;width:${size}px;height:${size * (Math.random()>0.5 ? 1 : 2.5)}px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${fallDur}s;`;
+      document.body.appendChild(el);
+      setTimeout(()=> el.remove(), (fallDur + 0.5) * 1000);
+    }, Math.random() * Math.min(duration * 0.55, 1200));
+  }
+}
+
+// ============================================================
 // INIT NEW FEATURES AFTER DOMContentLoaded
 // ============================================================
 function initNewFeatures(){
@@ -2674,6 +2847,23 @@ function initNewFeatures(){
     if (t === 'light') applyTheme(true);
   } catch(e){}
   updateEcoBar();
+  // Wire mute button
+  _updateMuteBtn();
+  const soundBtn = document.getElementById('soundToggleBtn');
+  if (soundBtn){
+    soundBtn.addEventListener('click', ()=>{
+      _soundEnabled = !_soundEnabled;
+      try { localStorage.setItem('mms_sound', _soundEnabled ? 'true' : 'false'); } catch(e){}
+      _updateMuteBtn();
+    });
+  }
+  // Close submit score overlay on backdrop click
+  document.getElementById('submitScoreOverlay').addEventListener('click', (e)=>{
+    if (e.target === document.getElementById('submitScoreOverlay')){
+      document.getElementById('submitScoreOverlay').style.display = 'none';
+      document.getElementById('submitScoreOverlay').querySelector('.modal').classList.remove('show');
+    }
+  });
 }
 
 // ============================================================
