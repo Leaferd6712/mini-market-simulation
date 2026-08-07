@@ -4,6 +4,10 @@ Educational browser stock-trading game. Modular Vite + vanilla ES modules build.
 
 **Play:** [https://leaferd6712.github.io/mini-market-simulation/](https://leaferd6712.github.io/mini-market-simulation/)
 
+## Deploy
+
+Step-by-step GitHub Pages + Supabase instructions: **[DEPLOY.md](DEPLOY.md)**
+
 ## Develop
 
 ```bash
