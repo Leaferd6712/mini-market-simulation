@@ -6,14 +6,23 @@ Educational browser stock-trading game. Modular Vite + vanilla ES modules build.
 
 ## Deploy
 
-Step-by-step GitHub Pages + Supabase instructions: **[DEPLOY.md](DEPLOY.md)**
+GitHub Pages (static game) + laptop Python API / Cloudflare tunnel (shared leaderboard): **[DEPLOY.md](DEPLOY.md)**
+
+Port **8788** for the leaderboard API (KartBlitz uses **8787**).
 
 ## Develop
 
 ```bash
-cp .env.example .env   # already has public Supabase URL/anon key if using the default project
+cp .env.example .env   # VITE_LB_API_BASE=http://localhost:8788
 npm install
 npm run dev
+```
+
+In another terminal:
+
+```bash
+cd server
+python app.py
 ```
 
 ## Scripts
@@ -24,24 +33,25 @@ npm run dev
 | `npm run build` | Production build → `dist/` (base `/mini-market-simulation/`) |
 | `npm run preview` | Preview production build |
 | `npm test` / `npm run test:run` | Vitest once |
+| `server/start-leaderboard.bat` | Start API on 8788 (+ cloudflared if on PATH) |
 
 ## Architecture
 
 - `src/data` — stocks, news, quests, achievements, levels
 - `src/sim` — day loop, economy, trading, dividends, news generation
 - `src/persist` — local save (v7) + local leaderboard
-- `src/api` — global leaderboard (REST read; Edge Function write)
-- `src/ui` — render, modals, charts, audio, a11y
-- `src/game` — loop + boot/init
+- `src/api` — global leaderboard client (`VITE_LB_API_BASE`)
+- `server/` — laptop leaderboard API (SQLite)
+- `src/game` — UI + boot
 
-## Leaderboard / Supabase
+## Leaderboard
 
-1. Apply `supabase/migrations/001_leaderboard_rls.sql` (revokes anon insert/update; keeps public select).
-2. Deploy `supabase/functions/submit-score` with service role secrets.
-3. Client submits scores only to `${VITE_SUPABASE_URL}/functions/v1/submit-score`.
-4. Client reads via REST GET on `leaderboard`.
+1. Run `python server/app.py` (port **8788**).
+2. Expose with `cloudflared tunnel --url http://localhost:8788`.
+3. Set `VITE_LB_API_BASE` to that URL and rebuild/redeploy Pages.
+4. Client: `POST /api/submit-score`, `GET /api/leaderboard`.
 
-Player names are sanitized (strip tags, alphanumeric + spaces/`_`/`-`, max 30) on client and in the Edge Function.
+Player names are sanitized (strip tags, alphanumeric + spaces/`_`/`-`/`'`.`, max 30) on client and server.
 
 ## Save format
 

@@ -7,7 +7,7 @@ import {
   LEADERBOARD_PROMPT_PROFIT,
   INITIAL_TOTAL_DAYS,
   EXTENDED_TOTAL_DAYS,
-  isSupabaseConfigured,
+  isLeaderboardConfigured,
 } from '../config.js';
 import { money, round2, pick, rand, capArray, pctText } from '../utils/format.js';
 import { sanitizePlayerName } from '../utils/sanitize.js';
@@ -1192,8 +1192,8 @@ async function renderGlobalLeaderboard(){
   const rankEl = document.getElementById('lbYourRank');
   if (!listEl) return;
   // Check config
-  if (!isSupabaseConfigured()){
-    listEl.innerHTML = '<div class="lb-config-warn">⚠️ Global leaderboard is not configured yet.<br>Follow the setup guide to connect your Supabase database.</div>';
+  if (!isLeaderboardConfigured()){
+    listEl.innerHTML = '<div class="lb-config-warn">⚠️ Global leaderboard is offline or not configured.<br>Start the laptop API (port 8788) + Cloudflare tunnel, set VITE_LB_API_BASE, and redeploy. See DEPLOY.md.</div>';
     rankEl.style.display = 'none';
     return;
   }

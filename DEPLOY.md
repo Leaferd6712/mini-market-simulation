@@ -1,200 +1,173 @@
 # Deploy Mini Market Simulation
 
-This guide covers deploying the educational stock game to **GitHub Pages**, plus the optional **Supabase** setup for the global leaderboard.
+Static game on **GitHub Pages**. Shared (global) leaderboard runs on **your laptop** via Python + a Cloudflare quick tunnel — same idea as KartBlitz, but on **port 8788** so KartBlitz can keep using **8787**.
 
-Live URL (after Pages is enabled):  
-`https://<your-github-username>.github.io/mini-market-simulation/`
+Live game URL (example):  
+`https://leaferd6712.github.io/mini-market-simulation/`
 
----
-
-## Prerequisites
-
-- Node.js **20+** and npm
-- A GitHub repository (this project)
-- (Optional, for global leaderboard) A free [Supabase](https://supabase.com) project and the [Supabase CLI](https://supabase.com/docs/guides/cli)
+Scores only sync while the laptop API + tunnel are running.
 
 ---
 
-## 1. One-time: enable GitHub Pages
+## What you need
 
-1. Push this repo to GitHub (default branch: `main`).
-2. Open the repo on GitHub → **Settings** → **Pages**.
-3. Under **Build and deployment**, set **Source** to **GitHub Actions**.
-4. Do **not** use “Deploy from a branch” — the workflow builds Vite output into `dist/` and uploads that.
-
-The workflow file is [`.github/workflows/static.yml`](.github/workflows/static.yml). It runs on every push to `main` and via **Actions → Deploy static content to Pages → Run workflow**.
+- Node.js 20+ (to build/deploy the game)
+- Python 3 on PATH (`python --version`)
+- `cloudflared` (e.g. `C:\Users\663208\Downloads\Applications\cloudflared-windows-amd64.exe`)
+- This repo, especially [`server/app.py`](server/app.py)
 
 ---
 
-## 2. Configure build secrets (recommended)
+## 1. One-time: GitHub Pages
 
-Vite bakes `VITE_*` values into the client at **build** time. Add these as repository secrets so CI can build a working leaderboard:
+1. Push to GitHub (`main`).
+2. Repo **Settings** → **Pages** → Source = **GitHub Actions**.
+3. Add Actions secret (optional until you have a tunnel URL):
 
-1. GitHub repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
-2. Create:
+| Secret | Value |
+|--------|--------|
+| `VITE_LB_API_BASE` | Your current tunnel URL, e.g. `https://something.trycloudflare.com` (no trailing slash) |
 
-| Secret name | Value |
-|-------------|--------|
-| `VITE_SUPABASE_URL` | Your project URL, e.g. `https://xxxx.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | Project **anon public** key (Settings → API) |
-
-The anon key is designed to be public in the browser. Score **writes** go through an Edge Function with the service role (never put the service role in `VITE_*` or client code).
-
-If these secrets are missing, the game still deploys; local save and play work, but global leaderboard submit/read will be disabled until configured.
+The workflow builds Vite with that env var baked into the client.
 
 ---
 
-## 3. Deploy the static site
+## 2. Every time you want the shared leaderboard online
 
-### Automatic (usual path)
+### 2.1 Start the API (port 8788)
+
+```bat
+cd C:\Users\663208\Downloads\mini-market-simulation\server
+python app.py
+```
+
+Or double-click [`server/start-leaderboard.bat`](server/start-leaderboard.bat) (starts API + tries to start cloudflared).
+
+Leave the window open. You should see:
+
+```text
+Mini Market leaderboard serving on http://localhost:8788
+```
+
+Check: http://localhost:8788/api/health → `{"ok": true, "service": "mini-market-leaderboard", "port": 8788}`
+
+### 2.2 Start the Cloudflare tunnel
+
+Second Command Prompt:
+
+```bat
+"C:\Users\663208\Downloads\Applications\cloudflared-windows-amd64.exe" tunnel --url http://localhost:8788
+```
+
+Copy the URL from **Your quick Tunnel has been created!**, for example:
+
+```text
+https://casinos-theaters-agencies-boards.trycloudflare.com
+```
+
+Leave this window open too.
+
+### 2.3 Point the game at the tunnel URL
+
+1. Set locally and/or as GitHub secret:
+
+```env
+VITE_LB_API_BASE=https://YOUR-CURRENT-TUNNEL-URL
+```
+
+2. Rebuild and redeploy Pages (`git push` to `main`, or run the workflow manually).
+
+Quick tunnel URLs change each time you restart `cloudflared`. When the URL changes, update `VITE_LB_API_BASE` and redeploy.
+
+Skip redeploy only if the baked URL already matches today’s tunnel.
+
+### 2.4 Play / share
+
+- Share the **GitHub Pages** game URL.
+- Global leaderboard works while both laptop windows stay open.
+- If Global shows offline / not configured, the API or tunnel is down, or `VITE_LB_API_BASE` is wrong.
+
+---
+
+## Keep both windows open
+
+| Window | Role |
+|--------|------|
+| `python app.py` | Stores scores in `server/scores.db` on **8788** |
+| `cloudflared ... 8788` | Lets the internet reach your laptop |
+
+Also:
+
+- Keep the laptop **plugged in and awake** (sleep kills the board).
+- Closing either window = shared leaderboard goes offline (Pages game still loads; local browser leaderboard still works).
+
+**Port reminder:** KartBlitz = **8787**, Mini Market = **8788**.
+
+---
+
+## Local game + local API (no tunnel)
+
+```bat
+cd C:\Users\663208\Downloads\mini-market-simulation
+copy .env.example .env
+npm install
+npm run dev
+```
+
+With `VITE_LB_API_BASE=http://localhost:8788` and `python server/app.py` running, Global submit works from the Vite dev server without cloudflared.
+
+---
+
+## Deploy the static site only
 
 ```bash
-git add -A
-git commit -m "Your message"
 git push origin main
 ```
 
-Then:
-
-1. Open **Actions** and wait for **Deploy static content to Pages** to finish (green).
-2. Visit `https://<username>.github.io/mini-market-simulation/`  
-   (first deploy can take a minute after the workflow completes.)
-
-### Manual workflow run
-
-GitHub → **Actions** → **Deploy static content to Pages** → **Run workflow**.
-
-### What the workflow does
-
-1. `npm ci`
-2. `npm test`
-3. `npm run build` → `dist/` (asset base `/mini-market-simulation/`)
-4. Upload **only** `dist/` to GitHub Pages (legacy HTML / notes are not published)
-
-### Local production check (optional)
+Or **Actions** → **Deploy static content to Pages** → **Run workflow**.
 
 ```bash
-cp .env.example .env   # edit if needed
-npm install
 npm test
 npm run build
 npm run preview
 ```
 
-Open the preview URL Vite prints. Paths assume the app is served under `/mini-market-simulation/`.
+---
+
+## Useful checks
+
+| Check | URL |
+|-------|-----|
+| Local API | http://localhost:8788/api/health |
+| Public API (tunnel) | `https://YOUR-TUNNEL-URL/api/health` |
+
+Both should return `{"ok": true, ...}`.
 
 ---
 
-## 4. Supabase: global leaderboard (optional but recommended)
+## Stopping
 
-Without this, players can still use the **local** (browser) leaderboard. Global submit needs a table, RLS, and the Edge Function.
-
-### 4.1 Create the table + RLS
-
-1. Supabase Dashboard → **SQL Editor** → New query.
-2. Paste and run the full contents of [`supabase/migrations/001_leaderboard_rls.sql`](supabase/migrations/001_leaderboard_rls.sql).
-
-That script:
-
-- Creates `public.leaderboard` if needed  
-- Enables RLS  
-- Allows **public SELECT**  
-- **Revokes** direct `INSERT` / `UPDATE` / `DELETE` from `anon` and `authenticated`  
-- Leaves writes to the Edge Function (service role)
-
-### 4.2 Deploy the `submit-score` Edge Function
-
-Install and log in to the CLI if you have not already:
-
-```bash
-npm install -g supabase
-supabase login
-supabase link --project-ref <your-project-ref>
-```
-
-Deploy:
-
-```bash
-supabase functions deploy submit-score
-```
-
-Set secrets used by the function (service role stays server-side):
-
-```bash
-supabase secrets set SUPABASE_URL=https://<project-ref>.supabase.co
-supabase secrets set SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
-```
-
-Get the service role key from Dashboard → **Project Settings** → **API** → **service_role** (secret). Never commit it or expose it as a `VITE_` variable.
-
-### 4.3 Confirm client env
-
-Local `.env` (and GitHub Actions secrets) should match:
-
-```env
-VITE_SUPABASE_URL=https://<project-ref>.supabase.co
-VITE_SUPABASE_ANON_KEY=<anon-public-key>
-```
-
-Client behaviour:
-
-- **Read** ranks: REST `GET` on `/rest/v1/leaderboard`
-- **Submit** scores: `POST` to `/functions/v1/submit-score` only
-
-### 4.4 Smoke-test leaderboard
-
-1. Play locally or on Pages, reach a score, open **Leaderboard**.
-2. **Submit My Score** with a simple name (letters/numbers; max 30 chars).
-3. Switch to **Global** and confirm the entry appears.
-4. In Supabase → **Table Editor** → `leaderboard`, confirm the row.
-
-If submit fails with 401/403, check Edge Function deploy and secrets.  
-If submit works but direct table inserts from the browser still work, re-run the RLS migration (anon writes should be blocked).
+`Ctrl+C` in each Command Prompt, or close the windows.
 
 ---
 
-## 5. Changing the GitHub repo name / URL path
+## Troubleshooting
 
-Vite `base` is set to `/mini-market-simulation/` in [`vite.config.js`](vite.config.js).
-
-If the GitHub repo is renamed, update:
-
-1. `base` in `vite.config.js` to `/<new-repo-name>/`
-2. Any README / docs URLs
-3. Redeploy (`git push` or manual workflow)
-
-For a custom domain at the site root, set `base: '/'` and configure DNS + Pages custom domain.
-
----
-
-## 6. Troubleshooting
-
-| Symptom | Likely fix |
-|---------|------------|
-| 404 on Pages | Pages source must be **GitHub Actions**; wait for the latest successful deploy |
-| Blank page / wrong asset paths | Confirm `base` matches the repo name path |
-| Global leaderboard “not configured” | Set `VITE_SUPABASE_*` secrets and rebuild |
-| Score submit fails | Deploy `submit-score`, set function secrets, check browser Network tab |
-| Anyone can POST scores into the table | Re-apply RLS migration; revoke anon insert/update |
-| CI fails on `npm ci` | Commit `package-lock.json`; use Node 20+ |
-
----
-
-## 7. Security notes (short)
-
-- The **anon** key in the frontend is expected.
-- The **service role** key must only live in Supabase Edge Function secrets.
-- Names are sanitized; scores are clamped and lightly rate-limited in the function.
-- Without full replay verification, determined cheating is still possible — acceptable for this educational demo.
+| Symptom | Fix |
+|---------|-----|
+| Port in use | Something else on 8788; stop it or change `PORT` in `server/app.py` |
+| Global offline on Pages | Update `VITE_LB_API_BASE` secret to today’s tunnel URL and redeploy |
+| CORS / network errors | Confirm tunnel points at **8788**, not 8787 |
+| KartBlitz conflict | Unrelated — KartBlitz stays on 8787 |
 
 ---
 
 ## Quick checklist
 
 - [ ] Pages source = GitHub Actions  
-- [ ] `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` set as Actions secrets  
-- [ ] Push to `main` (or run workflow manually) succeeds  
-- [ ] Site loads at `https://<user>.github.io/mini-market-simulation/`  
-- [ ] SQL migration applied  
-- [ ] `submit-score` function deployed + secrets set  
-- [ ] Global score submit smoke-tested  
+- [ ] `python server/app.py` on **8788**  
+- [ ] `cloudflared tunnel --url http://localhost:8788`  
+- [ ] `VITE_LB_API_BASE` = current tunnel URL  
+- [ ] Pages rebuild after URL change  
+- [ ] Health check OK via tunnel  
+- [ ] Submit a score from the live game  

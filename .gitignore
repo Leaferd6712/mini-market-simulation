@@ -8,3 +8,4 @@ _extract/
 .vite/
 coverage/
 index.legacy.html
+server/scores.db

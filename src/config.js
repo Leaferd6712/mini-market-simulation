@@ -4,19 +4,15 @@ export const LEADERBOARD_KEY = 'marketSim_v6_leaderboard';
 export const LEADERBOARD_PROMPT_PROFIT = 500;
 export const SAVE_VERSION = 7;
 
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
-export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+/** Base URL for the laptop leaderboard API (no trailing slash). */
+export const LB_API_BASE = String(import.meta.env.VITE_LB_API_BASE || '').replace(/\/$/, '');
 
 export const INITIAL_TOTAL_DAYS = 365;
 export const EXTENDED_TOTAL_DAYS = 700;
 
-export function isSupabaseConfigured() {
-  return Boolean(
-    SUPABASE_URL &&
-      SUPABASE_ANON_KEY &&
-      !SUPABASE_URL.includes('YOUR_SUPABASE') &&
-      !SUPABASE_URL.includes('your-project') &&
-      !SUPABASE_ANON_KEY.includes('YOUR_') &&
-      !SUPABASE_ANON_KEY.includes('your-anon')
-  );
+export function isLeaderboardConfigured() {
+  return Boolean(LB_API_BASE && /^https?:\/\//i.test(LB_API_BASE));
 }
+
+/** @deprecated Use isLeaderboardConfigured */
+export const isSupabaseConfigured = isLeaderboardConfigured;
